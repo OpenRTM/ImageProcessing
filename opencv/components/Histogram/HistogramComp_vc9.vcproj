@@ -137,7 +137,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="$(rtm_lib) $(coil_lib) cv200.lib highgui200.lib cvaux200.lib cxcore200.lib"
+				AdditionalDependencies="$(rtm_lib) $(coil_lib)"
 				OutputFile="$(OutDir)\HistogramComp.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="false"

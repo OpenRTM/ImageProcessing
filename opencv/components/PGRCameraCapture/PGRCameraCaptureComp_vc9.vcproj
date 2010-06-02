@@ -140,7 +140,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="$(rtm_lib) $(coil_lib) FlyCapture2.lib FlyCapture2GUI.lib cv200.lib highgui200.lib cvaux200.lib cxcore200.lib"
+				AdditionalDependencies="$(rtm_lib) $(coil_lib) FlyCapture2.lib FlyCapture2GUI.lib"
 				OutputFile="$(OutDir)\PGRCameraCaptureComp.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;C:\OpenCV2.0\lib&quot;;&quot;C:\Program Files\Point Grey Research\FlyCapture2\lib&quot;"
