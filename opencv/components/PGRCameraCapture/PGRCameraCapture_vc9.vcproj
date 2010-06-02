@@ -43,7 +43,6 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;C:\OpenCV2.0\include&quot;;&quot;C:\Program Files\Point Grey Research\FlyCapture2\include&quot;"
 				PreprocessorDefinitions="USE_stub_in_nt_dll;WIN32;_DEBUG;_WINDOWS;_USRDLL;__WIN32__;__NT__;__OSVERSION__=4;__x86__;_WIN32_WINNT=0x0500;_CRT_SECURE_NO_DEPRECATE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -66,7 +65,6 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="$(rtm_libd) $(coil_libd) FlyCapture2.lib FlyCapture2GUId.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;C:\OpenCV2.0\lib&quot;;&quot;C:\Program Files\Point Grey Research\FlyCapture2\lib&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -120,7 +118,6 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;C:\OpenCV2.0\include&quot;;&quot;C:\Program Files\Point Grey Research\FlyCapture2\include&quot;"
 				PreprocessorDefinitions="USE_stub_in_nt_dll;WIN32;NDEBUG;_WINDOWS;_USRDLL;__WIN32__;__NT__;__OSVERSION__=4;__x86__;_WIN32_WINNT=0x0500;_CRT_SECURE_NO_DEPRECATE"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -141,7 +138,6 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="$(rtm_lib) $(coil_lib) FlyCapture2.lib FlyCapture2GUI.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;C:\OpenCV2.0\lib&quot;;&quot;C:\Program Files\Point Grey Research\FlyCapture2\lib&quot;"
 				GenerateDebugInformation="false"
 				SubSystem="2"
 				OptimizeReferences="2"
