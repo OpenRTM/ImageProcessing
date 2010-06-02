@@ -63,7 +63,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="$(rtm_libd) cv200d.lib highgui200d.lib cvaux200d.lib cxcore200d.lib"
+				AdditionalDependencies="$(rtm_libd) $(coil_libd)"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="2"

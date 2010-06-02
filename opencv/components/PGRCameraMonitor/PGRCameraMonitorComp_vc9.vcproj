@@ -64,7 +64,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="$(rtm_libd) $(coil_libd) cv200d.lib highgui200d.lib cvaux200d.lib cxcore200d.lib"
+				AdditionalDependencies="$(rtm_libd) $(coil_libd)"
 				OutputFile="$(OutDir)\PGRCameraMonitorComp.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;C:\OpenCV2.0\lib&quot;"
@@ -140,7 +140,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="$(rtm_lib) $(coil_lib)  cv200.lib highgui200.lib cvaux200.lib cxcore200.lib"
+				AdditionalDependencies="$(rtm_lib) $(coil_lib)"
 				OutputFile="$(OutDir)\PGRCameraMonitorComp.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;C:\OpenCV2.0\lib&quot;"

@@ -137,7 +137,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="$(rtm_lib) cv200d.lib highgui200d.lib cvaux200d.lib cxcore200d.lib"
+				AdditionalDependencies="$(rtm_lib) $(coil_lib)"
 				OutputFile="$(OutDir)\FlipComp.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="false"
