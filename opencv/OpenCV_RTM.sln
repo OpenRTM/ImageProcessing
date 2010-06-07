@@ -93,14 +93,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImageCalibration", "compone
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImageCalibrationComp", "components\ImageCalibration\ImageCalibrationComp_vc9.vcproj", "{D8B9C29B-8E43-48D8-8519-4B429AA3B25B}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PGRCameraCapture", "components\PGRCameraCapture\PGRCameraCapture_vc9.vcproj", "{54C8056C-25D8-46FA-9015-2163BC33BD86}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PGRCameraCaptureComp", "components\PGRCameraCapture\PGRCameraCaptureComp_vc9.vcproj", "{6C9954B6-46B6-4B9E-8BC6-C43704C9CE4D}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PGRCameraMonitor", "components\PGRCameraMonitor\PGRCameraMonitor_vc9.vcproj", "{76C97225-FC5B-4AD7-8062-0D9BD7BC48FE}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PGRCameraMonitorComp", "components\PGRCameraMonitor\PGRCameraMonitorComp_vc9.vcproj", "{53FCAD48-037D-434B-AC65-AEDD4D53058F}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libCVRTCSkel", "rtm\idl\libCVRTCSkel_vc9.vcproj", "{E4054092-4820-11DE-B424-001C23DA0BDF}"
 EndProject
 Global
@@ -293,22 +285,6 @@ Global
 		{D8B9C29B-8E43-48D8-8519-4B429AA3B25B}.Debug|Win32.Build.0 = Debug|Win32
 		{D8B9C29B-8E43-48D8-8519-4B429AA3B25B}.Release|Win32.ActiveCfg = Release|Win32
 		{D8B9C29B-8E43-48D8-8519-4B429AA3B25B}.Release|Win32.Build.0 = Release|Win32
-		{54C8056C-25D8-46FA-9015-2163BC33BD86}.Debug|Win32.ActiveCfg = Debug|Win32
-		{54C8056C-25D8-46FA-9015-2163BC33BD86}.Debug|Win32.Build.0 = Debug|Win32
-		{54C8056C-25D8-46FA-9015-2163BC33BD86}.Release|Win32.ActiveCfg = Release|Win32
-		{54C8056C-25D8-46FA-9015-2163BC33BD86}.Release|Win32.Build.0 = Release|Win32
-		{6C9954B6-46B6-4B9E-8BC6-C43704C9CE4D}.Debug|Win32.ActiveCfg = Debug|Win32
-		{6C9954B6-46B6-4B9E-8BC6-C43704C9CE4D}.Debug|Win32.Build.0 = Debug|Win32
-		{6C9954B6-46B6-4B9E-8BC6-C43704C9CE4D}.Release|Win32.ActiveCfg = Release|Win32
-		{6C9954B6-46B6-4B9E-8BC6-C43704C9CE4D}.Release|Win32.Build.0 = Release|Win32
-		{76C97225-FC5B-4AD7-8062-0D9BD7BC48FE}.Debug|Win32.ActiveCfg = Debug|Win32
-		{76C97225-FC5B-4AD7-8062-0D9BD7BC48FE}.Debug|Win32.Build.0 = Debug|Win32
-		{76C97225-FC5B-4AD7-8062-0D9BD7BC48FE}.Release|Win32.ActiveCfg = Release|Win32
-		{76C97225-FC5B-4AD7-8062-0D9BD7BC48FE}.Release|Win32.Build.0 = Release|Win32
-		{53FCAD48-037D-434B-AC65-AEDD4D53058F}.Debug|Win32.ActiveCfg = Debug|Win32
-		{53FCAD48-037D-434B-AC65-AEDD4D53058F}.Debug|Win32.Build.0 = Debug|Win32
-		{53FCAD48-037D-434B-AC65-AEDD4D53058F}.Release|Win32.ActiveCfg = Release|Win32
-		{53FCAD48-037D-434B-AC65-AEDD4D53058F}.Release|Win32.Build.0 = Release|Win32
 		{E4054092-4820-11DE-B424-001C23DA0BDF}.Debug|Win32.ActiveCfg = Debug|Win32
 		{E4054092-4820-11DE-B424-001C23DA0BDF}.Debug|Win32.Build.0 = Debug|Win32
 		{E4054092-4820-11DE-B424-001C23DA0BDF}.Release|Win32.ActiveCfg = Release|Win32
