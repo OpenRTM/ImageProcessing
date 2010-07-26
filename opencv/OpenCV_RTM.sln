@@ -33,13 +33,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Translate", "components\Tra
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TranslateComp", "components\Translate\TranslateComp_vc9.vcproj", "{B3694BE7-788B-446C-ABFF-139E37E5E9A3}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "USBCameraAcquire", "components\USBCameraAcquire\USBCameraAcquire_vc9.vcproj", "{47B02DC5-C5BB-4DEE-AD6B-621B64D14B2A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenCVCamera", "components\OpenCVCamera\OpenCVCamera_vc9.vcproj", "{47B02DC5-C5BB-4DEE-AD6B-621B64D14B2A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "USBCameraAcquireComp", "components\USBCameraAcquire\USBCameraAcquireComp_vc9.vcproj", "{6D62D887-F497-47A8-9228-E30DF83EE3A0}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenCVCameraComp", "components\OpenCVCamera\OpenCVCameraComp_vc9.vcproj", "{6D62D887-F497-47A8-9228-E30DF83EE3A0}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "USBCameraMonitor", "components\USBCameraMonitor\USBCameraMonitor_vc9.vcproj", "{AC05A614-45C6-4F2A-B107-4696926F5227}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CameraViewer", "components\CameraViewer\CameraViewer_vc9.vcproj", "{AC05A614-45C6-4F2A-B107-4696926F5227}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "USBCameraMonitorComp", "components\USBCameraMonitor\USBCameraMonitorComp_vc9.vcproj", "{07408BDE-4821-11DE-A433-001C23DA0BDF}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CameraViewerComp", "components\CameraViewer\CameraViewerComp_vc9.vcproj", "{07408BDE-4821-11DE-A433-001C23DA0BDF}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Edge", "components\Edge\Edge_vc9.vcproj", "{B46F0524-7AA9-43E6-A4BF-8F0713AB8251}"
 EndProject
@@ -92,6 +92,14 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImageCalibration", "components\ImageCalibration\ImageCalibration_vc9.vcproj", "{A09F7780-6398-4740-A50F-93E30E3E842A}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImageCalibrationComp", "components\ImageCalibration\ImageCalibrationComp_vc9.vcproj", "{D8B9C29B-8E43-48D8-8519-4B429AA3B25B}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PGRCamera", "components\PGRCamera\PGRCamera_vc9.vcproj", "{54C8056C-25D8-46FA-9015-2163BC33BD86}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PGRCameraComp", "components\PGRCamera\PGRCameraComp_vc9.vcproj", "{6C9954B6-46B6-4B9E-8BC6-C43704C9CE4D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IEEE1394CameraComp", "components\IEEE1394Camera\IEEE1394CameraComp_vc9.vcproj", "{B69C7E9B-1A13-4132-ACE7-6101DC2F84EF}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IEEE1394Camera", "components\IEEE1394Camera\IEEE1394Camera_vc9.vcproj", "{C1F88645-4FE4-4240-B25D-C91D93E154C3}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libCVRTCSkel", "rtm\idl\libCVRTCSkel_vc9.vcproj", "{E4054092-4820-11DE-B424-001C23DA0BDF}"
 EndProject
@@ -285,6 +293,22 @@ Global
 		{D8B9C29B-8E43-48D8-8519-4B429AA3B25B}.Debug|Win32.Build.0 = Debug|Win32
 		{D8B9C29B-8E43-48D8-8519-4B429AA3B25B}.Release|Win32.ActiveCfg = Release|Win32
 		{D8B9C29B-8E43-48D8-8519-4B429AA3B25B}.Release|Win32.Build.0 = Release|Win32
+		{54C8056C-25D8-46FA-9015-2163BC33BD86}.Debug|Win32.ActiveCfg = Debug|Win32
+		{54C8056C-25D8-46FA-9015-2163BC33BD86}.Debug|Win32.Build.0 = Debug|Win32
+		{54C8056C-25D8-46FA-9015-2163BC33BD86}.Release|Win32.ActiveCfg = Release|Win32
+		{54C8056C-25D8-46FA-9015-2163BC33BD86}.Release|Win32.Build.0 = Release|Win32
+		{6C9954B6-46B6-4B9E-8BC6-C43704C9CE4D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6C9954B6-46B6-4B9E-8BC6-C43704C9CE4D}.Debug|Win32.Build.0 = Debug|Win32
+		{6C9954B6-46B6-4B9E-8BC6-C43704C9CE4D}.Release|Win32.ActiveCfg = Release|Win32
+		{6C9954B6-46B6-4B9E-8BC6-C43704C9CE4D}.Release|Win32.Build.0 = Release|Win32
+		{B69C7E9B-1A13-4132-ACE7-6101DC2F84EF}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B69C7E9B-1A13-4132-ACE7-6101DC2F84EF}.Debug|Win32.Build.0 = Debug|Win32
+		{B69C7E9B-1A13-4132-ACE7-6101DC2F84EF}.Release|Win32.ActiveCfg = Release|Win32
+		{B69C7E9B-1A13-4132-ACE7-6101DC2F84EF}.Release|Win32.Build.0 = Release|Win32
+		{C1F88645-4FE4-4240-B25D-C91D93E154C3}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C1F88645-4FE4-4240-B25D-C91D93E154C3}.Debug|Win32.Build.0 = Debug|Win32
+		{C1F88645-4FE4-4240-B25D-C91D93E154C3}.Release|Win32.ActiveCfg = Release|Win32
+		{C1F88645-4FE4-4240-B25D-C91D93E154C3}.Release|Win32.Build.0 = Release|Win32
 		{E4054092-4820-11DE-B424-001C23DA0BDF}.Debug|Win32.ActiveCfg = Debug|Win32
 		{E4054092-4820-11DE-B424-001C23DA0BDF}.Debug|Win32.Build.0 = Debug|Win32
 		{E4054092-4820-11DE-B424-001C23DA0BDF}.Release|Win32.ActiveCfg = Release|Win32

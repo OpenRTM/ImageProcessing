@@ -17,11 +17,11 @@
 #
 
 #
-# autogen [--clean] [--prepare]
+# autogen [--clean] [--prepare] [--all]
 #
 # --clean  : delete all automatically generated file
 # --prepare: copy necessary files to build
-#
+# --all    : all component build
 
 prefix="/usr/local/bin/"
 am_ver="19"
@@ -182,6 +182,26 @@ do_autoreconf()
     echo ""
 }
 
+do_allComponent()
+{
+    echo "------------------------------------------------------------"
+    echo " Build all Component"
+    echo "------------------------------------------------------------"
+
+    mv configure.ac configure.bak
+    mv configure.all configure.ac
+    mv ./components/Makefile.am ./components/Makefile.bak
+    mv ./components/Makefile.all ./components/Makefile.am
+}
+
+do_allComponent_re()
+{
+    mv configure.ac configure.all
+    mv configure.bak configure.ac
+    mv ./components/Makefile.am ./components/Makefile.all
+    mv ./components/Makefile.bak ./components/Makefile.am
+}
+
 
 if [ "x$1" = "x--clean" ]; then
     delete_autogen_files
@@ -193,12 +213,19 @@ if [ "x$1" = "x--prepare" ]; then
     exit
 fi
 
+if [ "x$1" = "x--all" ]; then
+    do_allComponent
+fi
+
 echo ""
 echo "Setting up environment to generate configure script."
 echo ""
-
 
 find_autotools
 delete_autogen_files
 do_prepare
 do_autoreconf
+
+if [ "x$1" = "x--all" ]; then
+    do_allComponent_re
+fi

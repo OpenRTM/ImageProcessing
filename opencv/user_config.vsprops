@@ -2,7 +2,7 @@
 <VisualStudioPropertySheet
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="OpenCV"
+	Name="OpenCV_DirectShow"
 	>
 	<Tool
 		Name="VCCLCompilerTool"
@@ -10,15 +10,7 @@
 	/>
 	<Tool
 		Name="VCLinkerTool"
-		AdditionalLibraryDirectories="$(cv_libdir)"
-	/>
-	<UserMacro
-		Name="user_lib"
-		Value="$(cv_lib)"
-	/>
-	<UserMacro
-		Name="user_libd"
-		Value="$(cv_libd)"
+		AdditionalLibraryDirectories="$(cv_libdir);$(skel_libdir)"
 	/>
 	<UserMacro
 		Name="cv_root"
@@ -33,6 +25,10 @@
 		Value="&quot;$(cv_root)\lib&quot;"
 	/>
 	<UserMacro
+		Name="skel_libdir"
+		Value="&quot;$(SolutionDir)\bin\&quot;"
+	/>
+	<UserMacro
 		Name="cv_bin"
 		Value="$(cv_root)\bin"
 	/>
@@ -43,5 +39,21 @@
 	<UserMacro
 		Name="cv_libd"
 		Value="cv210d.lib highgui210d.lib cxcore210d.lib"
+	/>
+	<UserMacro
+		Name="ds_lib"
+		Value="strmiids.lib winmm.lib strmbase.lib quartz.lib comsuppw.lib"
+	/>
+	<UserMacro
+		Name="ds_libd"
+		Value="strmiids.lib winmm.lib strmbasd.lib quartz.lib comsuppw.lib"
+	/>
+	<UserMacro
+		Name="skel_lib"
+		Value="libCVRTCSkel.lib"
+	/>
+	<UserMacro
+		Name="skel_libd"
+		Value="libCVRTCSkeld.lib"
 	/>
 </VisualStudioPropertySheet>

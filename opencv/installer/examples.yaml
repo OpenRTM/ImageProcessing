@@ -21,6 +21,11 @@ Examples:
       Name: BinarizationComp.exe
       Source: ..\bin\\BinarizationComp.exe
       Shortcut: true
+    - Id: CameraViewerComp.exe
+      ShortName: CameraViewer.exe
+      Name: CameraViewerComp.exe
+      Source: ..\bin\\CameraViewerComp.exe
+      Shortcut: true
     - Id: ChromakeyComp.exe
       ShortName: Chromakey.exe
       Name: ChromakeyComp.exe
@@ -56,6 +61,11 @@ Examples:
       Name: HoughComp.exe
       Source: ..\bin\\HoughComp.exe
       Shortcut: true
+    - Id: IEEE1394CameraComp.exe
+      ShortName: IEEE1394Camera.exe
+      Name: IEEE1394CameraComp.exe
+      Source: ..\bin\\IEEE1394CameraComp.exe
+      Shortcut: true
     - Id: ImageCalibrationComp.exe
       ShortName: ImageCalibration.exe
       Name: ImageCalibrationComp.exe
@@ -71,10 +81,20 @@ Examples:
       Name: ObjectTrackingComp.exe
       Source: ..\bin\\ObjectTrackingComp.exe
       Shortcut: true
+    - Id: OpenCVCameraComp.exe
+      ShortName: OpenCVCamera.exe
+      Name: OpenCVCameraComp.exe
+      Source: ..\bin\\OpenCVCameraComp.exe
+      Shortcut: true
     - Id: PerspectiveComp.exe
       ShortName: Perspective.exe
       Name: PerspectiveComp.exe
       Source: ..\bin\\PerspectiveComp.exe
+      Shortcut: true
+    - Id: PGRCameraComp.exe
+      ShortName: PGRCamera.exe
+      Name: PGRCameraComp.exe
+      Source: ..\bin\\PGRCameraComp.exe
       Shortcut: true
     - Id: RockPaperScissorsComp.exe
       ShortName: RockPaperScissors.exe
@@ -111,26 +131,6 @@ Examples:
       Name: translateComp.exe
       Source: ..\bin\\translateComp.exe
       Shortcut: true
-    - Id: USBCameraAcquireComp.exe
-      ShortName: USBCameraAcquire.exe
-      Name: USBCameraAcquireComp.exe
-      Source: ..\bin\\USBCameraAcquireComp.exe
-      Shortcut: true
-    - Id: USBCameraMonitorComp.exe
-      ShortName: USBCameraMonitor.exe
-      Name: USBCameraMonitorComp.exe
-      Source: ..\bin\\USBCameraMonitorComp.exe
-      Shortcut: true
-    - Id: PGRCameraCaptureComp.exe
-      ShortName: PGRCameraCaptureComp.exe
-      Name: PGRCameraCaptureComp.exe
-      Source: ..\bin\\PGRCameraCaptureComp.exe
-      Shortcut: true
-    - Id: PGRCameraMonitorComp.exe
-      ShortName: PGRCameraMonitorComp.exe
-      Name: PGRCameraMonitorComp.exe
-      Source: ..\bin\\PGRCameraMonitorComp.exe
-      Shortcut: true
     - Id: Affine.dll
       ShortName: Affine.dll
       Name: Affine.dll
@@ -143,6 +143,10 @@ Examples:
       ShortName: Binarization.dll
       Name: Binarization.dll
       Source: ..\bin\\Binarization.dll
+    - Id: CameraViewer.dll
+      ShortName: CameraViewer.dll
+      Name: CameraViewer.dll
+      Source: ..\bin\\CameraViewer.dll
     - Id: Chromakey.dll
       ShortName: Chromakey.dll
       Name: Chromakey.dll
@@ -171,6 +175,10 @@ Examples:
       ShortName: Hough.dll
       Name: Hough.dll
       Source: ..\bin\\Hough.dll
+    - Id: IEEE1394Camera.dll
+      ShortName: IEEE1394Camera.dll
+      Name: IEEE1394Camera.dll
+      Source: ..\bin\\IEEE1394Camera.dll
     - Id: ImageCalibration.dll
       ShortName: ImageCalibration.dll
       Name: ImageCalibration.dll
@@ -183,10 +191,18 @@ Examples:
       ShortName: ObjectTracking.dll
       Name: ObjectTracking.dll
       Source: ..\bin\\ObjectTracking.dll
+    - Id: OpenCVCamera.dll
+      ShortName: OpenCVCamera.dll
+      Name: OpenCVCamera.dll
+      Source: ..\bin\\OpenCVCamera.dll
     - Id: Perspective.dll
       ShortName: Perspective.dll
       Name: Perspective.dll
       Source: ..\bin\\Perspective.dll
+    - Id: PGRCamera.dll
+      ShortName: PGRCamera.dll
+      Name: PGRCamera.dll
+      Source: ..\bin\\PGRCamera.dll
     - Id: RockPaperScissors.dll
       ShortName: RockPaperScissors.dll
       Name: RockPaperScissors.dll
@@ -215,22 +231,6 @@ Examples:
       ShortName: Translate.dll
       Name: Translate.dll
       Source: ..\bin\\Translate.dll
-    - Id: USBCameraAcquire.dll
-      ShortName: USBCameraAcquire.dll
-      Name: USBCameraAcquire.dll
-      Source: ..\bin\\USBCameraAcquire.dll
-    - Id: USBCameraMonitor.dll
-      ShortName: USBCameraMonitor.dll
-      Name: USBCameraMonitor.dll
-      Source: ..\bin\\USBCameraMonitor.dll
-    - Id: PGRCameraCapture.dll
-      ShortName: PGRCameraCapture.dll
-      Name: PGRCameraCapture.dll
-      Source: ..\bin\\PGRCameraCapture.dll
-    - Id: PGRCameraMonitor.dll
-      ShortName: PGRCameraMonitor.dll
-      Name: PGRCameraMonitor.dll
-      Source: ..\bin\\PGRCameraMonitor.dll
     - Id: libCVRTCSkel.lib
       ShortName: libCVRTCSkel.lib
       Name: libCVRTCSkel.lib

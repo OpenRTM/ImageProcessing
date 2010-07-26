@@ -77,6 +77,17 @@
 			      > 
 		      		    </Shortcut>
 		    		  </File>
+		  		  <File Id="CameraViewerComp.exe"
+			Name="CameraViewerComp.exe" DiskId="1"
+			Source="..\bin\\CameraViewerComp.exe">
+		    		    <Shortcut Id="CameraViewerComp.exe" Directory="OpenCVMenuFolder"
+			      Name="CameraViewerComp.exe"
+			      Show="normal"
+			      WorkingDirectory="CXXexamples"
+			      Icon="RTC.ico" IconIndex="0"
+			      > 
+		      		    </Shortcut>
+		    		  </File>
 		  		  <File Id="ChromakeyComp.exe"
 			Name="ChromakeyComp.exe" DiskId="1"
 			Source="..\bin\\ChromakeyComp.exe">
@@ -154,6 +165,17 @@
 			      > 
 		      		    </Shortcut>
 		    		  </File>
+		  		  <File Id="IEEE1394CameraComp.exe"
+			Name="IEEE1394CameraComp.exe" DiskId="1"
+			Source="..\bin\\IEEE1394CameraComp.exe">
+		    		    <Shortcut Id="IEEE1394CameraComp.exe" Directory="OpenCVMenuFolder"
+			      Name="IEEE1394CameraComp.exe"
+			      Show="normal"
+			      WorkingDirectory="CXXexamples"
+			      Icon="RTC.ico" IconIndex="0"
+			      > 
+		      		    </Shortcut>
+		    		  </File>
 		  		  <File Id="ImageCalibrationComp.exe"
 			Name="ImageCalibrationComp.exe" DiskId="1"
 			Source="..\bin\\ImageCalibrationComp.exe">
@@ -187,11 +209,33 @@
 			      > 
 		      		    </Shortcut>
 		    		  </File>
+		  		  <File Id="OpenCVCameraComp.exe"
+			Name="OpenCVCameraComp.exe" DiskId="1"
+			Source="..\bin\\OpenCVCameraComp.exe">
+		    		    <Shortcut Id="OpenCVCameraComp.exe" Directory="OpenCVMenuFolder"
+			      Name="OpenCVCameraComp.exe"
+			      Show="normal"
+			      WorkingDirectory="CXXexamples"
+			      Icon="RTC.ico" IconIndex="0"
+			      > 
+		      		    </Shortcut>
+		    		  </File>
 		  		  <File Id="PerspectiveComp.exe"
 			Name="PerspectiveComp.exe" DiskId="1"
 			Source="..\bin\\PerspectiveComp.exe">
 		    		    <Shortcut Id="PerspectiveComp.exe" Directory="OpenCVMenuFolder"
 			      Name="PerspectiveComp.exe"
+			      Show="normal"
+			      WorkingDirectory="CXXexamples"
+			      Icon="RTC.ico" IconIndex="0"
+			      > 
+		      		    </Shortcut>
+		    		  </File>
+		  		  <File Id="PGRCameraComp.exe"
+			Name="PGRCameraComp.exe" DiskId="1"
+			Source="..\bin\\PGRCameraComp.exe">
+		    		    <Shortcut Id="PGRCameraComp.exe" Directory="OpenCVMenuFolder"
+			      Name="PGRCameraComp.exe"
 			      Show="normal"
 			      WorkingDirectory="CXXexamples"
 			      Icon="RTC.ico" IconIndex="0"
@@ -275,50 +319,6 @@
 			      > 
 		      		    </Shortcut>
 		    		  </File>
-		  		  <File Id="USBCameraAcquireComp.exe"
-			Name="USBCameraAcquireComp.exe" DiskId="1"
-			Source="..\bin\\USBCameraAcquireComp.exe">
-		    		    <Shortcut Id="USBCameraAcquireComp.exe" Directory="OpenCVMenuFolder"
-			      Name="USBCameraAcquireComp.exe"
-			      Show="normal"
-			      WorkingDirectory="CXXexamples"
-			      Icon="RTC.ico" IconIndex="0"
-			      > 
-		      		    </Shortcut>
-		    		  </File>
-		  		  <File Id="USBCameraMonitorComp.exe"
-			Name="USBCameraMonitorComp.exe" DiskId="1"
-			Source="..\bin\\USBCameraMonitorComp.exe">
-		    		    <Shortcut Id="USBCameraMonitorComp.exe" Directory="OpenCVMenuFolder"
-			      Name="USBCameraMonitorComp.exe"
-			      Show="normal"
-			      WorkingDirectory="CXXexamples"
-			      Icon="RTC.ico" IconIndex="0"
-			      > 
-		      		    </Shortcut>
-		    		  </File>
-		  		  <File Id="PGRCameraCaptureComp.exe"
-			Name="PGRCameraCaptureComp.exe" DiskId="1"
-			Source="..\bin\\PGRCameraCaptureComp.exe">
-		    		    <Shortcut Id="PGRCameraCaptureComp.exe" Directory="OpenCVMenuFolder"
-			      Name="PGRCameraCaptureComp.exe"
-			      Show="normal"
-			      WorkingDirectory="CXXexamples"
-			      Icon="RTC.ico" IconIndex="0"
-			      > 
-		      		    </Shortcut>
-		    		  </File>
-		  		  <File Id="PGRCameraMonitorComp.exe"
-			Name="PGRCameraMonitorComp.exe" DiskId="1"
-			Source="..\bin\\PGRCameraMonitorComp.exe">
-		    		    <Shortcut Id="PGRCameraMonitorComp.exe" Directory="OpenCVMenuFolder"
-			      Name="PGRCameraMonitorComp.exe"
-			      Show="normal"
-			      WorkingDirectory="CXXexamples"
-			      Icon="RTC.ico" IconIndex="0"
-			      > 
-		      		    </Shortcut>
-		    		  </File>
 		  		  <File Id="Affine.dll"
 			Name="Affine.dll" DiskId="1"
 			Source="..\bin\\Affine.dll">
@@ -330,6 +330,10 @@
 		  		  <File Id="Binarization.dll"
 			Name="Binarization.dll" DiskId="1"
 			Source="..\bin\\Binarization.dll">
+		    		  </File>
+		  		  <File Id="CameraViewer.dll"
+			Name="CameraViewer.dll" DiskId="1"
+			Source="..\bin\\CameraViewer.dll">
 		    		  </File>
 		  		  <File Id="Chromakey.dll"
 			Name="Chromakey.dll" DiskId="1"
@@ -359,6 +363,10 @@
 			Name="Hough.dll" DiskId="1"
 			Source="..\bin\\Hough.dll">
 		    		  </File>
+		  		  <File Id="IEEE1394Camera.dll"
+			Name="IEEE1394Camera.dll" DiskId="1"
+			Source="..\bin\\IEEE1394Camera.dll">
+		    		  </File>
 		  		  <File Id="ImageCalibration.dll"
 			Name="ImageCalibration.dll" DiskId="1"
 			Source="..\bin\\ImageCalibration.dll">
@@ -371,9 +379,17 @@
 			Name="ObjectTracking.dll" DiskId="1"
 			Source="..\bin\\ObjectTracking.dll">
 		    		  </File>
+		  		  <File Id="OpenCVCamera.dll"
+			Name="OpenCVCamera.dll" DiskId="1"
+			Source="..\bin\\OpenCVCamera.dll">
+		    		  </File>
 		  		  <File Id="Perspective.dll"
 			Name="Perspective.dll" DiskId="1"
 			Source="..\bin\\Perspective.dll">
+		    		  </File>
+		  		  <File Id="PGRCamera.dll"
+			Name="PGRCamera.dll" DiskId="1"
+			Source="..\bin\\PGRCamera.dll">
 		    		  </File>
 		  		  <File Id="RockPaperScissors.dll"
 			Name="RockPaperScissors.dll" DiskId="1"
@@ -402,22 +418,6 @@
 		  		  <File Id="Translate.dll"
 			Name="Translate.dll" DiskId="1"
 			Source="..\bin\\Translate.dll">
-		    		  </File>
-		  		  <File Id="USBCameraAcquire.dll"
-			Name="USBCameraAcquire.dll" DiskId="1"
-			Source="..\bin\\USBCameraAcquire.dll">
-		    		  </File>
-		  		  <File Id="USBCameraMonitor.dll"
-			Name="USBCameraMonitor.dll" DiskId="1"
-			Source="..\bin\\USBCameraMonitor.dll">
-		    		  </File>
-		  		  <File Id="PGRCameraCapture.dll"
-			Name="PGRCameraCapture.dll" DiskId="1"
-			Source="..\bin\\PGRCameraCapture.dll">
-		    		  </File>
-		  		  <File Id="PGRCameraMonitor.dll"
-			Name="PGRCameraMonitor.dll" DiskId="1"
-			Source="..\bin\\PGRCameraMonitor.dll">
 		    		  </File>
 		  		  <File Id="libCVRTCSkel.lib"
 			Name="libCVRTCSkel.lib" DiskId="1"

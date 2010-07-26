@@ -2,10 +2,11 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.61])
-AC_INIT(opencv_rtc, 0.0.1, Noriaki Ando)
+AC_INIT(OpenCV, 0.0.1, Noriaki Ando)
 AC_CONFIG_AUX_DIR([.])
 AC_CONFIG_HEADERS(config.h)
-AM_INIT_AUTOMAKE(opencv_rtc, 0.0.1)
+AM_INIT_AUTOMAKE(OpenCV, 0.0.1)
+
 
 # Checks for programs.
 AC_PROG_CXX
@@ -75,9 +76,9 @@ if test "x$rtm_config" = "x" ; then
 	# Error exit!!
 else
 	AC_MSG_RESULT($RTC_h)
-	CPPFLAGS=`rtm-config --cflags` `pkg-config --cflags opencv`
-	CXXFLAGS=`rtm-config --cflags` `pkg-config --cflags opencv`
-	LDFLAGS=`rtm-config --libs` `pkg-config --libs opencv`
+	CPPFLAGS="`rtm-config --cflags` `pkg-config --cflags opencv`"
+	CXXFLAGS="`rtm-config --cflags` `pkg-config --cflags opencv`"
+	LDFLAGS="`rtm-config --libs` `pkg-config --libs opencv`"
 	LIBS="$LIBS $LDFLAGS"
 fi
 
@@ -1375,8 +1376,7 @@ AC_OUTPUT([Makefile
 	components/ImageCalibration/Makefile
 	components/ImageSubstraction/Makefile
 	components/ObjectTracking/Makefile
-	components/PGRCameraCapture/Makefile
-	components/PGRCameraMonitor/Makefile
+	components/PGRCamera/Makefile
 	components/Perspective/Makefile
 	components/RockPaperScissors/Makefile
 	components/Rotate/Makefile
@@ -1385,8 +1385,8 @@ AC_OUTPUT([Makefile
 	components/SubStractCaptureImage/Makefile
 	components/Template/Makefile
 	components/Translate/Makefile
-	components/USBCameraAcquire/Makefile
-	components/USBCameraMonitor/Makefile
+	components/OpenCVCamera/Makefile
+	components/CameraViewer/Makefile
 	rtm/Makefile
 	rtm/idl/Makefile
 ])
