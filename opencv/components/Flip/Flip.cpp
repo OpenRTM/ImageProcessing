@@ -29,7 +29,10 @@ static const char* flip_spec[] =
     "lang_type",         "compile",
     "exec_cxt.periodic.rate", "1000.0",
     // Configuration variables
-    "conf.default.flip_mode", "1",
+    "conf.default.flip_mode", "1",// Widget
+    "conf.__widget__.flipMode", "radio",
+    // Constraints
+    "conf.__constraints__.flip_mode", "(-1,0,1)",
     ""
   };
 // </rtc-template>
