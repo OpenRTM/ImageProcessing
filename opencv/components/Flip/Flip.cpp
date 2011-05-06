@@ -30,7 +30,7 @@ static const char* flip_spec[] =
     "exec_cxt.periodic.rate", "1000.0",
     // Configuration variables
     "conf.default.flip_mode", "1",// Widget
-    "conf.__widget__.flipMode", "radio",
+    "conf.__widget__.flip_mode", "radio",
     // Constraints
     "conf.__constraints__.flip_mode", "(-1,0,1)",
     ""
