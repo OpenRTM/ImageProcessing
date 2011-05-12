@@ -166,7 +166,6 @@ RTC::ReturnCode_t CameraViewer::onExecute(RTC::UniqueId ec_id)
         return RTC::RTC_OK;
     }
 
-	  */
     // ƒTƒCƒY‚ª•Ï‚í‚Á‚½‚Æ‚«‚¾‚¯Ä¶¬‚·‚é
     if(m_in_height != (int)m_in.height || m_in_width != (int)m_in.width)
     {
