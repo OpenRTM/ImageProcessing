@@ -18,9 +18,9 @@
 #include <rtm/idl/BasicDataTypeSkel.h>
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
-#include "Camera.h"
-#include "FlyCapture2.h"
-#include "FlyCapture2GUI.h"
+//#include "Camera.h"
+//#include "FlyCapture2.h"
+//#include "FlyCapture2GUI.h"
 
 #include <cv.h>
 #include <cxcore.h>

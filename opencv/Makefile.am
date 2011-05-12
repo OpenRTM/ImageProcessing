@@ -2,4 +2,4 @@
 
 AUTOMAKE_OPTIONS = 1.4
 
-SUBDIRS = rtm components
+SUBDIRS = components

@@ -2,10 +2,10 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.61])
-AC_INIT(OpenCV, 0.0.1, Noriaki Ando)
+AC_INIT(OpenCVRTC, 1.0.0, Noriaki Ando)
 AC_CONFIG_AUX_DIR([.])
 AC_CONFIG_HEADERS(config.h)
-AM_INIT_AUTOMAKE(OpenCV, 0.0.1)
+AM_INIT_AUTOMAKE(OpenCVRTC, 1.0.0)
 
 
 # Checks for programs.
@@ -1376,7 +1376,6 @@ AC_OUTPUT([Makefile
 	components/ImageCalibration/Makefile
 	components/ImageSubstraction/Makefile
 	components/ObjectTracking/Makefile
-	components/PGRCamera/Makefile
 	components/Perspective/Makefile
 	components/RockPaperScissors/Makefile
 	components/Rotate/Makefile
@@ -1387,7 +1386,5 @@ AC_OUTPUT([Makefile
 	components/Translate/Makefile
 	components/OpenCVCamera/Makefile
 	components/CameraViewer/Makefile
-	rtm/Makefile
-	rtm/idl/Makefile
 ])
 

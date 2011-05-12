@@ -2,8 +2,8 @@
 
 AUTOMAKE_OPTIONS = 1.9
 
-AM_CPPFLAGS=`rtm-config --cflags` `pkg-config --cflags opencv` -I$(top_srcdir)/rtm/idl
-AM_LDFLAGS=-`rtm-config --libs` `pkg-config --libs opencv` -L$(top_srcdir)/rtm/idl -lRTCSkel
+AM_CPPFLAGS=`rtm-config --cflags` `pkg-config --cflags opencv`
+AM_LDFLAGS=-`rtm-config --libs` `pkg-config --libs opencv`
 
 #------------------------------------------------------------
 # Targets
@@ -17,7 +17,7 @@ sourcedir  = $(exampledir)/src/RockPaperScissors
 # Loadable RTCs
 socomp_LTLIBRARIES = RockPaperScissors.la
 
-RockPaperScissors_la_SOURCES = RockPaperScissors.cpp RockPaperScissors.h
+RockPaperScissors_la_SOURCES = RockPaperScissors.cpp RockPaperScissors.h Labeling.h LabellingW.h
 RockPaperScissors_la_LDFLAGS = -module
 
 # Standalone RTCs
@@ -39,7 +39,9 @@ EXTRA_DIST =                  \
 	Makefile.RockPaperScissors \
 	README.RockPaperScissors
 
-ALL_SRC =                    \
+ALL_SRC =                     \
+	Labeling.h                \
+	LabellingW.h              \
 	RockPaperScissorsComp.cpp \
 	RockPaperScissors.cpp     \
 	RockPaperScissors.h
