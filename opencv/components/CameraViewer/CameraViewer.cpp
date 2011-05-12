@@ -114,7 +114,6 @@ RTC::ReturnCode_t CameraViewer::onShutdown(RTC::UniqueId ec_id)
 RTC::ReturnCode_t CameraViewer::onActivated(RTC::UniqueId ec_id)
 { 
 
-    m_img       = NULL;
     m_orig_img  = NULL;
 
     m_in_height = 0;
@@ -130,9 +129,6 @@ RTC::ReturnCode_t CameraViewer::onActivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t CameraViewer::onDeactivated(RTC::UniqueId ec_id)
 {
-    if(m_img != NULL)
-        cvReleaseImage(&m_img);
-
     if(m_orig_img != NULL)
         cvReleaseImage(&m_orig_img);
 
@@ -170,21 +166,7 @@ RTC::ReturnCode_t CameraViewer::onExecute(RTC::UniqueId ec_id)
         return RTC::RTC_OK;
     }
 
-    // 出力サイズはコンフィグレーションのをつかう
-    if(m_img == NULL || isCFGChanged())
-    {
-        printf("[onExecute] CFG is changed!\n");
-        
-        m_nOldHeight = m_img_height;
-        m_nOldWidth  = m_img_width;
-
-        if(m_img != NULL)
-            cvReleaseImage(&m_img);
-
-        // チャンネルは３で固定
-        m_img = cvCreateImage(cvSize(m_img_width, m_img_height), IPL_DEPTH_8U, 3);
-    }
-
+	  */
     // サイズが変わったときだけ再生成する
     if(m_in_height != (int)m_in.height || m_in_width != (int)m_in.width)
     {
@@ -203,14 +185,12 @@ RTC::ReturnCode_t CameraViewer::onExecute(RTC::UniqueId ec_id)
     // データコピー
     memcpy(m_orig_img->imageData,(void *)&(m_in.pixels[0]), m_in.pixels.length());
 
-    // 入力映像を出力サイズに合わせてコピー
-    cvResize( m_orig_img, m_img, CV_INTER_LINEAR );
 
     //画像表示
 	#if (!defined WIN32) || (!defined WIN64)
     cvStartWindowThread();
 	#endif
-    cvShowImage("CaptureImage", m_img);
+    cvShowImage("CaptureImage", m_orig_img);
 
     if (count > 100)
     {

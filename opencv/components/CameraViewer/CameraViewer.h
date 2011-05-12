@@ -275,7 +275,6 @@ class CameraViewer
 
 private:
     int dummy;
-    IplImage* m_img;
     IplImage* m_orig_img;
 
     int m_img_height;     // CFG : Image-Height
