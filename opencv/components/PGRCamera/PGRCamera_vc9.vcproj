@@ -64,7 +64,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="$(rtm_libd) $(coil_libd) $(cv_libd) $(skel_libd)FlyCapture2.lib FlyCapture2GUId.lib"
+				AdditionalDependencies="$(rtm_libd) $(coil_libd) $(cv_libd) $(skel_libd) FlyCapture2.lib FlyCapture2GUId.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;C:\Program Files\Point Grey Research\FlyCapture2\lib&quot;"
 				GenerateDebugInformation="true"
