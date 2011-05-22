@@ -6,11 +6,11 @@
 	>
 	<Tool
 		Name="VCCLCompilerTool"
-		AdditionalIncludeDirectories="$(cv_includes)"
+		AdditionalIncludeDirectories="$(cv_includes);$(ds_includes)"
 	/>
 	<Tool
 		Name="VCLinkerTool"
-		AdditionalLibraryDirectories="$(cv_libdir);$(skel_libdir)"
+		AdditionalLibraryDirectories="$(cv_libdir);$(ds_libdir);$(skel_libdir)"
 	/>
 	<UserMacro
 		Name="cv_root"
@@ -41,12 +41,20 @@
 		Value="cv210d.lib highgui210d.lib cxcore210d.lib"
 	/>
 	<UserMacro
+		Name="ds_includes"
+		Value="&quot;$(DXSDK_DIR)\Include\x86\&quot;;&quot;$(WindowsSdkDir)\Samples\Multimedia\DirectShow\BaseClasses&quot;"
+	/>
+	<UserMacro
+		Name="ds_libdir"
+		Value="&quot;$(DXSDK_DIR)\Lib\x86\&quot;;&quot;$(WindowsSdkDir)\Samples\Multimedia\DirectShow\BaseClasses&quot;"
+	/>
+	<UserMacro
 		Name="ds_lib"
-		Value="strmiids.lib winmm.lib strmbase.lib quartz.lib comsuppw.lib"
+		Value="dxerr.lib dxguid.lib d3dx10d.lib d3d9.lib winmm.lib strmiids.lib strmbase.lib"
 	/>
 	<UserMacro
 		Name="ds_libd"
-		Value="strmiids.lib winmm.lib strmbasd.lib quartz.lib comsuppw.lib"
+		Value="dxerr.lib dxguid.lib d3dx9d.lib d3dx10d.lib winmm.lib strmiids.lib strmbased.lib"
 	/>
 	<UserMacro
 		Name="skel_lib"
