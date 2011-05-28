@@ -13,6 +13,14 @@
 		AdditionalLibraryDirectories="$(cv_libdir);$(ds_libdir);$(skel_libdir)"
 	/>
 	<UserMacro
+		Name="MyWindowsSdkDir"
+		Value="C:\Program Files\Microsoft SDKs\Windows\v7.1"
+	/>
+	<UserMacro
+		Name="BaseClassDir"
+		Value="$(MyWindowsSdkDir)\Samples\multimedia\directshow\baseclasses"
+	/>
+	<UserMacro
 		Name="cv_root"
 		Value="C:\OpenCV2.1"
 	/>
@@ -42,11 +50,11 @@
 	/>
 	<UserMacro
 		Name="ds_includes"
-		Value="&quot;$(DXSDK_DIR)\Include\x86\&quot;;&quot;$(WindowsSdkDir)\Samples\Multimedia\DirectShow\BaseClasses&quot;"
+		Value="&quot;$(DXSDK_DIR)\Include\x86\&quot;;&quot;$(MyWindowsSdkDir)\Samples\Multimedia\DirectShow\BaseClasses&quot;"
 	/>
 	<UserMacro
 		Name="ds_libdir"
-		Value="&quot;$(DXSDK_DIR)\Lib\x86\&quot;;&quot;$(WindowsSdkDir)\Samples\Multimedia\DirectShow\BaseClasses&quot;"
+		Value="&quot;$(DXSDK_DIR)\Lib\x86\&quot;;&quot;$(MyWindowsSdkDir)\Samples\Multimedia\DirectShow\BaseClasses&quot;"
 	/>
 	<UserMacro
 		Name="ds_lib"
@@ -63,5 +71,9 @@
 	<UserMacro
 		Name="skel_libd"
 		Value="libCVRTCSkeld.lib"
+	/>
+	<UserMacro
+		Name="WindowsSdkDir"
+		Value="C:\Program Files\Microsoft SDKs\Windows\v7.1"
 	/>
 </VisualStudioPropertySheet>
