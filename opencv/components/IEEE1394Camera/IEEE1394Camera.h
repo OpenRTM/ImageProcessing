@@ -11,13 +11,13 @@
 #define IEEE1394CAMERA_H
 
 //DirectShow
-#include <dshow.h>
-#include <streams.h>
+//#include <dshow.h>
+#include "streams.h"
 #define __IDxtCompositor_INTERFACE_DEFINED__
 #define __IDxtAlphaSetter_INTERFACE_DEFINED__
 #define __IDxtJpeg_INTERFACE_DEFINED__
 #define __IDxtKey_INTERFACE_DEFINED__
-#include <qedit.h>
+#include "qedit.h"
 #include <comdef.h>
 
 //OpenRTM

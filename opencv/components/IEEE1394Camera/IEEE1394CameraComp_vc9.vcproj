@@ -64,6 +64,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="$(rtm_libd) $(coil_libd) $(ds_libd) $(skel_libd)"
+				AdditionalLibraryDirectories="baseclass\$(ConfigurationName)"
 				OutputFile="$(OutDir)\IEEE1394CameraComp.exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
@@ -137,6 +138,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="$(rtm_lib) $(coil_lib) $(ds_lib) $(skel_lib)"
+				AdditionalLibraryDirectories="baseclass\$(ConfigurationName)"
 				OutputFile="$(OutDir)\IEEE1394CameraComp.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
