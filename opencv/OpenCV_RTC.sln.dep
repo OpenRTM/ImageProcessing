@@ -1,0 +1,52 @@
+libCVRTCSkel: 
+BaseClasses:
+RockPaperScissorsComp: libCVRTCSkel
+RockPaperScissors: libCVRTCSkel
+ChromakeyComp: libCVRTCSkel
+Chromakey: libCVRTCSkel
+HoughComp: libCVRTCSkel
+Hough: libCVRTCSkel
+ImageSubstractionComp: libCVRTCSkel
+ImageSubstraction: libCVRTCSkel
+ScaleComp: libCVRTCSkel
+Scale: libCVRTCSkel
+AffineComp: libCVRTCSkel
+Affine: libCVRTCSkel
+PerspectiveComp: libCVRTCSkel
+Perspective: libCVRTCSkel
+ObjectTrackingComp: libCVRTCSkel
+ObjectTracking: libCVRTCSkel
+BinarizationComp: libCVRTCSkel
+Binarization: libCVRTCSkel
+FindcontourComp: libCVRTCSkel
+Findcontour: libCVRTCSkel
+FlipComp: libCVRTCSkel
+Flip: libCVRTCSkel
+ImageCalibrationComp: libCVRTCSkel
+ImageCalibration: libCVRTCSkel
+TranslateComp: libCVRTCSkel
+Translate: libCVRTCSkel
+HistogramComp: libCVRTCSkel
+Histogram: libCVRTCSkel
+RotateComp: libCVRTCSkel
+Rotate: libCVRTCSkel
+IEEE1394Camera: libCVRTCSkel BaseClasses
+IEEE1394CameraComp: libCVRTCSkel BaseClasses
+PGRCameraComp: libCVRTCSkel
+PGRCamera: libCVRTCSkel
+SepiaComp: libCVRTCSkel
+Sepia: libCVRTCSkel
+SubStractCaptureImageComp: libCVRTCSkel
+SubStractCaptureImage: libCVRTCSkel
+DilationErosionComp: libCVRTCSkel
+DilationErosion: libCVRTCSkel
+OpenCVCameraComp: libCVRTCSkel
+OpenCVCamera: libCVRTCSkel
+EdgeComp: libCVRTCSkel
+Edge: libCVRTCSkel
+BackGroundSubtractionSimpleComp: libCVRTCSkel
+BackGroundSubtractionSimple: libCVRTCSkel
+CameraViewerComp: libCVRTCSkel
+CameraViewer: libCVRTCSkel
+Template: libCVRTCSkel
+TemplateComp: libCVRTCSkel
