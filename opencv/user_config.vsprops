@@ -54,7 +54,7 @@
 	/>
 	<UserMacro
 		Name="ds_libdir"
-		Value="&quot;$(DXSDK_DIR)\Lib\x86\&quot;;&quot;$(MyWindowsSdkDir)\Samples\Multimedia\DirectShow\BaseClasses&quot;"
+		Value="&quot;$(DXSDK_DIR)\Lib\x86\&quot;;&quot;$(SolutionDir)\components\IEEE1394Camera\baseclass\$(ConfigurationName)&quot;"
 	/>
 	<UserMacro
 		Name="ds_lib"
