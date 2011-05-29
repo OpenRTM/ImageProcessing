@@ -22,7 +22,7 @@
 	/>
 	<UserMacro
 		Name="cv_root"
-		Value="C:\OpenCV2.1"
+		Value="C:\distribution\OpenCV2.1"
 	/>
 	<UserMacro
 		Name="cv_includes"
@@ -66,11 +66,11 @@
 	/>
 	<UserMacro
 		Name="skel_lib"
-		Value="libCVRTCSkel.lib"
+		Value=""
 	/>
 	<UserMacro
 		Name="skel_libd"
-		Value="libCVRTCSkeld.lib"
+		Value=""
 	/>
 	<UserMacro
 		Name="WindowsSdkDir"
