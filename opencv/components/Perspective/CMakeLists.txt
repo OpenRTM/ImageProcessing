@@ -103,12 +103,13 @@ add_custom_target(uninstall_${RTC_NAME} COMMAND
 
 
 # target settings for library/executable
+list(APPEND INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${INCLUDE_DIRS})
 
 link_directories(${LIBRARY_DIRS})
 
 add_definitions(${CFLAGS})
-add_definitions(-I${CMAKE_CURRENT_BINARY_DIR})
+#add_definitions(-I${CMAKE_CURRENT_BINARY_DIR})
 
 foreach(idl ${IDL_FILES})
     string(REGEX REPLACE "([^\\/]*)\\.idl" "\\1" idl_base ${idl})

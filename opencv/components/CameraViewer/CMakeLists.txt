@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
-project(CameraViewer)
+project(Chromakey)
 
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake_modules")
@@ -16,7 +16,7 @@ set(RTC_VERSION_MAJOR "1")
 set(RTC_VERSION_MINOR "0")
 set(RTC_VERSION_PATCH "0")
 set(RTC_LANG "c++")
-set(RTC_DESCRIPTION "CameraViewer Agent Component")
+set(RTC_DESCRIPTION "Chromakey Agent Component")
 set(RTC_VENDOR "Shibaura Inst. of Tech, Tanaka & Fujita & Takasu")
 set(RTC_MAINTAINER "author@example.com")
 
@@ -42,14 +42,14 @@ set(IMPL_INCS ""
 	#              WiiInfoSVC_impl.h
 )
 
-set(LIBS_SRCS CameraViewer.cpp)
+set(LIBS_SRCS Chromakey.cpp)
 
-set(LIBS_INCS CameraViewer.h)
+set(LIBS_INCS Chromakey.h)
 
-set(EXEC_SRCS CameraViewerComp.cpp)
+set(EXEC_SRCS ChromakeyComp.cpp)
 
 set(OTHER_SRCS CMakeLists.txt Doxyfile.in
-               RTC.xml CameraViewer.conf rtc.conf)
+               RTC.xml Chromakey.conf rtc.conf)
 
 
 # check OpenRTM installed
@@ -103,12 +103,12 @@ add_custom_target(uninstall_${RTC_NAME} COMMAND
 
 
 # target settings for library/executable
+list(APPEND INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${INCLUDE_DIRS})
 
 link_directories(${LIBRARY_DIRS})
 
 add_definitions(${CFLAGS})
-add_definitions(-I${CMAKE_CURRENT_BINARY_DIR})
 
 foreach(idl ${IDL_FILES})
     string(REGEX REPLACE "([^\\/]*)\\.idl" "\\1" idl_base ${idl})

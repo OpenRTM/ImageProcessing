@@ -141,7 +141,7 @@ if(WIN32)
 
     set(OPENRTM_CFLAGS "-DUSE_stub_in_nt_dll")
 
-    foreach(library "RTC110" "coil")
+    foreach(library "RTC110" "coil110")
         list(APPEND OPENRTM_LIBRARIES optimized "${library}" debug "${library}d")
     endforeach()
     foreach(library "ws2_32" "mswsock")
