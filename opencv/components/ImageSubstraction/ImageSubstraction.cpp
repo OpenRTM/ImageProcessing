@@ -32,7 +32,7 @@ static const char* imagesubstraction_spec[] =
   };
 // </rtc-template>
 
-int count = 0;
+int ImageSubstraction_count = 0;
 int key;		//	キー入力用の変数
 int	mode = 0;	// 0: 画素ごとに異なる閾値 / 1: 画像全体で一つの閾値
 int g_temp_w = 0;
@@ -219,7 +219,7 @@ RTC::ReturnCode_t ImageSubstraction::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t ImageSubstraction::onActivated(RTC::UniqueId ec_id)
 {
-	count = 0;
+	ImageSubstraction_count = 0;
 	g_temp_w = 0;
 	g_temp_h = 0;
 
@@ -256,7 +256,7 @@ RTC::ReturnCode_t ImageSubstraction::onExecute(RTC::UniqueId ec_id)
 {	
 	
 	//初期値を取得する。
-	if(count == 0 && m_img_origIn.isNew()) {
+	if(ImageSubstraction_count == 0 && m_img_origIn.isNew()) {
 		
 		m_img_origIn.read();
 		
@@ -293,13 +293,13 @@ RTC::ReturnCode_t ImageSubstraction::onExecute(RTC::UniqueId ec_id)
 
 			initializeBackgroundModel( NUM_OF_BACKGROUND_FRAMES, cvSize(m_img_orig.width, m_img_orig.height) );
 			
-			count = 1;
+			ImageSubstraction_count = 1;
 			g_temp_w = m_img_orig.width;
 			g_temp_h = m_img_orig.height;
 		}
 	}
 
-	if(count == 1 && m_img_origIn.isNew()) {
+	if(ImageSubstraction_count == 1 && m_img_origIn.isNew()) {
 		
 		m_img_origIn.read();
 		
@@ -415,7 +415,7 @@ RTC::ReturnCode_t ImageSubstraction::onExecute(RTC::UniqueId ec_id)
 			g_temp_h = m_img_orig.height;
 		
 		}else if(g_temp_w != m_img_orig.width || g_temp_h != m_img_orig.height){
-			count = 0;
+			ImageSubstraction_count = 0;
 		}
 		
 	}
