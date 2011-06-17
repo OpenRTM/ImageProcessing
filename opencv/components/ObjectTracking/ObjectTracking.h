@@ -19,6 +19,7 @@
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
 #include <cv.h>
+#include <cvaux.h>
 #include <highgui.h>
 
 #define		SEGMENT				150		//	cvSnakeImage‚Å—p‚¢‚é§Œä“_‚Ì”
