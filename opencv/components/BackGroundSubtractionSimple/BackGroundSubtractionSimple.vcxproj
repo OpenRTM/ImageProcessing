@@ -61,7 +61,7 @@
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">BackGroundSubtractionSimple</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.dll</TargetExt>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\distribution\ImageProcessing\opencv\components\BackGroundSubtractionSimple\Release\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)BackGroundSubtractionSimple\$(ConfigurationName)</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">BackGroundSubtractionSimple.dir\Release\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">BackGroundSubtractionSimple</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.dll</TargetExt>
@@ -167,11 +167,6 @@
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
-    <PostBuildEvent>
-      <Command>if NOT EXIST "$(SolutionDir)\\bin" mkdir "$(SolutionDir)\\bin"
-copy "$(OutDir)\\BackGroundSubtractionSimple.dll" "$(SolutionDir)\\bin"
-</Command>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">
     <ClCompile>
