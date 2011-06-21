@@ -18,7 +18,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGUID>{DDA405B9-13CE-4B37-B12B-632EE6D5AED7}</ProjectGUID>
+    <ProjectGUID>{B947F6ED-BEAA-4A93-AB1F-586DF141AC43}</ProjectGUID>
     <SccProjectName />
     <SccLocalPath />
     <Keyword>Win32Proj</Keyword>
@@ -148,10 +148,10 @@ if errorlevel 1 goto :VCEnd</Command>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Chromakey/Chromakey.vcxproj">
-      <Project>CB01E0B2-B7F5-431E-9B03-E048E6273CCD</Project>
+      <Project>CCEF5EB8-E5CF-4F28-ABE3-D9EC5EDD5BA8</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Chromakey/ChromakeyComp.vcxproj">
-      <Project>44599340-DC83-480E-A9DC-551B28C9DE29</Project>
+      <Project>DF7CBC43-CCAD-4CEF-BA65-733C113053D0</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

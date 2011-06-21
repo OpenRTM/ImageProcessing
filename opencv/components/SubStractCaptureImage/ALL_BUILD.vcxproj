@@ -18,7 +18,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGUID>{DDA405B9-13CE-4B37-B12B-632EE6D5AED7}</ProjectGUID>
+    <ProjectGUID>{B947F6ED-BEAA-4A93-AB1F-586DF141AC43}</ProjectGUID>
     <SccProjectName />
     <SccLocalPath />
     <Keyword>Win32Proj</Keyword>
@@ -148,10 +148,10 @@ if errorlevel 1 goto :VCEnd</Command>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/SubStractCaptureImage/SubStractCaptureImage.vcxproj">
-      <Project>95A2274B-7925-4759-921D-EFB65406EFA3</Project>
+      <Project>3FE60507-E821-49B0-810E-9E8C7BE4FC82</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/SubStractCaptureImage/SubStractCaptureImageComp.vcxproj">
-      <Project>4516CDCB-81AE-44F3-8B85-C74C007B0639</Project>
+      <Project>FD458E07-4A18-4D94-A708-C83C3A14E48A</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

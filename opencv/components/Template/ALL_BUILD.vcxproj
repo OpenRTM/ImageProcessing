@@ -18,7 +18,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGUID>{DDA405B9-13CE-4B37-B12B-632EE6D5AED7}</ProjectGUID>
+    <ProjectGUID>{B947F6ED-BEAA-4A93-AB1F-586DF141AC43}</ProjectGUID>
     <SccProjectName />
     <SccLocalPath />
     <Keyword>Win32Proj</Keyword>
@@ -148,10 +148,10 @@ if errorlevel 1 goto :VCEnd</Command>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Template/Template.vcxproj">
-      <Project>49627A33-6160-4483-BDA4-70991630083E</Project>
+      <Project>5CD30196-4B0E-418D-97C3-4BEFD808792A</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Template/TemplateComp.vcxproj">
-      <Project>F478FDCC-AA86-4612-852C-C5A5CEED3112</Project>
+      <Project>C1A0E8AB-62BF-43D8-91DA-77E1371E0400</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

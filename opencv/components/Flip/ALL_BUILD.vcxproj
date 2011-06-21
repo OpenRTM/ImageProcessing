@@ -18,7 +18,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGUID>{DDA405B9-13CE-4B37-B12B-632EE6D5AED7}</ProjectGUID>
+    <ProjectGUID>{B947F6ED-BEAA-4A93-AB1F-586DF141AC43}</ProjectGUID>
     <SccProjectName />
     <SccLocalPath />
     <Keyword>Win32Proj</Keyword>
@@ -148,10 +148,10 @@ if errorlevel 1 goto :VCEnd</Command>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Flip/Flip.vcxproj">
-      <Project>DA87184D-9D6A-406A-8AFC-E6A07F8A088B</Project>
+      <Project>4ECE8D87-CA8B-4A34-AE4C-60BF3D82F9E9</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Flip/FlipComp.vcxproj">
-      <Project>835EA72B-CE5F-4181-B227-8242C37713CB</Project>
+      <Project>49A78619-FDA0-453F-9382-EE640B2A9886</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

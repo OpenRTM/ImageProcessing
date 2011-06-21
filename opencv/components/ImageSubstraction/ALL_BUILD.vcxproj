@@ -18,7 +18,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGUID>{DDA405B9-13CE-4B37-B12B-632EE6D5AED7}</ProjectGUID>
+    <ProjectGUID>{B947F6ED-BEAA-4A93-AB1F-586DF141AC43}</ProjectGUID>
     <SccProjectName />
     <SccLocalPath />
     <Keyword>Win32Proj</Keyword>
@@ -148,10 +148,10 @@ if errorlevel 1 goto :VCEnd</Command>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/ImageSubstraction/ImageSubstraction.vcxproj">
-      <Project>6BE13B72-AA3B-4425-B1A8-2C5D65B417F8</Project>
+      <Project>24BB5421-C263-42C3-8388-DC23D3D62AC9</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/ImageSubstraction/ImageSubstractionComp.vcxproj">
-      <Project>FB78A02A-2483-4670-B64B-BDF6F592A85C</Project>
+      <Project>B7306E98-48FF-430F-8100-2A39EC26DCFD</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

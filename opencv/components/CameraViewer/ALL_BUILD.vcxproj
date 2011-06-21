@@ -18,7 +18,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGUID>{DDA405B9-13CE-4B37-B12B-632EE6D5AED7}</ProjectGUID>
+    <ProjectGUID>{B947F6ED-BEAA-4A93-AB1F-586DF141AC43}</ProjectGUID>
     <SccProjectName />
     <SccLocalPath />
     <Keyword>Win32Proj</Keyword>
@@ -148,10 +148,10 @@ if errorlevel 1 goto :VCEnd</Command>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/CameraViewer/CameraViewer.vcxproj">
-      <Project>D43F0C62-2B5E-4AAC-9102-3392449017A1</Project>
+      <Project>CF5A61C0-A270-47B7-BA12-924815784533</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/CameraViewer/CameraViewerComp.vcxproj">
-      <Project>4FA79529-9705-417D-8A2E-47E0368DB95A</Project>
+      <Project>18E4796A-7322-4653-A768-EF074B160F27</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

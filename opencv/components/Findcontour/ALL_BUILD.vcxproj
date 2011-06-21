@@ -18,7 +18,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGUID>{DDA405B9-13CE-4B37-B12B-632EE6D5AED7}</ProjectGUID>
+    <ProjectGUID>{B947F6ED-BEAA-4A93-AB1F-586DF141AC43}</ProjectGUID>
     <SccProjectName />
     <SccLocalPath />
     <Keyword>Win32Proj</Keyword>
@@ -148,10 +148,10 @@ if errorlevel 1 goto :VCEnd</Command>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Findcontour/Findcontour.vcxproj">
-      <Project>2989644F-3608-4B20-8824-C554D393DFE2</Project>
+      <Project>1432EA43-3CFA-45AA-8433-5AD57A14A1B0</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Findcontour/FindcontourComp.vcxproj">
-      <Project>083F0836-0F38-413D-A007-FE7AAF645526</Project>
+      <Project>D0A4F517-0532-4CD5-BBA2-110D8A64DBB1</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

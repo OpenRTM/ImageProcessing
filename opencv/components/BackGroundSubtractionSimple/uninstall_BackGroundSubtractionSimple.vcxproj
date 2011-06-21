@@ -18,7 +18,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGUID>{C7EE9195-83D5-469A-8F34-CD5F92FB7872}</ProjectGUID>
+    <ProjectGUID>{2ED8D451-6FCE-440B-9D2A-CA351FF5CF63}</ProjectGUID>
     <SccProjectName />
     <SccLocalPath />
     <Keyword>Win32Proj</Keyword>
@@ -152,7 +152,7 @@ if errorlevel 1 goto :VCEnd</Command>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/ZERO_CHECK.vcxproj">
-      <Project>6AA3C512-6CB8-4F43-8AB6-036275B3CEF3</Project>
+      <Project>87493064-6817-4173-BA90-7F469034490A</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

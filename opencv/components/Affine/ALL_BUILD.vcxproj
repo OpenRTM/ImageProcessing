@@ -18,7 +18,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGUID>{DDA405B9-13CE-4B37-B12B-632EE6D5AED7}</ProjectGUID>
+    <ProjectGUID>{B947F6ED-BEAA-4A93-AB1F-586DF141AC43}</ProjectGUID>
     <SccProjectName />
     <SccLocalPath />
     <Keyword>Win32Proj</Keyword>
@@ -148,10 +148,10 @@ if errorlevel 1 goto :VCEnd</Command>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Affine/Affine.vcxproj">
-      <Project>544133B4-5DEA-4961-A87A-BC7394EB1131</Project>
+      <Project>1196ADB4-F69F-4F7E-84FE-849018F7F3C2</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Affine/AffineComp.vcxproj">
-      <Project>D17F0CC7-4C53-42C2-B3E8-33255FE2DAA2</Project>
+      <Project>0589E138-7CC9-4B78-8F01-7A5EA87E825D</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

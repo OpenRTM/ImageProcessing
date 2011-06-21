@@ -18,7 +18,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGUID>{DDA405B9-13CE-4B37-B12B-632EE6D5AED7}</ProjectGUID>
+    <ProjectGUID>{B947F6ED-BEAA-4A93-AB1F-586DF141AC43}</ProjectGUID>
     <SccProjectName />
     <SccLocalPath />
     <Keyword>Win32Proj</Keyword>
@@ -148,10 +148,10 @@ if errorlevel 1 goto :VCEnd</Command>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Sepia/Sepia.vcxproj">
-      <Project>1B3FC494-1C0C-4E3F-AF80-48D540311F4A</Project>
+      <Project>26E9942F-0258-4C85-BCC4-30A876D91E2A</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Sepia/SepiaComp.vcxproj">
-      <Project>D0E8392C-60BD-46E4-ACB3-A8B2319829B7</Project>
+      <Project>33916FE1-3246-441F-BF4A-D5B0DBA62BE6</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

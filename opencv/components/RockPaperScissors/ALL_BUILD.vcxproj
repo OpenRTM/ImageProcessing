@@ -18,7 +18,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGUID>{DDA405B9-13CE-4B37-B12B-632EE6D5AED7}</ProjectGUID>
+    <ProjectGUID>{B947F6ED-BEAA-4A93-AB1F-586DF141AC43}</ProjectGUID>
     <SccProjectName />
     <SccLocalPath />
     <Keyword>Win32Proj</Keyword>
@@ -148,10 +148,10 @@ if errorlevel 1 goto :VCEnd</Command>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/RockPaperScissors/RockPaperScissors.vcxproj">
-      <Project>6330D2FB-EF80-4CB8-A631-6EE7CCD26D3C</Project>
+      <Project>D4322820-36DD-4393-A24A-EFD727662EE4</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/RockPaperScissors/RockPaperScissorsComp.vcxproj">
-      <Project>FB8B2D90-F988-4B86-9E10-96C57AA396D7</Project>
+      <Project>3A0CB1E4-2BD9-4C26-9CE6-06BEB5FCA3DE</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

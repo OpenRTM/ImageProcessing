@@ -18,7 +18,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGUID>{DDA405B9-13CE-4B37-B12B-632EE6D5AED7}</ProjectGUID>
+    <ProjectGUID>{B947F6ED-BEAA-4A93-AB1F-586DF141AC43}</ProjectGUID>
     <SccProjectName />
     <SccLocalPath />
     <Keyword>Win32Proj</Keyword>
@@ -148,10 +148,10 @@ if errorlevel 1 goto :VCEnd</Command>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Dilationerosion/Dilationerosion.vcxproj">
-      <Project>8B6A9D5A-E4CD-47FF-A8C7-E00A1C0BC5CA</Project>
+      <Project>52893112-01F6-4056-AC0C-BC4DC7249375</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Dilationerosion/DilationerosionComp.vcxproj">
-      <Project>DBF7562E-664C-4CA7-86A3-9D6D08924A98</Project>
+      <Project>286071F0-D3D1-417F-BB7E-BA0562183F1F</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

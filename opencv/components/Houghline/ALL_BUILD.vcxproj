@@ -18,7 +18,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGUID>{DDA405B9-13CE-4B37-B12B-632EE6D5AED7}</ProjectGUID>
+    <ProjectGUID>{B947F6ED-BEAA-4A93-AB1F-586DF141AC43}</ProjectGUID>
     <SccProjectName />
     <SccLocalPath />
     <Keyword>Win32Proj</Keyword>
@@ -148,10 +148,10 @@ if errorlevel 1 goto :VCEnd</Command>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Houghline/Hough.vcxproj">
-      <Project>A5FB86D0-7444-4E5B-A35C-810DE43A797B</Project>
+      <Project>73F43C99-7A19-45DD-84F4-46CAB90E0D37</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Houghline/HoughComp.vcxproj">
-      <Project>D9F8D467-2C4B-4FE7-870D-F4F0617A34CD</Project>
+      <Project>2C7874D8-5466-4F3B-A775-CC3E4172D38D</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

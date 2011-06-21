@@ -18,7 +18,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGUID>{DDA405B9-13CE-4B37-B12B-632EE6D5AED7}</ProjectGUID>
+    <ProjectGUID>{B947F6ED-BEAA-4A93-AB1F-586DF141AC43}</ProjectGUID>
     <SccProjectName />
     <SccLocalPath />
     <Keyword>Win32Proj</Keyword>
@@ -148,145 +148,145 @@ if errorlevel 1 goto :VCEnd</Command>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Affine/Affine.vcxproj">
-      <Project>544133B4-5DEA-4961-A87A-BC7394EB1131</Project>
+      <Project>1196ADB4-F69F-4F7E-84FE-849018F7F3C2</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Affine/AffineComp.vcxproj">
-      <Project>D17F0CC7-4C53-42C2-B3E8-33255FE2DAA2</Project>
+      <Project>0589E138-7CC9-4B78-8F01-7A5EA87E825D</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/BackGroundSubtractionSimple/BackGroundSubtractionSimple.vcxproj">
-      <Project>255F278E-208D-4589-A5AB-FEE3CFA1A644</Project>
+      <Project>019FA75B-5EFD-4355-BBB2-BBFA206C98D9</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/BackGroundSubtractionSimple/BackGroundSubtractionSimpleComp.vcxproj">
-      <Project>5AF64452-4354-4A58-91CD-401DA50D29F8</Project>
+      <Project>C0E8C9D5-6242-4522-9E4F-DEA98123EF59</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Binarization/Binarization.vcxproj">
-      <Project>16CF01C0-D7DB-4712-A106-B9F3CE5E2043</Project>
+      <Project>72953267-AC0D-4F8B-8F44-844A022793F8</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Binarization/BinarizationComp.vcxproj">
-      <Project>276B7A5A-FF50-46B7-B924-50F95D11FCE0</Project>
+      <Project>AFA9B6E2-492E-4CF0-9CE1-2D6513281EF9</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/CameraViewer/CameraViewer.vcxproj">
-      <Project>D43F0C62-2B5E-4AAC-9102-3392449017A1</Project>
+      <Project>CF5A61C0-A270-47B7-BA12-924815784533</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/CameraViewer/CameraViewerComp.vcxproj">
-      <Project>4FA79529-9705-417D-8A2E-47E0368DB95A</Project>
+      <Project>18E4796A-7322-4653-A768-EF074B160F27</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Chromakey/Chromakey.vcxproj">
-      <Project>CB01E0B2-B7F5-431E-9B03-E048E6273CCD</Project>
+      <Project>CCEF5EB8-E5CF-4F28-ABE3-D9EC5EDD5BA8</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Chromakey/ChromakeyComp.vcxproj">
-      <Project>44599340-DC83-480E-A9DC-551B28C9DE29</Project>
+      <Project>DF7CBC43-CCAD-4CEF-BA65-733C113053D0</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Dilationerosion/Dilationerosion.vcxproj">
-      <Project>8B6A9D5A-E4CD-47FF-A8C7-E00A1C0BC5CA</Project>
+      <Project>52893112-01F6-4056-AC0C-BC4DC7249375</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Dilationerosion/DilationerosionComp.vcxproj">
-      <Project>DBF7562E-664C-4CA7-86A3-9D6D08924A98</Project>
+      <Project>286071F0-D3D1-417F-BB7E-BA0562183F1F</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Edge/Edge.vcxproj">
-      <Project>F3A5F01A-177A-4AF1-8270-B2250E166862</Project>
+      <Project>78E54853-5FF3-4AB7-9C83-6DFAE205148F</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Edge/EdgeComp.vcxproj">
-      <Project>A868731B-F837-423C-944E-72D4C0A61989</Project>
+      <Project>4AC30EE8-B76A-4269-8DCE-EC175F07FA41</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Findcontour/Findcontour.vcxproj">
-      <Project>2989644F-3608-4B20-8824-C554D393DFE2</Project>
+      <Project>1432EA43-3CFA-45AA-8433-5AD57A14A1B0</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Findcontour/FindcontourComp.vcxproj">
-      <Project>083F0836-0F38-413D-A007-FE7AAF645526</Project>
+      <Project>D0A4F517-0532-4CD5-BBA2-110D8A64DBB1</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Flip/Flip.vcxproj">
-      <Project>DA87184D-9D6A-406A-8AFC-E6A07F8A088B</Project>
+      <Project>4ECE8D87-CA8B-4A34-AE4C-60BF3D82F9E9</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Flip/FlipComp.vcxproj">
-      <Project>835EA72B-CE5F-4181-B227-8242C37713CB</Project>
+      <Project>49A78619-FDA0-453F-9382-EE640B2A9886</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Histogram/Histogram.vcxproj">
-      <Project>00F1C28A-F512-4C4E-A2D9-B0AFA78C3614</Project>
+      <Project>EA1908A3-F4A0-4522-9960-112DEABE0197</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Histogram/HistogramComp.vcxproj">
-      <Project>DC78A38E-1C09-47D1-9147-274385503240</Project>
+      <Project>9E34DCA5-78F1-48FA-B519-3393416111E3</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Houghline/Hough.vcxproj">
-      <Project>A5FB86D0-7444-4E5B-A35C-810DE43A797B</Project>
+      <Project>73F43C99-7A19-45DD-84F4-46CAB90E0D37</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Houghline/HoughComp.vcxproj">
-      <Project>D9F8D467-2C4B-4FE7-870D-F4F0617A34CD</Project>
+      <Project>2C7874D8-5466-4F3B-A775-CC3E4172D38D</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/ImageCalibration/ImageCalibration.vcxproj">
-      <Project>3F6D74F7-D0A6-4224-878B-61EEC1C5DCA9</Project>
+      <Project>E48BE961-CF9E-4671-8984-F78E325D738A</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/ImageCalibration/ImageCalibrationComp.vcxproj">
-      <Project>DD11AD09-5527-42F4-94AE-71C99190C5E2</Project>
+      <Project>61751368-570A-48AA-9A8D-676B72184538</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/ImageSubstraction/ImageSubstraction.vcxproj">
-      <Project>6BE13B72-AA3B-4425-B1A8-2C5D65B417F8</Project>
+      <Project>24BB5421-C263-42C3-8388-DC23D3D62AC9</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/ImageSubstraction/ImageSubstractionComp.vcxproj">
-      <Project>FB78A02A-2483-4670-B64B-BDF6F592A85C</Project>
+      <Project>B7306E98-48FF-430F-8100-2A39EC26DCFD</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/ObjectTracking/ObjectTracking.vcxproj">
-      <Project>7E1F6BC6-3281-44FB-BA97-42CA78FE47E6</Project>
+      <Project>B9F97E8E-89A2-42C8-BC0B-9D908944C3B3</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/ObjectTracking/ObjectTrackingComp.vcxproj">
-      <Project>B0F0DF7F-316D-4F1A-ACC6-0E9106E69673</Project>
+      <Project>2C322BBB-389E-4A90-8486-66C94114A626</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/OpenCVCamera/OpenCVCamera.vcxproj">
-      <Project>808F262D-BA99-4245-A720-79537676178A</Project>
+      <Project>A2EAA1F9-F13D-4453-A7D0-6BD7783D84B4</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/OpenCVCamera/OpenCVCameraComp.vcxproj">
-      <Project>BEEF99D7-5FBA-49C4-8AD2-189D990F5C1F</Project>
+      <Project>D291AC22-6C06-4A48-BD6C-25B7911E6460</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Perspective/Perspective.vcxproj">
-      <Project>96116BB3-6DAD-4CB1-81E3-B26F13473092</Project>
+      <Project>135A5283-39BE-4282-A4D4-F169A7B00CB7</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Perspective/PerspectiveComp.vcxproj">
-      <Project>899FAA01-7035-4525-A6DF-D2051E48B7B9</Project>
+      <Project>763DA8CD-9AEE-4574-A38E-3BC510F355ED</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/RockPaperScissors/RockPaperScissors.vcxproj">
-      <Project>6330D2FB-EF80-4CB8-A631-6EE7CCD26D3C</Project>
+      <Project>D4322820-36DD-4393-A24A-EFD727662EE4</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/RockPaperScissors/RockPaperScissorsComp.vcxproj">
-      <Project>FB8B2D90-F988-4B86-9E10-96C57AA396D7</Project>
+      <Project>3A0CB1E4-2BD9-4C26-9CE6-06BEB5FCA3DE</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Rotate/Rotate.vcxproj">
-      <Project>C748E8A1-A6F3-4FAA-B1ED-CC5298F6C218</Project>
+      <Project>5C602B23-A183-454B-BFD1-70FC1DA8D9EA</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Rotate/RotateComp.vcxproj">
-      <Project>38339708-FCF7-4619-9F83-732F83EB7B53</Project>
+      <Project>13C3DF1C-AC43-4A1F-ADCA-5A670EEF83B1</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Scale/Scale.vcxproj">
-      <Project>289D9D39-E94A-42AB-9FB4-E2EDC5317739</Project>
+      <Project>115F9766-37FF-498A-B19C-552C32FDA770</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Scale/ScaleComp.vcxproj">
-      <Project>CD267CCA-A5BA-445E-B111-9983F3089212</Project>
+      <Project>A3211B2E-7229-4242-BF3E-0D8379FC3569</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Sepia/Sepia.vcxproj">
-      <Project>1B3FC494-1C0C-4E3F-AF80-48D540311F4A</Project>
+      <Project>26E9942F-0258-4C85-BCC4-30A876D91E2A</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Sepia/SepiaComp.vcxproj">
-      <Project>D0E8392C-60BD-46E4-ACB3-A8B2319829B7</Project>
+      <Project>33916FE1-3246-441F-BF4A-D5B0DBA62BE6</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/SubStractCaptureImage/SubStractCaptureImage.vcxproj">
-      <Project>95A2274B-7925-4759-921D-EFB65406EFA3</Project>
+      <Project>3FE60507-E821-49B0-810E-9E8C7BE4FC82</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/SubStractCaptureImage/SubStractCaptureImageComp.vcxproj">
-      <Project>4516CDCB-81AE-44F3-8B85-C74C007B0639</Project>
+      <Project>FD458E07-4A18-4D94-A708-C83C3A14E48A</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Template/Template.vcxproj">
-      <Project>49627A33-6160-4483-BDA4-70991630083E</Project>
+      <Project>5CD30196-4B0E-418D-97C3-4BEFD808792A</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Template/TemplateComp.vcxproj">
-      <Project>F478FDCC-AA86-4612-852C-C5A5CEED3112</Project>
+      <Project>C1A0E8AB-62BF-43D8-91DA-77E1371E0400</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Translate/Translate.vcxproj">
-      <Project>7B732B9A-992A-42DF-87AD-8E07FF056EC7</Project>
+      <Project>54FDCE8D-E6A5-42BF-A3A4-CBCD19F7E0FD</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Translate/TranslateComp.vcxproj">
-      <Project>52CF7414-FF89-4603-9B63-D9B96A30EE9D</Project>
+      <Project>737E94C8-040A-449D-8423-FA05562F68D6</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/ZERO_CHECK.vcxproj">
-      <Project>6AA3C512-6CB8-4F43-8AB6-036275B3CEF3</Project>
+      <Project>87493064-6817-4173-BA90-7F469034490A</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

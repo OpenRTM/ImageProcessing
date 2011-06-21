@@ -18,7 +18,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGUID>{7C3D1454-4C08-4F48-8747-BD14546BF019}</ProjectGUID>
+    <ProjectGUID>{0F103D78-0F29-4905-BDD6-10170713B2B6}</ProjectGUID>
     <SccProjectName />
     <SccLocalPath />
     <Keyword>Win32Proj</Keyword>
@@ -169,7 +169,7 @@ if errorlevel 1 goto :VCEnd</Command>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/ImageCalibration/ALL_BUILD.vcxproj">
-      <Project>DDA405B9-13CE-4B37-B12B-632EE6D5AED7</Project>
+      <Project>B947F6ED-BEAA-4A93-AB1F-586DF141AC43</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

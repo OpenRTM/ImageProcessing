@@ -18,7 +18,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGUID>{DDA405B9-13CE-4B37-B12B-632EE6D5AED7}</ProjectGUID>
+    <ProjectGUID>{B947F6ED-BEAA-4A93-AB1F-586DF141AC43}</ProjectGUID>
     <SccProjectName />
     <SccLocalPath />
     <Keyword>Win32Proj</Keyword>
@@ -148,10 +148,10 @@ if errorlevel 1 goto :VCEnd</Command>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Binarization/Binarization.vcxproj">
-      <Project>16CF01C0-D7DB-4712-A106-B9F3CE5E2043</Project>
+      <Project>72953267-AC0D-4F8B-8F44-844A022793F8</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Binarization/BinarizationComp.vcxproj">
-      <Project>276B7A5A-FF50-46B7-B924-50F95D11FCE0</Project>
+      <Project>AFA9B6E2-492E-4CF0-9CE1-2D6513281EF9</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

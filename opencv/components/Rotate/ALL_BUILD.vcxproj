@@ -18,7 +18,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGUID>{DDA405B9-13CE-4B37-B12B-632EE6D5AED7}</ProjectGUID>
+    <ProjectGUID>{B947F6ED-BEAA-4A93-AB1F-586DF141AC43}</ProjectGUID>
     <SccProjectName />
     <SccLocalPath />
     <Keyword>Win32Proj</Keyword>
@@ -148,10 +148,10 @@ if errorlevel 1 goto :VCEnd</Command>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Rotate/Rotate.vcxproj">
-      <Project>C748E8A1-A6F3-4FAA-B1ED-CC5298F6C218</Project>
+      <Project>5C602B23-A183-454B-BFD1-70FC1DA8D9EA</Project>
     </ProjectReference>
     <ProjectReference Include="C:/distribution/ImageProcessing/opencv/components/Rotate/RotateComp.vcxproj">
-      <Project>38339708-FCF7-4619-9F83-732F83EB7B53</Project>
+      <Project>13C3DF1C-AC43-4A1F-ADCA-5A670EEF83B1</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
