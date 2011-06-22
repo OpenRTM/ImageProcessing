@@ -151,6 +151,26 @@ else()
     set_target_properties(${RTC_NAME}Comp PROPERTIES LINK_FLAGS "${LDFLAGS}")
 endif()
 
+if(WIN32)
+    set (LIBRARY_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/${RTC_NAME}/)
+    set (EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/${RTC_NAME}Comp/)
+
+    ADD_CUSTOM_COMMAND(
+       TARGET ${RTC_NAME}
+       POST_BUILD
+       COMMAND ${CMAKE_COMMAND} -E copy
+       "${CMAKE_CURRENT_SOURCE_DIR}/${RTC_NAME}/Release/${RTC_NAME}.dll"
+       "${CMAKE_CURRENT_SOURCE_DIR}/../../bin"
+     )
+    ADD_CUSTOM_COMMAND(
+       TARGET ${RTC_NAME}Comp
+       POST_BUILD
+       COMMAND ${CMAKE_COMMAND} -E copy
+       "${CMAKE_CURRENT_SOURCE_DIR}/${RTC_NAME}Comp/Release/${RTC_NAME}Comp.exe"
+       "${CMAKE_CURRENT_SOURCE_DIR}/../../bin"
+     )
+endif()
+
 install(TARGETS ${RTC_NAME} LIBRARY DESTINATION "${INSTALL_PREFIX}"
                             ARCHIVE DESTINATION "${INSTALL_PREFIX}"
                             RUNTIME DESTINATION "${INSTALL_PREFIX}"
