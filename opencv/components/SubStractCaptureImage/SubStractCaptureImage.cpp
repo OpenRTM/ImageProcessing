@@ -44,7 +44,7 @@ CvSize imageSize;
 
 int g_temp_w = 0;
 int g_temp_h = 0;
-int count = 0;
+int SubStractCaptureImage_count = 0;
 
 void showFlipImage( char *windowName, IplImage *image ) {
 	if ( image->origin == 0 ) {
@@ -139,7 +139,7 @@ RTC::ReturnCode_t SubStractCaptureImage::onActivated(RTC::UniqueId ec_id)
 {
 	g_temp_w = 0;
 	g_temp_h = 0;
-	count = 0;
+	SubStractCaptureImage_count = 0;
 	
 	inputImage = NULL;
 	backgroundAverageImage = NULL;
@@ -266,7 +266,7 @@ RTC::ReturnCode_t SubStractCaptureImage::onDeactivated(RTC::UniqueId ec_id)
 RTC::ReturnCode_t SubStractCaptureImage::onExecute(RTC::UniqueId ec_id)
 {	
 	
-	if(m_image_origIn.isNew() && count == 0){
+	if(m_image_origIn.isNew() && SubStractCaptureImage_count == 0){
 	
 		m_image_origIn.read();
 
@@ -317,11 +317,11 @@ RTC::ReturnCode_t SubStractCaptureImage::onExecute(RTC::UniqueId ec_id)
 			g_temp_w = m_image_orig.width;
 			g_temp_h = m_image_orig.height;
 
-			count = 1;
+			SubStractCaptureImage_count = 1;
 
 		}
 
-	}else if(m_image_origIn.isNew() && count != 0 ){
+	}else if(m_image_origIn.isNew() && SubStractCaptureImage_count != 0 ){
 		
 		m_image_origIn.read();
 
@@ -535,7 +535,7 @@ RTC::ReturnCode_t SubStractCaptureImage::onExecute(RTC::UniqueId ec_id)
 		//g_temp_w = m_image_orig.width;
 		//g_temp_h = m_image_orig.height;
 
-		count = 0;
+		SubStractCaptureImage_count = 0;
 	}
 
     return RTC::RTC_OK;

@@ -1,0 +1,105 @@
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ALL_BUILD", "ALL_BUILD.vcxproj", "{B947F6ED-BEAA-4A93-AB1F-586DF141AC43}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A2EAA1F9-F13D-4453-A7D0-6BD7783D84B4} = {A2EAA1F9-F13D-4453-A7D0-6BD7783D84B4}
+		{D291AC22-6C06-4A48-BD6C-25B7911E6460} = {D291AC22-6C06-4A48-BD6C-25B7911E6460}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "INSTALL", "INSTALL.vcxproj", "{0F103D78-0F29-4905-BDD6-10170713B2B6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B947F6ED-BEAA-4A93-AB1F-586DF141AC43} = {B947F6ED-BEAA-4A93-AB1F-586DF141AC43}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenCVCamera", "OpenCVCamera.vcxproj", "{A2EAA1F9-F13D-4453-A7D0-6BD7783D84B4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{87493064-6817-4173-BA90-7F469034490A} = {87493064-6817-4173-BA90-7F469034490A}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenCVCameraComp", "OpenCVCameraComp.vcxproj", "{D291AC22-6C06-4A48-BD6C-25B7911E6460}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A2EAA1F9-F13D-4453-A7D0-6BD7783D84B4} = {A2EAA1F9-F13D-4453-A7D0-6BD7783D84B4}
+		{87493064-6817-4173-BA90-7F469034490A} = {87493064-6817-4173-BA90-7F469034490A}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PACKAGE", "PACKAGE.vcxproj", "{33F42C36-1EE4-4E2E-A533-F95493177B79}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B947F6ED-BEAA-4A93-AB1F-586DF141AC43} = {B947F6ED-BEAA-4A93-AB1F-586DF141AC43}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZERO_CHECK", "..\..\ZERO_CHECK.vcxproj", "{87493064-6817-4173-BA90-7F469034490A}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "doxygen_OpenCVCamera", "doxygen_OpenCVCamera.vcxproj", "{115D139D-A4B0-4A0E-B418-E991DC11B11D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{87493064-6817-4173-BA90-7F469034490A} = {87493064-6817-4173-BA90-7F469034490A}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "uninstall_OpenCVCamera", "uninstall_OpenCVCamera.vcxproj", "{3D0DCBDC-24DC-4B66-9C54-A61C9422D5BB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{87493064-6817-4173-BA90-7F469034490A} = {87493064-6817-4173-BA90-7F469034490A}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+		MinSizeRel|Win32 = MinSizeRel|Win32
+		RelWithDebInfo|Win32 = RelWithDebInfo|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B947F6ED-BEAA-4A93-AB1F-586DF141AC43}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B947F6ED-BEAA-4A93-AB1F-586DF141AC43}.Debug|Win32.Build.0 = Debug|Win32
+		{B947F6ED-BEAA-4A93-AB1F-586DF141AC43}.Release|Win32.ActiveCfg = Release|Win32
+		{B947F6ED-BEAA-4A93-AB1F-586DF141AC43}.Release|Win32.Build.0 = Release|Win32
+		{B947F6ED-BEAA-4A93-AB1F-586DF141AC43}.MinSizeRel|Win32.ActiveCfg = MinSizeRel|Win32
+		{B947F6ED-BEAA-4A93-AB1F-586DF141AC43}.MinSizeRel|Win32.Build.0 = MinSizeRel|Win32
+		{B947F6ED-BEAA-4A93-AB1F-586DF141AC43}.RelWithDebInfo|Win32.ActiveCfg = RelWithDebInfo|Win32
+		{B947F6ED-BEAA-4A93-AB1F-586DF141AC43}.RelWithDebInfo|Win32.Build.0 = RelWithDebInfo|Win32
+		{0F103D78-0F29-4905-BDD6-10170713B2B6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0F103D78-0F29-4905-BDD6-10170713B2B6}.Release|Win32.ActiveCfg = Release|Win32
+		{0F103D78-0F29-4905-BDD6-10170713B2B6}.MinSizeRel|Win32.ActiveCfg = MinSizeRel|Win32
+		{0F103D78-0F29-4905-BDD6-10170713B2B6}.RelWithDebInfo|Win32.ActiveCfg = RelWithDebInfo|Win32
+		{A2EAA1F9-F13D-4453-A7D0-6BD7783D84B4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A2EAA1F9-F13D-4453-A7D0-6BD7783D84B4}.Debug|Win32.Build.0 = Debug|Win32
+		{A2EAA1F9-F13D-4453-A7D0-6BD7783D84B4}.Release|Win32.ActiveCfg = Release|Win32
+		{A2EAA1F9-F13D-4453-A7D0-6BD7783D84B4}.Release|Win32.Build.0 = Release|Win32
+		{A2EAA1F9-F13D-4453-A7D0-6BD7783D84B4}.MinSizeRel|Win32.ActiveCfg = MinSizeRel|Win32
+		{A2EAA1F9-F13D-4453-A7D0-6BD7783D84B4}.MinSizeRel|Win32.Build.0 = MinSizeRel|Win32
+		{A2EAA1F9-F13D-4453-A7D0-6BD7783D84B4}.RelWithDebInfo|Win32.ActiveCfg = RelWithDebInfo|Win32
+		{A2EAA1F9-F13D-4453-A7D0-6BD7783D84B4}.RelWithDebInfo|Win32.Build.0 = RelWithDebInfo|Win32
+		{D291AC22-6C06-4A48-BD6C-25B7911E6460}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D291AC22-6C06-4A48-BD6C-25B7911E6460}.Debug|Win32.Build.0 = Debug|Win32
+		{D291AC22-6C06-4A48-BD6C-25B7911E6460}.Release|Win32.ActiveCfg = Release|Win32
+		{D291AC22-6C06-4A48-BD6C-25B7911E6460}.Release|Win32.Build.0 = Release|Win32
+		{D291AC22-6C06-4A48-BD6C-25B7911E6460}.MinSizeRel|Win32.ActiveCfg = MinSizeRel|Win32
+		{D291AC22-6C06-4A48-BD6C-25B7911E6460}.MinSizeRel|Win32.Build.0 = MinSizeRel|Win32
+		{D291AC22-6C06-4A48-BD6C-25B7911E6460}.RelWithDebInfo|Win32.ActiveCfg = RelWithDebInfo|Win32
+		{D291AC22-6C06-4A48-BD6C-25B7911E6460}.RelWithDebInfo|Win32.Build.0 = RelWithDebInfo|Win32
+		{33F42C36-1EE4-4E2E-A533-F95493177B79}.Debug|Win32.ActiveCfg = Debug|Win32
+		{33F42C36-1EE4-4E2E-A533-F95493177B79}.Release|Win32.ActiveCfg = Release|Win32
+		{33F42C36-1EE4-4E2E-A533-F95493177B79}.MinSizeRel|Win32.ActiveCfg = MinSizeRel|Win32
+		{33F42C36-1EE4-4E2E-A533-F95493177B79}.RelWithDebInfo|Win32.ActiveCfg = RelWithDebInfo|Win32
+		{87493064-6817-4173-BA90-7F469034490A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{87493064-6817-4173-BA90-7F469034490A}.Debug|Win32.Build.0 = Debug|Win32
+		{87493064-6817-4173-BA90-7F469034490A}.Release|Win32.ActiveCfg = Release|Win32
+		{87493064-6817-4173-BA90-7F469034490A}.Release|Win32.Build.0 = Release|Win32
+		{87493064-6817-4173-BA90-7F469034490A}.MinSizeRel|Win32.ActiveCfg = MinSizeRel|Win32
+		{87493064-6817-4173-BA90-7F469034490A}.MinSizeRel|Win32.Build.0 = MinSizeRel|Win32
+		{87493064-6817-4173-BA90-7F469034490A}.RelWithDebInfo|Win32.ActiveCfg = RelWithDebInfo|Win32
+		{87493064-6817-4173-BA90-7F469034490A}.RelWithDebInfo|Win32.Build.0 = RelWithDebInfo|Win32
+		{115D139D-A4B0-4A0E-B418-E991DC11B11D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{115D139D-A4B0-4A0E-B418-E991DC11B11D}.Release|Win32.ActiveCfg = Release|Win32
+		{115D139D-A4B0-4A0E-B418-E991DC11B11D}.MinSizeRel|Win32.ActiveCfg = MinSizeRel|Win32
+		{115D139D-A4B0-4A0E-B418-E991DC11B11D}.RelWithDebInfo|Win32.ActiveCfg = RelWithDebInfo|Win32
+		{3D0DCBDC-24DC-4B66-9C54-A61C9422D5BB}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3D0DCBDC-24DC-4B66-9C54-A61C9422D5BB}.Release|Win32.ActiveCfg = Release|Win32
+		{3D0DCBDC-24DC-4B66-9C54-A61C9422D5BB}.MinSizeRel|Win32.ActiveCfg = MinSizeRel|Win32
+		{3D0DCBDC-24DC-4B66-9C54-A61C9422D5BB}.RelWithDebInfo|Win32.ActiveCfg = RelWithDebInfo|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal
