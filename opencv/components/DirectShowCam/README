@@ -5,8 +5,9 @@
 - PGRDirectShowSource.ax
 - regsvr32 PGRDirectShowDecoder.ax PGRDirectShowSource.ax
 
-2.「Microsoft DirectXR SDK」インストール
-- Microsoft DirectX 9.0 SDK Update (Summer 2004)
+2.「Microsoft DirectX SDK」インストール
+- Microsoft DirectX SDK (June 2010)
+  http://www.microsoft.com/download/en/details.aspx?displaylang=en&id=6812
 
 3.「Microsoft Windows Server 2003 R2 Platform SDK」インストール
 - Microsoft Platform SDK for Windows Server 2003 R2
