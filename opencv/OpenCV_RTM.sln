@@ -97,9 +97,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PGRCamera", "components\PGR
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PGRCameraComp", "components\PGRCamera\PGRCameraComp_vc9.vcproj", "{6C9954B6-46B6-4B9E-8BC6-C43704C9CE4D}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IEEE1394CameraComp", "components\IEEE1394Camera\IEEE1394CameraComp_vc9.vcproj", "{B69C7E9B-1A13-4132-ACE7-6101DC2F84EF}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DirectShowCamComp", "components\DirectShowCam\DirectShowCamComp_vc9.vcproj", "{B69C7E9B-1A13-4132-ACE7-6101DC2F84EF}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IEEE1394Camera", "components\IEEE1394Camera\IEEE1394Camera_vc9.vcproj", "{C1F88645-4FE4-4240-B25D-C91D93E154C3}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DirectShowCam", "components\DirectShowCam\DirectShowCam_vc9.vcproj", "{C1F88645-4FE4-4240-B25D-C91D93E154C3}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libCVRTCSkel", "rtm\idl\libCVRTCSkel_vc9.vcproj", "{E4054092-4820-11DE-B424-001C23DA0BDF}"
 EndProject

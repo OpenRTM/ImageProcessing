@@ -14,7 +14,7 @@
 	/>
 	<UserMacro
 		Name="MyWindowsSdkDir"
-		Value="C:\Program Files\Microsoft SDKs\Windows\v7.1"
+		Value="C:\Program Files\Microsoft SDKs\Windows\v6.0"
 	/>
 	<UserMacro
 		Name="BaseClassDir"
@@ -54,7 +54,7 @@
 	/>
 	<UserMacro
 		Name="ds_libdir"
-		Value="&quot;$(DXSDK_DIR)\Lib\x86\&quot;;&quot;$(SolutionDir)\components\IEEE1394Camera\baseclass\$(ConfigurationName)&quot;"
+		Value="&quot;$(DXSDK_DIR)\Lib\x86\&quot;;&quot;$(SolutionDir)\components\DirectShowCam\baseclass\$(ConfigurationName)&quot;"
 	/>
 	<UserMacro
 		Name="ds_lib"
@@ -74,6 +74,6 @@
 	/>
 	<UserMacro
 		Name="WindowsSdkDir"
-		Value="C:\Program Files\Microsoft SDKs\Windows\v7.1"
+		Value="C:\Program Files\Microsoft SDKs\Windows\v6.0"
 	/>
 </VisualStudioPropertySheet>

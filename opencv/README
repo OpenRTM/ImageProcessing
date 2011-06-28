@@ -1,14 +1,14 @@
 - Windwos
 -- コンポーネント
---- IEEE1394Camera
-----「Direct Show」を用いて作成しましたのでIEEE1394のREADMEを参考して下さい。
+--- DirectShowCam
+----「Direct Show」を用いて作成しましたのでDirectShowCamのREADMEを参考して下さい。
 --- PGRCamera
 ----「Point Grey」社のDragonfly2を元で作成しましたのでDragonfly2(Windwos用)ライブラリが必要となります。
 
 - Linux
 -- Fedora
 --- コンポーネント
----- IEEE1394Camera
+---- DirectShowCam
 ----- Fedoraはサポートできません。
 ---- OpenCVCamera
 ----- IEEE1394カメラ対応
@@ -16,7 +16,7 @@
 ----- Fedoraはサポートできません。
 -- Ubuntu
 --- コンポーネント
----- IEEE1394Camera
+---- DirectShowCam
 ----- Ubuntuはサポートできません。
 ---- OpenCVCamera
 ----- IEEE1394カメラ対応
