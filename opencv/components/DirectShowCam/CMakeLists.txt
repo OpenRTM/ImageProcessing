@@ -91,6 +91,7 @@ find_package(OpenCV REQUIRED)
 list(APPEND INCLUDE_DIRS ${OPENCV_INCLUDE_DIRS})
 list(APPEND LIBRARY_DIRS ${OPENCV_LIBRARY_DIRS})
 list(APPEND LIBRARIES ${OPENCV_LIBRARIES})
+list(APPEND LIBRARIES "strmbase")
 
 
 # add uninstall target
@@ -104,8 +105,11 @@ add_custom_target(uninstall_${RTC_NAME} COMMAND
 
 # target settings for library/executable
 list(APPEND INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR})
+list(APPEND INCLUDE_DIRS "$ENV{WindowsSdkDir}/Samples/Multimedia/DirectShow/BaseClasses")
+
 include_directories(${INCLUDE_DIRS})
 
+list(APPEND LIBRARY_DIRS ${PROJECT_SOURCE_DIR}) 
 link_directories(${LIBRARY_DIRS})
 
 add_definitions(${CFLAGS})
@@ -151,6 +155,26 @@ else()
     add_dependencies(${RTC_NAME}Comp ${RTC_NAME})
     target_link_libraries(${RTC_NAME}Comp ${RTC_NAME} ${LIBRARIES})
     set_target_properties(${RTC_NAME}Comp PROPERTIES LINK_FLAGS "${LDFLAGS}")
+endif()
+
+if(WIN32)
+    set (LIBRARY_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/${RTC_NAME}/)
+    set (EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/${RTC_NAME}Comp/)
+
+    ADD_CUSTOM_COMMAND(
+       TARGET ${RTC_NAME}
+       POST_BUILD
+       COMMAND ${CMAKE_COMMAND} -E copy
+       "${CMAKE_CURRENT_SOURCE_DIR}/${RTC_NAME}/Release/${RTC_NAME}.dll"
+       "${CMAKE_CURRENT_SOURCE_DIR}/../../bin"
+     )
+    ADD_CUSTOM_COMMAND(
+       TARGET ${RTC_NAME}Comp
+       POST_BUILD
+       COMMAND ${CMAKE_COMMAND} -E copy
+       "${CMAKE_CURRENT_SOURCE_DIR}/${RTC_NAME}Comp/Release/${RTC_NAME}Comp.exe"
+       "${CMAKE_CURRENT_SOURCE_DIR}/../../bin"
+     )
 endif()
 
 install(TARGETS ${RTC_NAME} LIBRARY DESTINATION "${INSTALL_PREFIX}"
