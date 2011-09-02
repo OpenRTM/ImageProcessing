@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
-project(Dilationerosion)
+project(DilationErosion)
 
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake_modules")
@@ -16,7 +16,7 @@ set(RTC_VERSION_MAJOR "1")
 set(RTC_VERSION_MINOR "0")
 set(RTC_VERSION_PATCH "0")
 set(RTC_LANG "c++")
-set(RTC_DESCRIPTION "Dilationerosion Agent Component")
+set(RTC_DESCRIPTION "DilationErosion Agent Component")
 set(RTC_VENDOR "Shibaura Inst. of Tech, Tanaka & Fujita & Takasu")
 set(RTC_MAINTAINER "author@example.com")
 
@@ -42,14 +42,14 @@ set(IMPL_INCS ""
 	#              WiiInfoSVC_impl.h
 )
 
-set(LIBS_SRCS Dilationerosion.cpp)
+set(LIBS_SRCS DilationErosion.cpp)
 
-set(LIBS_INCS Dilationerosion.h)
+set(LIBS_INCS DilationErosion.h)
 
-set(EXEC_SRCS DilationerosionComp.cpp)
+set(EXEC_SRCS DilationErosionComp.cpp)
 
 set(OTHER_SRCS CMakeLists.txt Doxyfile.in
-               RTC.xml Dilationerosion.conf rtc.conf)
+               DilationErosion.conf rtc.conf)
 
 
 # check OpenRTM installed
@@ -179,8 +179,6 @@ install(TARGETS ${RTC_NAME} LIBRARY DESTINATION "${INSTALL_PREFIX}"
         COMPONENT "applications")
 install(TARGETS ${RTC_NAME}Comp RUNTIME DESTINATION "${INSTALL_PREFIX}"
         COMPONENT "applications")
-install(FILES RTC.xml DESTINATION "${INSTALL_PREFIX}"
-        COMPONENT "applications")
 
 
 # target settings for document
@@ -190,16 +188,17 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in"
 add_custom_target(doxygen_${RTC_NAME} COMMAND
                   ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
 
-set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES doc)
+set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES)
+#set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES doc)
 
-get_target_property(DOC_TARGET doc TYPE)
-if(NOT DOC_TARGET)
-    add_custom_target(doc)
-endif()
-add_dependencies(doc doxygen)
+#get_target_property(DOC_TARGET doc TYPE)
+#if(NOT DOC_TARGET)
+#    add_custom_target(doc)
+#endif()
+#add_dependencies(doc doxygen)
 
-install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/doc DESTINATION "${INSTALL_PREFIX}"
-        COMPONENT "documents")
+#install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/doc DESTINATION "${INSTALL_PREFIX}"
+#        COMPONENT "documents")
 
 
 # install source files

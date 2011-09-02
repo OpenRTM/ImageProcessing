@@ -49,7 +49,7 @@ set(LIBS_INCS Flip.h)
 set(EXEC_SRCS FlipComp.cpp)
 
 set(OTHER_SRCS CMakeLists.txt Doxyfile.in
-               RTC.xml Flip.conf rtc.conf)
+               Flip.conf rtc.conf)
 
 
 # check OpenRTM installed
@@ -179,8 +179,6 @@ install(TARGETS ${RTC_NAME} LIBRARY DESTINATION "${INSTALL_PREFIX}"
         COMPONENT "applications")
 install(TARGETS ${RTC_NAME}Comp RUNTIME DESTINATION "${INSTALL_PREFIX}"
         COMPONENT "applications")
-install(FILES RTC.xml DESTINATION "${INSTALL_PREFIX}"
-        COMPONENT "applications")
 
 
 # target settings for document
@@ -190,16 +188,17 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in"
 add_custom_target(doxygen_${RTC_NAME} COMMAND
                   ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
 
-set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES doc)
+set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES)
+#set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES doc)
 
-get_target_property(DOC_TARGET doc TYPE)
-if(NOT DOC_TARGET)
-    add_custom_target(doc)
-endif()
-add_dependencies(doc doxygen)
+#get_target_property(DOC_TARGET doc TYPE)
+#if(NOT DOC_TARGET)
+#    add_custom_target(doc)
+#endif()
+#add_dependencies(doc doxygen)
 
-install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/doc DESTINATION "${INSTALL_PREFIX}"
-        COMPONENT "documents")
+#install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/doc DESTINATION "${INSTALL_PREFIX}"
+#        COMPONENT "documents")
 
 
 # install source files
