@@ -333,7 +333,7 @@ RTC::ReturnCode_t DirectShowCam::onExecute(RTC::UniqueId ec_id)
   }
 
   //è„â∫ïœä∑
-  m_flip(pBuffer, v_Width, abs(v_Height), v_Channel);
+  //  m_flip(pBuffer, v_Width, abs(v_Height), v_Channel);
 
   int len = v_Channel * v_Width * abs(v_Height);
 
