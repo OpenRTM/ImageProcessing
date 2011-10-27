@@ -17,8 +17,8 @@ set(RTC_VERSION_MINOR "0")
 set(RTC_VERSION_PATCH "0")
 set(RTC_LANG "c++")
 set(RTC_DESCRIPTION "CameraViewer Agent Component")
-set(RTC_VENDOR "Shibaura Inst. of Tech, Tanaka & Fujita & Takasu")
-set(RTC_MAINTAINER "author@example.com")
+set(RTC_VENDOR "AIST")
+set(RTC_MAINTAINER "openrtm@openrtm.org")
 
 string(TOLOWER ${RTC_NAME} PACKAGE_NAME)
 set(PACKAGE_VERSION "${RTC_VERSION_MAJOR}.${RTC_VERSION_MINOR}.${RTC_VERSION_PATCH}")
@@ -88,9 +88,9 @@ endif()
 # check OpenCV installed
 find_package(OpenCV REQUIRED)
 
-list(APPEND INCLUDE_DIRS ${OPENCV_INCLUDE_DIRS})
-list(APPEND LIBRARY_DIRS ${OPENCV_LIBRARY_DIRS})
-list(APPEND LIBRARIES ${OPENCV_LIBRARIES})
+list(APPEND INCLUDE_DIRS ${OpenCV_INCLUDE_DIRS})
+list(APPEND LIBRARY_DIRS ${OpenCV_LIB_DIRS})
+list(APPEND LIBRARIES ${OpenCV_LIBS})
 
 
 # add uninstall target

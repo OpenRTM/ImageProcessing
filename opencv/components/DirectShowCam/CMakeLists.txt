@@ -17,8 +17,8 @@ set(RTC_VERSION_MINOR "0")
 set(RTC_VERSION_PATCH "0")
 set(RTC_LANG "c++")
 set(RTC_DESCRIPTION "DirectShowCam Agent Component")
-set(RTC_VENDOR "Shibaura Inst. of Tech, Tanaka & Fujita & Takasu")
-set(RTC_MAINTAINER "author@example.com")
+set(RTC_VENDOR "AIST")
+set(RTC_MAINTAINER "openrtm@openrtm.org")
 
 string(TOLOWER ${RTC_NAME} PACKAGE_NAME)
 set(PACKAGE_VERSION "${RTC_VERSION_MAJOR}.${RTC_VERSION_MINOR}.${RTC_VERSION_PATCH}")
@@ -88,9 +88,9 @@ endif()
 # check OpenCV installed
 find_package(OpenCV REQUIRED)
 
-list(APPEND INCLUDE_DIRS ${OPENCV_INCLUDE_DIRS})
-list(APPEND LIBRARY_DIRS ${OPENCV_LIBRARY_DIRS})
-list(APPEND LIBRARIES ${OPENCV_LIBRARIES})
+list(APPEND INCLUDE_DIRS ${OpenCV_INCLUDE_DIRS})
+list(APPEND LIBRARY_DIRS ${OpenCV_LIB_DIRS} "$ENV{WindowsSdkDir}/Samples/Multimedia/DirectShow/BaseClasses")
+list(APPEND LIBRARIES ${OpenCV_LIBS})
 list(APPEND LIBRARIES "strmbase")
 
 
@@ -109,7 +109,7 @@ list(APPEND INCLUDE_DIRS "$ENV{WindowsSdkDir}/Samples/Multimedia/DirectShow/Base
 
 include_directories(${INCLUDE_DIRS})
 
-list(APPEND LIBRARY_DIRS ${PROJECT_SOURCE_DIR}) 
+list(APPEND LIBRARY_DIRS ${PROJECT_SOURCE_DIR} "$ENV{WindowsSdkDir}/Samples/Multimedia/DirectShow/BaseClasses") 
 link_directories(${LIBRARY_DIRS})
 
 add_definitions(${CFLAGS})
