@@ -1,22 +1,14 @@
-Source: opencvrtc
+Source: opencv-rtcs
 Section: main
 Priority: extra
 Maintainer: Noriaki Ando <n-ando@aist.go.jp>
-Build-Depends: debhelper, libomniorb4-dev, omniidl4, omniorb4-nameserver, python, uuid-dev
+Build-Depends: debhelper, openrtm-aist-dev, libopencv-contrib-dev, libopencv-core-dev, libopencv-dev, libopencv-highgui-dev, libopencv-legacy-dev
 Standards-Version: 3.8.4
-Homepage: http://www.openrtm.org
+Homepage: http://openrtm.org/openrtm/ja/project/opencv_rtcs
 
-Package: opencvrtc
+Package: opencv-rtcs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: OpenRTM-aist, RT-Middleware distributed by AIST
- OpenRTM-aist is a reference implementation of RTC (Robotic Technology
- Component) specification which is OMG standard. OpenRTM-aist includes
- RT-Middleware runtime environment and RTC framework. The OMG standard
- defines a component model and certain important infrastructure
- services applicable to the domain of robotics software development.
- OpenRTM-aist is being developed and distributed by Intelligent
- Systems Research Institute, National Institute of Advanced Industrial
- Science and Technology (AIST), Japan.
- Please see http://www.openrtm.org/ for more detail.
+Description: OpenCV based filter RT-Components.
+ Please see http://openrtm.org/openrtm/ja/project/opencv_rtcs for more detail.
 
