@@ -3,7 +3,7 @@
 AUTOMAKE_OPTIONS = 1.9
 
 AM_CPPFLAGS=`rtm-config --cflags` `pkg-config --cflags opencv`
-AM_LDFLAGS=-`rtm-config --libs` `pkg-config --libs opencv`
+AM_LDFLAGS=`rtm-config --libs` `pkg-config --libs opencv`
 
 #------------------------------------------------------------
 # Targets
