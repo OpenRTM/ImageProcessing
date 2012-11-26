@@ -10,8 +10,10 @@ AM_LDFLAGS=`rtm-config --libs` `pkg-config --libs opencv`
 #------------------------------------------------------------
 # Targets directories
 #exampledir = $(pkgdatadir)/examples
-exampledir = /usr/share/OpenRTM-aist/Components/OpenCV
-socompdir  = $(exampledir)/rtcs
+#exampledir = /usr/share/OpenRTM-aist/Components/OpenCV
+exampledir = /usr/share/openrtm-1.1/example/opencv-rtcs
+socompdir  = $(exampledir)/rtc
+#socompdir  = $(exampledir)/rtcs
 sourcedir  = $(exampledir)/src/Hough
 
 # Loadable RTCs
