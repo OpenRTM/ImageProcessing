@@ -9,6 +9,6 @@ Homepage: http://openrtm.org/openrtm/ja/project/opencv_rtcs
 Package: opencv-rtcs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: OpenCV based filter RT-Components.
+Description: OpenCV based image processing RT-Components.
  Please see http://openrtm.org/openrtm/ja/project/opencv_rtcs for more detail.
 
