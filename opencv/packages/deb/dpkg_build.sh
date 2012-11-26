@@ -88,7 +88,7 @@ fi
 #------------------------------------------------------------
 if test ! -f "files" ; then
     PKGVER=`head -n 1 changelog | sed 's/.*(\([0-9\.\-]*\).*/\1/'`
-    echo "opencvrtc_"${PKGVER}"_amd64.deb main extra" > files
+    echo "opencv-rtcs_"${PKGVER}"_amd64.deb main extra" > files
 fi
 
 #------------------------------------------------------------
@@ -97,7 +97,7 @@ fi
 packagedir=`pwd`/../../
 mkdir $packagedir/debian
 
-rm -f $packagedir/packages/opencvrtc*
+rm -f $packagedir/packages/opencv-rtcs*
 
 cp README.Debian $packagedir/debian/
 cp changelog $packagedir/debian/
@@ -115,4 +115,4 @@ cd $packagedir
 
 dpkg-buildpackage -W -us -uc -rfakeroot
 
-#mv $packagedir/../opencvrtc* $packagedir/packages/
+#mv $packagedir/../opencv-rtcs* $packagedir/packages/
