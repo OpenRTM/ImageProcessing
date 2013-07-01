@@ -1,0 +1,54 @@
+# DirectShowCam CMake config file
+#
+# This file sets the following variables:
+# DirectShowCam_FOUND - Always TRUE.
+# DirectShowCam_INCLUDE_DIRS - Directories containing the DirectShowCam include files.
+# DirectShowCam_IDL_DIRS - Directories containing the DirectShowCam IDL files.
+# DirectShowCam_LIBRARIES - Libraries needed to use DirectShowCam.
+# DirectShowCam_DEFINITIONS - Compiler flags for DirectShowCam.
+# DirectShowCam_VERSION - The version of DirectShowCam found.
+# DirectShowCam_VERSION_MAJOR - The major version of DirectShowCam found.
+# DirectShowCam_VERSION_MINOR - The minor version of DirectShowCam found.
+# DirectShowCam_VERSION_REVISION - The revision version of DirectShowCam found.
+# DirectShowCam_VERSION_CANDIDATE - The candidate version of DirectShowCam found.
+
+message(STATUS "Found DirectShowCam-@PROJECT_VERSION@")
+set(DirectShowCam_FOUND TRUE)
+
+find_package(<dependency> REQUIRED)
+
+#set(DirectShowCam_INCLUDE_DIRS
+#    "@CMAKE_INSTALL_PREFIX@/include/@PROJECT_NAME_LOWER@-@PROJECT_VERSION_MAJOR@"
+#    ${<dependency>_INCLUDE_DIRS}
+#    )
+#
+#set(DirectShowCam_IDL_DIRS
+#    "@CMAKE_INSTALL_PREFIX@/include/@PROJECT_NAME_LOWER@-@PROJECT_VERSION_MAJOR@/idl")
+set(DirectShowCam_INCLUDE_DIRS
+    "@CMAKE_INSTALL_PREFIX@/include/@CPACK_PACKAGE_FILE_NAME@"
+    ${<dependency>_INCLUDE_DIRS}
+    )
+set(DirectShowCam_IDL_DIRS
+    "@CMAKE_INSTALL_PREFIX@/include/@CPACK_PACKAGE_FILE_NAME@/idl")
+
+
+if(WIN32)
+    set(DirectShowCam_LIBRARIES
+        "@CMAKE_INSTALL_PREFIX@/@LIB_INSTALL_DIR@/@CMAKE_SHARED_LIBRARY_PREFIX@@PROJECT_NAME_LOWER@@CMAKE_STATIC_LIBRARY_SUFFIX@"
+        ${<dependency>_LIBRARIES}
+        )
+else(WIN32)
+    set(DirectShowCam_LIBRARIES
+        "@CMAKE_INSTALL_PREFIX@/@LIB_INSTALL_DIR@/@CMAKE_SHARED_LIBRARY_PREFIX@@PROJECT_NAME_LOWER@@CMAKE_SHARED_LIBRARY_SUFFIX@"
+        ${<dependency>_LIBRARIES}
+        )
+endif(WIN32)
+
+set(DirectShowCam_DEFINITIONS ${<dependency>_DEFINITIONS})
+
+set(DirectShowCam_VERSION @PROJECT_VERSION@)
+set(DirectShowCam_VERSION_MAJOR @PROJECT_VERSION_MAJOR@)
+set(DirectShowCam_VERSION_MINOR @PROJECT_VERSION_MINOR@)
+set(DirectShowCam_VERSION_REVISION @PROJECT_VERSION_REVISION@)
+set(DirectShowCam_VERSION_CANDIDATE @PROJECT_VERSION_CANDIDATE@)
+

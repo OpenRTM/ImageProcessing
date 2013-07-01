@@ -1,0 +1,54 @@
+# ImageCalibration CMake config file
+#
+# This file sets the following variables:
+# ImageCalibration_FOUND - Always TRUE.
+# ImageCalibration_INCLUDE_DIRS - Directories containing the ImageCalibration include files.
+# ImageCalibration_IDL_DIRS - Directories containing the ImageCalibration IDL files.
+# ImageCalibration_LIBRARIES - Libraries needed to use ImageCalibration.
+# ImageCalibration_DEFINITIONS - Compiler flags for ImageCalibration.
+# ImageCalibration_VERSION - The version of ImageCalibration found.
+# ImageCalibration_VERSION_MAJOR - The major version of ImageCalibration found.
+# ImageCalibration_VERSION_MINOR - The minor version of ImageCalibration found.
+# ImageCalibration_VERSION_REVISION - The revision version of ImageCalibration found.
+# ImageCalibration_VERSION_CANDIDATE - The candidate version of ImageCalibration found.
+
+message(STATUS "Found ImageCalibration-@PROJECT_VERSION@")
+set(ImageCalibration_FOUND TRUE)
+
+find_package(<dependency> REQUIRED)
+
+#set(ImageCalibration_INCLUDE_DIRS
+#    "@CMAKE_INSTALL_PREFIX@/include/@PROJECT_NAME_LOWER@-@PROJECT_VERSION_MAJOR@"
+#    ${<dependency>_INCLUDE_DIRS}
+#    )
+#
+#set(ImageCalibration_IDL_DIRS
+#    "@CMAKE_INSTALL_PREFIX@/include/@PROJECT_NAME_LOWER@-@PROJECT_VERSION_MAJOR@/idl")
+set(ImageCalibration_INCLUDE_DIRS
+    "@CMAKE_INSTALL_PREFIX@/include/@CPACK_PACKAGE_FILE_NAME@"
+    ${<dependency>_INCLUDE_DIRS}
+    )
+set(ImageCalibration_IDL_DIRS
+    "@CMAKE_INSTALL_PREFIX@/include/@CPACK_PACKAGE_FILE_NAME@/idl")
+
+
+if(WIN32)
+    set(ImageCalibration_LIBRARIES
+        "@CMAKE_INSTALL_PREFIX@/@LIB_INSTALL_DIR@/@CMAKE_SHARED_LIBRARY_PREFIX@@PROJECT_NAME_LOWER@@CMAKE_STATIC_LIBRARY_SUFFIX@"
+        ${<dependency>_LIBRARIES}
+        )
+else(WIN32)
+    set(ImageCalibration_LIBRARIES
+        "@CMAKE_INSTALL_PREFIX@/@LIB_INSTALL_DIR@/@CMAKE_SHARED_LIBRARY_PREFIX@@PROJECT_NAME_LOWER@@CMAKE_SHARED_LIBRARY_SUFFIX@"
+        ${<dependency>_LIBRARIES}
+        )
+endif(WIN32)
+
+set(ImageCalibration_DEFINITIONS ${<dependency>_DEFINITIONS})
+
+set(ImageCalibration_VERSION @PROJECT_VERSION@)
+set(ImageCalibration_VERSION_MAJOR @PROJECT_VERSION_MAJOR@)
+set(ImageCalibration_VERSION_MINOR @PROJECT_VERSION_MINOR@)
+set(ImageCalibration_VERSION_REVISION @PROJECT_VERSION_REVISION@)
+set(ImageCalibration_VERSION_CANDIDATE @PROJECT_VERSION_CANDIDATE@)
+

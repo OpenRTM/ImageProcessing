@@ -1,0 +1,54 @@
+# Scale CMake config file
+#
+# This file sets the following variables:
+# Scale_FOUND - Always TRUE.
+# Scale_INCLUDE_DIRS - Directories containing the Scale include files.
+# Scale_IDL_DIRS - Directories containing the Scale IDL files.
+# Scale_LIBRARIES - Libraries needed to use Scale.
+# Scale_DEFINITIONS - Compiler flags for Scale.
+# Scale_VERSION - The version of Scale found.
+# Scale_VERSION_MAJOR - The major version of Scale found.
+# Scale_VERSION_MINOR - The minor version of Scale found.
+# Scale_VERSION_REVISION - The revision version of Scale found.
+# Scale_VERSION_CANDIDATE - The candidate version of Scale found.
+
+message(STATUS "Found Scale-@PROJECT_VERSION@")
+set(Scale_FOUND TRUE)
+
+find_package(<dependency> REQUIRED)
+
+#set(Scale_INCLUDE_DIRS
+#    "@CMAKE_INSTALL_PREFIX@/include/@PROJECT_NAME_LOWER@-@PROJECT_VERSION_MAJOR@"
+#    ${<dependency>_INCLUDE_DIRS}
+#    )
+#
+#set(Scale_IDL_DIRS
+#    "@CMAKE_INSTALL_PREFIX@/include/@PROJECT_NAME_LOWER@-@PROJECT_VERSION_MAJOR@/idl")
+set(Scale_INCLUDE_DIRS
+    "@CMAKE_INSTALL_PREFIX@/include/@CPACK_PACKAGE_FILE_NAME@"
+    ${<dependency>_INCLUDE_DIRS}
+    )
+set(Scale_IDL_DIRS
+    "@CMAKE_INSTALL_PREFIX@/include/@CPACK_PACKAGE_FILE_NAME@/idl")
+
+
+if(WIN32)
+    set(Scale_LIBRARIES
+        "@CMAKE_INSTALL_PREFIX@/@LIB_INSTALL_DIR@/@CMAKE_SHARED_LIBRARY_PREFIX@@PROJECT_NAME_LOWER@@CMAKE_STATIC_LIBRARY_SUFFIX@"
+        ${<dependency>_LIBRARIES}
+        )
+else(WIN32)
+    set(Scale_LIBRARIES
+        "@CMAKE_INSTALL_PREFIX@/@LIB_INSTALL_DIR@/@CMAKE_SHARED_LIBRARY_PREFIX@@PROJECT_NAME_LOWER@@CMAKE_SHARED_LIBRARY_SUFFIX@"
+        ${<dependency>_LIBRARIES}
+        )
+endif(WIN32)
+
+set(Scale_DEFINITIONS ${<dependency>_DEFINITIONS})
+
+set(Scale_VERSION @PROJECT_VERSION@)
+set(Scale_VERSION_MAJOR @PROJECT_VERSION_MAJOR@)
+set(Scale_VERSION_MINOR @PROJECT_VERSION_MINOR@)
+set(Scale_VERSION_REVISION @PROJECT_VERSION_REVISION@)
+set(Scale_VERSION_CANDIDATE @PROJECT_VERSION_CANDIDATE@)
+

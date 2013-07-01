@@ -1,0 +1,54 @@
+# ImageSubstraction CMake config file
+#
+# This file sets the following variables:
+# ImageSubstraction_FOUND - Always TRUE.
+# ImageSubstraction_INCLUDE_DIRS - Directories containing the ImageSubstraction include files.
+# ImageSubstraction_IDL_DIRS - Directories containing the ImageSubstraction IDL files.
+# ImageSubstraction_LIBRARIES - Libraries needed to use ImageSubstraction.
+# ImageSubstraction_DEFINITIONS - Compiler flags for ImageSubstraction.
+# ImageSubstraction_VERSION - The version of ImageSubstraction found.
+# ImageSubstraction_VERSION_MAJOR - The major version of ImageSubstraction found.
+# ImageSubstraction_VERSION_MINOR - The minor version of ImageSubstraction found.
+# ImageSubstraction_VERSION_REVISION - The revision version of ImageSubstraction found.
+# ImageSubstraction_VERSION_CANDIDATE - The candidate version of ImageSubstraction found.
+
+message(STATUS "Found ImageSubstraction-@PROJECT_VERSION@")
+set(ImageSubstraction_FOUND TRUE)
+
+find_package(<dependency> REQUIRED)
+
+#set(ImageSubstraction_INCLUDE_DIRS
+#    "@CMAKE_INSTALL_PREFIX@/include/@PROJECT_NAME_LOWER@-@PROJECT_VERSION_MAJOR@"
+#    ${<dependency>_INCLUDE_DIRS}
+#    )
+#
+#set(ImageSubstraction_IDL_DIRS
+#    "@CMAKE_INSTALL_PREFIX@/include/@PROJECT_NAME_LOWER@-@PROJECT_VERSION_MAJOR@/idl")
+set(ImageSubstraction_INCLUDE_DIRS
+    "@CMAKE_INSTALL_PREFIX@/include/@CPACK_PACKAGE_FILE_NAME@"
+    ${<dependency>_INCLUDE_DIRS}
+    )
+set(ImageSubstraction_IDL_DIRS
+    "@CMAKE_INSTALL_PREFIX@/include/@CPACK_PACKAGE_FILE_NAME@/idl")
+
+
+if(WIN32)
+    set(ImageSubstraction_LIBRARIES
+        "@CMAKE_INSTALL_PREFIX@/@LIB_INSTALL_DIR@/@CMAKE_SHARED_LIBRARY_PREFIX@@PROJECT_NAME_LOWER@@CMAKE_STATIC_LIBRARY_SUFFIX@"
+        ${<dependency>_LIBRARIES}
+        )
+else(WIN32)
+    set(ImageSubstraction_LIBRARIES
+        "@CMAKE_INSTALL_PREFIX@/@LIB_INSTALL_DIR@/@CMAKE_SHARED_LIBRARY_PREFIX@@PROJECT_NAME_LOWER@@CMAKE_SHARED_LIBRARY_SUFFIX@"
+        ${<dependency>_LIBRARIES}
+        )
+endif(WIN32)
+
+set(ImageSubstraction_DEFINITIONS ${<dependency>_DEFINITIONS})
+
+set(ImageSubstraction_VERSION @PROJECT_VERSION@)
+set(ImageSubstraction_VERSION_MAJOR @PROJECT_VERSION_MAJOR@)
+set(ImageSubstraction_VERSION_MINOR @PROJECT_VERSION_MINOR@)
+set(ImageSubstraction_VERSION_REVISION @PROJECT_VERSION_REVISION@)
+set(ImageSubstraction_VERSION_CANDIDATE @PROJECT_VERSION_CANDIDATE@)
+

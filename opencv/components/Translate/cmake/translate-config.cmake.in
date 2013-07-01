@@ -1,0 +1,54 @@
+# Translate CMake config file
+#
+# This file sets the following variables:
+# Translate_FOUND - Always TRUE.
+# Translate_INCLUDE_DIRS - Directories containing the Translate include files.
+# Translate_IDL_DIRS - Directories containing the Translate IDL files.
+# Translate_LIBRARIES - Libraries needed to use Translate.
+# Translate_DEFINITIONS - Compiler flags for Translate.
+# Translate_VERSION - The version of Translate found.
+# Translate_VERSION_MAJOR - The major version of Translate found.
+# Translate_VERSION_MINOR - The minor version of Translate found.
+# Translate_VERSION_REVISION - The revision version of Translate found.
+# Translate_VERSION_CANDIDATE - The candidate version of Translate found.
+
+message(STATUS "Found Translate-@PROJECT_VERSION@")
+set(Translate_FOUND TRUE)
+
+find_package(<dependency> REQUIRED)
+
+#set(Translate_INCLUDE_DIRS
+#    "@CMAKE_INSTALL_PREFIX@/include/@PROJECT_NAME_LOWER@-@PROJECT_VERSION_MAJOR@"
+#    ${<dependency>_INCLUDE_DIRS}
+#    )
+#
+#set(Translate_IDL_DIRS
+#    "@CMAKE_INSTALL_PREFIX@/include/@PROJECT_NAME_LOWER@-@PROJECT_VERSION_MAJOR@/idl")
+set(Translate_INCLUDE_DIRS
+    "@CMAKE_INSTALL_PREFIX@/include/@CPACK_PACKAGE_FILE_NAME@"
+    ${<dependency>_INCLUDE_DIRS}
+    )
+set(Translate_IDL_DIRS
+    "@CMAKE_INSTALL_PREFIX@/include/@CPACK_PACKAGE_FILE_NAME@/idl")
+
+
+if(WIN32)
+    set(Translate_LIBRARIES
+        "@CMAKE_INSTALL_PREFIX@/@LIB_INSTALL_DIR@/@CMAKE_SHARED_LIBRARY_PREFIX@@PROJECT_NAME_LOWER@@CMAKE_STATIC_LIBRARY_SUFFIX@"
+        ${<dependency>_LIBRARIES}
+        )
+else(WIN32)
+    set(Translate_LIBRARIES
+        "@CMAKE_INSTALL_PREFIX@/@LIB_INSTALL_DIR@/@CMAKE_SHARED_LIBRARY_PREFIX@@PROJECT_NAME_LOWER@@CMAKE_SHARED_LIBRARY_SUFFIX@"
+        ${<dependency>_LIBRARIES}
+        )
+endif(WIN32)
+
+set(Translate_DEFINITIONS ${<dependency>_DEFINITIONS})
+
+set(Translate_VERSION @PROJECT_VERSION@)
+set(Translate_VERSION_MAJOR @PROJECT_VERSION_MAJOR@)
+set(Translate_VERSION_MINOR @PROJECT_VERSION_MINOR@)
+set(Translate_VERSION_REVISION @PROJECT_VERSION_REVISION@)
+set(Translate_VERSION_CANDIDATE @PROJECT_VERSION_CANDIDATE@)
+
