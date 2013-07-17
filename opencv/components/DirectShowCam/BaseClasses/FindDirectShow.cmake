@@ -9,29 +9,29 @@
 
 if(MSVC)
 
-	foreach(winsdkver v7.1 v7.0A)
-		get_filename_component(sdkdir
-			"[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows\\${winsdkver};InstallationFolder]"
-			ABSOLUTE)
-		if(EXISTS "${sdkdir}")
-			list(APPEND win_sdk_dir "${sdkdir}")
-		endif()
-	endforeach()
+  foreach(winsdkver v7.1 v7.0A)
+    get_filename_component(sdkdir
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows\\${winsdkver};InstallationFolder]"
+      ABSOLUTE)
+    if(EXISTS "${sdkdir}")
+      list(APPEND win_sdk_dir "${sdkdir}")
+    endif()
+  endforeach()
 
-	foreach(sdkdir ${win_sdk_dir})
-		if(EXISTS "${sdkdir}/Samples/Multimedia/DirectShow/BaseClasses/streams.h"
-						AND EXISTS "${sdkdir}/Include/DShow.h")
-			list(APPEND WINDOWSSDK_ROOT "${sdkdir}")
-			list(APPEND WINDOWSSDK_INCLUDE_DIR "${sdkdir}/Include")
-		endif()
-	endforeach()
+  foreach(sdkdir ${win_sdk_dir})
+    if(EXISTS "${sdkdir}/Samples/Multimedia/DirectShow/BaseClasses/streams.h"
+        AND EXISTS "${sdkdir}/Include/DShow.h")
+      list(APPEND WINDOWSSDK_ROOT "${sdkdir}")
+      list(APPEND WINDOWSSDK_INCLUDE_DIR "${sdkdir}/Include")
+    endif()
+  endforeach()
 
-	message(STATUS "WindowsSDK Include : ${WINDOWSSDK_INCLUDE_DIR}")
+  message(STATUS "WindowsSDK Include : ${WINDOWSSDK_INCLUDE_DIR}")
 
   set(WINDOWSSDK_LIBRARY_DIRS "${WINDOWSSDK_ROOT}/Lib")
 
   set(DIRECTSHOW_BASECLASS_DIR "${WINDOWSSDK_ROOT}/Samples/multimedia/directshow/baseclasses")
-	message(STATUS "DirectShow baseclasses : ${DIRECTSHOW_BASECLASS_DIR}")
+  message(STATUS "DirectShow baseclasses : ${DIRECTSHOW_BASECLASS_DIR}")
 
   # if DirectShow include dir found, then find DirectShow libraries
   if(WINDOWSSDK_INCLUDE_DIR)
