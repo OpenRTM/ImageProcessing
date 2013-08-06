@@ -70,16 +70,18 @@ install(EXPORT ${PROJECT_NAME}
     FILE ${PROJECT_NAME}Depends.cmake)
 
 if (SolutionDir)
-  add_custom_command(
-    TARGET ${PROJECT_NAME}
-    POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E 
-      copy ${PROJECT_BINARY_DIR}/src/Release/${PROJECT_NAME}.dll ${SolutionDir}/bin
-  )
-  add_custom_command(
-    TARGET ${PROJECT_NAME}Comp
-    POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E 
-      copy ${PROJECT_BINARY_DIR}/src/Release/${PROJECT_NAME}Comp.exe ${SolutionDir}/bin
-  )
+  if (MSVC)
+    add_custom_command(
+      TARGET ${PROJECT_NAME}
+      POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E 
+        copy ${PROJECT_BINARY_DIR}/src/Release/${PROJECT_NAME}.dll ${SolutionDir}/bin
+    )
+    add_custom_command(
+      TARGET ${PROJECT_NAME}Comp
+      POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E 
+        copy ${PROJECT_BINARY_DIR}/src/Release/${PROJECT_NAME}Comp.exe ${SolutionDir}/bin
+    )
+  endif (MSVC)
 endif (SolutionDir)
