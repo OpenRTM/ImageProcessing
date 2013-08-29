@@ -25,19 +25,18 @@ static const char* backgroundsubtractionsimple_spec[] =
     "language",          "C++",
     "lang_type",         "compile",
     // Configuration variables
-    "conf.default.control_mode", "a",
+    "conf.default.control_mode", "b",
     "conf.default.image_height", "240",
     "conf.default.image_width", "320",
     // Widget
-    "conf.__widget__.control_mode", "text",
+    "conf.__widget__.control_mode", "radio",
     "conf.__widget__.image_height", "text",
     "conf.__widget__.image_width", "text",
     // Constraints
+    "conf.__constraints__.control_mode", "(b,m,n)",
     ""
   };
 // </rtc-template>
-
-int key;
 
 //char windowNameCurrent[] = "Current";		//	現在の画像を表示するウィンドウの名前
 //char windowNameResult[] = "Result";			//	背景差分結果を表示するウィンドウの名前
@@ -57,16 +56,17 @@ IplImage *backgroundImage = NULL;
 IplImage *resultImage = NULL;
 IplImage *outputImage = NULL;
 
-char *differenceMethod[3] = {
-	"RGBの成分ごとに評価",
-	"CIE L*a*b* で距離を評価",
-	"グレースケールで評価"
+//char *differenceMethod[3] = {
+std::string differenceMethod[3] = {
+	"Evaluate each component of RGB",  //RGBの成分ごとに評価
+	"Evaluate the distance in CIE L * a * b *",  //CIE L*a*b* で距離を評価
+	"Evaluated by gray scale"  //グレースケールで評価
 };
 
-char *noiseMethod[3] = {
-	"なし",
-	"オープニング",
-	"メディアンフィルタ"
+std::string noiseMethod[3] = {
+	"None",
+	"Opening",
+	"Median filter"
 };
 
 void colorDifference( IplImage *currentImage, IplImage *backgroundImage, IplImage *resultImage ){
@@ -255,7 +255,7 @@ RTC::ReturnCode_t BackGroundSubtractionSimple::onShutdown(RTC::UniqueId ec_id)
 RTC::ReturnCode_t BackGroundSubtractionSimple::onActivated(RTC::UniqueId ec_id)
 {	
 	captureOn = CAPTURE_ON;				//	背景差分を行う画像を更新するかどうか
-    differenceMode = COLOR_DIFFERENCE;	//	差分の計算モード
+  differenceMode = COLOR_DIFFERENCE;	//	差分の計算モード
 	noiseMode = NOISE_KEEP;				//	ノイズを除去するモード
 
 	g_temp_w = 0;
@@ -339,13 +339,6 @@ RTC::ReturnCode_t BackGroundSubtractionSimple::onExecute(RTC::UniqueId ec_id)
 		//	現在の画像としても1枚確保する
 		//currentImage = cvCloneImage( originalImage );
 
-		//Key入力Read
-		if(m_keyIn.isNew()){
-			m_keyIn.read();
-			//Intに変換
-			key = (int)m_key.data;
-		}
-		
 		//InPortの映像の取得
 		memcpy(originalImage->imageData,(void *)&(m_img_orig.pixels[0]),m_img_orig.pixels.length());
 
@@ -414,41 +407,35 @@ RTC::ReturnCode_t BackGroundSubtractionSimple::onExecute(RTC::UniqueId ec_id)
 		//cvShowImage( windowNameCurrent, currentImage );
 		//cvShowImage( windowNameResult, resultImage );
 		//cvShowImage( windowNameBackground, backgroundImage );
+				
+		//Key入力Read
+		if(m_keyIn.isNew()){
+			m_keyIn.read();
 		
-		//key = cvWaitKey(1);
-		cvWaitKey(1);
-		
-		if(key == 'b'){
-			if(backgroundImage != NULL) {
-				cvReleaseImage(&backgroundImage);
-			}
-			backgroundImage = cvCloneImage(originalImage);
-			//backgroundImage = NULL;
-			printf( "背景画像更新\n" );
-		}else if(key == ' '){
-			captureOn = 1 - captureOn;
-			if(captureOn == CAPTURE_ON){
-				printf("映像取得：ON\n");
-			}else if(captureOn == CAPTURE_OFF){
-				printf("映像取得：OFF\n");
-			}
-		}else if(key == 'm'){
-			differenceMode = differenceMode + 1;
-			if( differenceMode > GRAY_DIFFERENCE ){
-				differenceMode = COLOR_DIFFERENCE;
-			}
-			printf( "差の評価方法: %s\n", differenceMethod[differenceMode] );
-		}else if( key == 'n' ){ 
-			//	'n'キーが押されたらノイズ除去方法を変更する
-			noiseMode = noiseMode + 1;
-			if( noiseMode > NOISE_MEDIAN ){
-				noiseMode = NOISE_KEEP;
-			}
-			printf( "ノイズ除去方法: %s\n", noiseMethod[noiseMode] );
+		  if(m_cont_mode == 'b'){
+			  if(backgroundImage != NULL) {
+				  cvReleaseImage(&backgroundImage);
+			  }
+			  backgroundImage = cvCloneImage(originalImage);
+			  //backgroundImage = NULL;
+			  printf( "Background image update\n" );   //背景画像更新
+
+		  }else if(m_cont_mode == 'm'){
+			  differenceMode = differenceMode + 1;
+			  if( differenceMode > GRAY_DIFFERENCE ){
+				  differenceMode = COLOR_DIFFERENCE;
+			  }
+			  printf( "Evaluation method of difference: %s\n", differenceMethod[differenceMode].c_str() );   //差の評価方法
+		  }else if( m_cont_mode == 'n' ){ 
+			  //	'n'キーが押されたらノイズ除去方法を変更する
+			  noiseMode = noiseMode + 1;
+			  if( noiseMode > NOISE_MEDIAN ){
+				  noiseMode = NOISE_KEEP;
+			  }
+			  printf( "Noise removal method: %s\n", noiseMethod[noiseMode].c_str() );  //ノイズ除去方法
+		  }
 		}
-
-		key = '0';
-
+		
 		if(originalImage != NULL){
 			cvReleaseImage(&originalImage);
 		}
