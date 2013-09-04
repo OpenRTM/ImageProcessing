@@ -32,13 +32,19 @@ static const char* chromakey_spec[] =
     "conf.default.lower_red", "0",
     "conf.default.upper_red", "0",
     // Widget
-    "conf.__widget__.lower_blue", "text",
-    "conf.__widget__.upper_blue", "text",
-    "conf.__widget__.lower_yellow", "text",
-    "conf.__widget__.upper_yellow", "text",
-    "conf.__widget__.lower_red", "text",
-    "conf.__widget__.upper_red", "text",
+    "conf.__widget__.lower_blue", "slider.1",
+    "conf.__widget__.upper_blue", "slider.1",
+    "conf.__widget__.lower_yellow", "slider.1",
+    "conf.__widget__.upper_yellow", "slider.1",
+    "conf.__widget__.lower_red", "slider.1",
+    "conf.__widget__.upper_red", "slider.1",
     // Constraints
+    "conf.__constraints__.lower_blue", "0<=x<=255",
+    "conf.__constraints__.upper_blue", "0<=x<=255",
+    "conf.__constraints__.lower_yellow", "0<=x<=255",
+    "conf.__constraints__.upper_yellow", "0<=x<=255",
+    "conf.__constraints__.lower_red", "0<=x<=255",
+    "conf.__constraints__.upper_red", "0<=x<=255",
     ""
   };
 // </rtc-template>
