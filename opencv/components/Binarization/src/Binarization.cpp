@@ -29,8 +29,9 @@ static const char* binarization_spec[] =
     // Configuration variables
     "conf.default.threshold_level", "128",
     // Widget
-    "conf.__widget__.threshold_level", "text",
+    "conf.__widget__.threshold_level", "slider.1",
     // Constraints
+    "conf.__constraints__.threshold_level", "0<=x<=255",
     ""
   };
 // </rtc-template>
