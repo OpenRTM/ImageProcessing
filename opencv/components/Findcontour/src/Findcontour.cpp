@@ -26,6 +26,12 @@ static const char* findcontour_spec[] =
     "max_instance",      "1",
     "language",          "C++",
     "lang_type",         "compile",
+    // Configuration variables
+    "conf.default.threshold_level", "10",
+    // Widget
+    "conf.__widget__.threshold_level", "slider.1",
+    // Constraints
+    "conf.__constraints__.threshold_level", "0<=x<=255",
     ""
   };
 // </rtc-template>
@@ -72,6 +78,7 @@ RTC::ReturnCode_t Findcontour::onInitialize()
   // </rtc-template>
 
   // <rtc-template block="bind_config">
+  bindParameter("threshold_level", m_nThresholdLv, "10");
   // </rtc-template>
   
   return RTC::RTC_OK;
@@ -170,7 +177,7 @@ RTC::ReturnCode_t Findcontour::onExecute(RTC::UniqueId ec_id)
 	  cvCvtColor( imageBuff, grayImage, CV_RGB2GRAY);
 
 	  //  グレースケールから2値に変換する
-	  cvThreshold( grayImage, binaryImage, THRESHOLD, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY );
+	  cvThreshold( grayImage, binaryImage, m_nThresholdLv, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY );
 
 	  //  抽出された輪郭を保存する領域 
 	  CvMemStorage* storage = cvCreateMemStorage( 0 );

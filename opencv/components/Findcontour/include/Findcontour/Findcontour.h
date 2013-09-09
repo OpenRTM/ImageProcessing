@@ -24,11 +24,6 @@
 #include <cxcore.h>
 #include <highgui.h>
 
-#if (defined WIN32) || (defined WIN64)
-#define THRESHOLD	10			//	2値化の際の閾値
-#else
-#define THRESHOLD	25			//	2値化の際の閾値
-#endif
 #define THRESHOLD_MAX_VALUE	255	//	2値化の際に使用する最大値
 
 #define CONTOUR_MAX_LEVEL	1	//	描画される輪郭の最大レベル
@@ -239,7 +234,7 @@ class Findcontour
 
   // Configuration variable declaration
   // <rtc-template block="config_declare">
-
+  int m_nThresholdLv;
   // </rtc-template>
 
   // DataInPort declaration
