@@ -23,18 +23,16 @@
 #include <cxcore.h>
 #include <highgui.h>
 
-#define	THRESHOLD			20				//	·•ª‚ğ‹‚ß‚éÛ‚Ìè‡’l
-#define THRESHOLD_MAX_VALUE	255				//	2’l‰»‚ÌÛ‚Ég—p‚·‚éÅ‘å’l
-#define	SCALE				( 1.0 / 255.0 )	//	L*a*b*‚É•ÏŠ·‚·‚é‚½‚ß‚É•K—v‚ÈƒXƒP[ƒ‹ƒtƒ@ƒNƒ^
+#define THRESHOLD_MAX_VALUE	255				//	2å€¤åŒ–ã®éš›ã«ä½¿ç”¨ã™ã‚‹æœ€å¤§å€¤
+#define	SCALE				( 1.0 / 255.0 )	//	L*a*b*ã«å¤‰æ›ã™ã‚‹ãŸã‚ã«å¿…è¦ãªã‚¹ã‚±ãƒ¼ãƒ«ãƒ•ã‚¡ã‚¯ã‚¿
 
-#define CAPTURE_OFF			0	//	‰æ‘œ‚ÌƒLƒƒƒvƒ`ƒƒ‚ğ’†~‚·‚éƒtƒ‰ƒO’l
-#define CAPTURE_ON			1	//	‰æ‘œ‚ÌƒLƒƒƒvƒ`ƒƒ‚ğŠJn‚·‚éƒtƒ‰ƒO’l
-#define COLOR_DIFFERENCE	0	//	RGBŠe¬•ª‚É‚¨‚¯‚é·•ªZo‚Ìƒtƒ‰ƒO’l
-#define LAB_DIFFERENCE		1	//	L*a*b*•\FŒn‚É‚¨‚¯‚é·•ªZo‚Ìƒtƒ‰ƒO’l
-#define GRAY_DIFFERENCE		2	//	ƒOƒŒ[ƒXƒP[ƒ‹‚É‚¨‚¯‚é·•ªZo‚Ìƒtƒ‰ƒO’l
-#define NOISE_KEEP			0	//	ƒmƒCƒY‚ğœ‹‚µ‚È‚¢ƒtƒ‰ƒO’l
-#define	NOISE_MORPHOLOGY	1	//	ƒ‚ƒ‹ƒtƒHƒƒW[‰‰Z‚É‚æ‚éƒmƒCƒYœ‹‚Ìƒtƒ‰ƒO’l
-#define NOISE_MEDIAN		2	//	ƒƒfƒBƒAƒ“ƒtƒBƒ‹ƒ^‚É‚æ‚éƒmƒCƒYœ‹‚Ìƒtƒ‰ƒO’l
+#define COLOR_DIFFERENCE	0	//	RGBå„æˆåˆ†ã«ãŠã‘ã‚‹å·®åˆ†ç®—å‡ºã®ãƒ•ãƒ©ã‚°å€¤
+#define LAB_DIFFERENCE		1	//	L*a*b*è¡¨è‰²ç³»ã«ãŠã‘ã‚‹å·®åˆ†ç®—å‡ºã®ãƒ•ãƒ©ã‚°å€¤
+#define GRAY_DIFFERENCE		2	//	ã‚°ãƒ¬ãƒ¼ã‚¹ã‚±ãƒ¼ãƒ«ã«ãŠã‘ã‚‹å·®åˆ†ç®—å‡ºã®ãƒ•ãƒ©ã‚°å€¤
+#define NOISE_KEEP			0	//	ãƒã‚¤ã‚ºã‚’é™¤å»ã—ãªã„ãƒ•ãƒ©ã‚°å€¤
+#define	NOISE_MORPHOLOGY	1	//	ãƒ¢ãƒ«ãƒ•ã‚©ãƒ­ã‚¸ãƒ¼æ¼”ç®—ã«ã‚ˆã‚‹ãƒã‚¤ã‚ºé™¤å»ã®ãƒ•ãƒ©ã‚°å€¤
+#define NOISE_MEDIAN		2	//	ãƒ¡ãƒ‡ã‚£ã‚¢ãƒ³ãƒ•ã‚£ãƒ«ã‚¿ã«ã‚ˆã‚‹ãƒã‚¤ã‚ºé™¤å»ã®ãƒ•ãƒ©ã‚°å€¤
+
 
 // Service implementation headers
 // <rtc-template block="service_impl_h">
@@ -243,21 +241,27 @@ class BackGroundSubtractionSimple
   /*!
    * 
    * - Name:  cont_mode
-   * - DefaultValue: a
+   * - DefaultValue: b
    */
   char m_cont_mode;
+    /*!
+   * 
+   * - Name:  diff_mode
+   * - DefaultValue: b
+   */
+  char m_diff_mode;
+    /*!
+   * 
+   * - Name:  noise_mode
+   * - DefaultValue: b
+   */
+  char m_noise_mode;
   /*!
    * 
-   * - Name:  img_height
-   * - DefaultValue: 240
+   * - Name:  nThresholdLv
+   * - DefaultValue: 20
    */
-  int m_img_height;
-  /*!
-   * 
-   * - Name:  img_width
-   * - DefaultValue: 320
-   */
-  int m_img_width;
+  int m_nThresholdLv;
 
   // </rtc-template>
 
@@ -315,6 +319,20 @@ class BackGroundSubtractionSimple
   // <rtc-template block="private_operation">
   
   // </rtc-template>
+	void colorDifference( void );
+	void labDifference( void );
+	void grayScaleDifference( void );
+
+	IplImage *m_originalImage;
+	IplImage *m_currentImage;
+	IplImage *m_backgroundImage;
+	IplImage *m_resultImage;
+	IplImage *m_outputImage;
+	
+	int	m_differenceMode;		//	å·®åˆ†ã®è¨ˆç®—ãƒ¢ãƒ¼ãƒ‰
+	int	m_noiseMode;				//	ãƒã‚¤ã‚ºã‚’é™¤å»ã™ã‚‹ãƒ¢ãƒ¼ãƒ‰
+	int m_temp_w;
+	int m_temp_h;
 
 };
 

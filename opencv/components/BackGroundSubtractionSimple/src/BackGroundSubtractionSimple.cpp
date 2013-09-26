@@ -26,41 +26,27 @@ static const char* backgroundsubtractionsimple_spec[] =
     "lang_type",         "compile",
     // Configuration variables
     "conf.default.control_mode", "b",
-    "conf.default.image_height", "240",
-    "conf.default.image_width", "320",
+    "conf.default.diff_mode", "0",
+    "conf.default.noise_mode", "0",
+    "conf.default.threshold_level", "20",
     // Widget
     "conf.__widget__.control_mode", "radio",
-    "conf.__widget__.image_height", "text",
-    "conf.__widget__.image_width", "text",
+    "conf.__widget__.diff_mode", "radio",
+    "conf.__widget__.noise_mode", "radio",
+    "conf.__widget__.threshold_level", "slider.1",
     // Constraints
-    "conf.__constraints__.control_mode", "(b,m,n)",
+    "conf.__constraints__.control_mode", "(b,M)",
+    "conf.__constraints__.diff_mode", "(0,1,2)",
+    "conf.__constraints__.noise_mode", "(0,1,2)",
+    "conf.__constraints__.threshold_level", "0<=x<=255",
     ""
   };
 // </rtc-template>
 
-//char windowNameCurrent[] = "Current";		//	Œ»İ‚Ì‰æ‘œ‚ğ•\¦‚·‚éƒEƒBƒ“ƒhƒE‚Ì–¼‘O
-//char windowNameResult[] = "Result";			//	”wŒi·•ªŒ‹‰Ê‚ğ•\¦‚·‚éƒEƒBƒ“ƒhƒE‚Ì–¼‘O
-//char windowNameBackground[] = "Background";	//	”wŒi‰æ‘œ‚ğ•\¦‚·‚éƒEƒBƒ“ƒhƒE‚Ì–¼‘O
-
-int	captureOn = CAPTURE_ON;				//	”wŒi·•ª‚ğs‚¤‰æ‘œ‚ğXV‚·‚é‚©‚Ç‚¤‚©
-int	differenceMode = COLOR_DIFFERENCE;	//	·•ª‚ÌŒvZƒ‚[ƒh
-int	noiseMode = NOISE_KEEP;				//	ƒmƒCƒY‚ğœ‹‚·‚éƒ‚[ƒh
-
-int g_temp_w = 0;
-int g_temp_h = 0;
-
-
-IplImage *originalImage = NULL;
-IplImage *currentImage = NULL;
-IplImage *backgroundImage = NULL;
-IplImage *resultImage = NULL;
-IplImage *outputImage = NULL;
-
-//char *differenceMethod[3] = {
 std::string differenceMethod[3] = {
-	"Evaluate each component of RGB",  //RGB‚Ì¬•ª‚²‚Æ‚É•]‰¿
-	"Evaluate the distance in CIE L * a * b *",  //CIE L*a*b* ‚Å‹——£‚ğ•]‰¿
-	"Evaluated by gray scale"  //ƒOƒŒ[ƒXƒP[ƒ‹‚Å•]‰¿
+	"RGB",          //RGBã®æˆåˆ†ã”ã¨ã«è©•ä¾¡
+	"CIE L*a*b*",   //CIE L*a*b* ã§è·é›¢ã‚’è©•ä¾¡
+	"gray scale"    //ã‚°ãƒ¬ãƒ¼ã‚¹ã‚±ãƒ¼ãƒ«ã§è©•ä¾¡
 };
 
 std::string noiseMethod[3] = {
@@ -68,110 +54,6 @@ std::string noiseMethod[3] = {
 	"Opening",
 	"Median filter"
 };
-
-void colorDifference( IplImage *currentImage, IplImage *backgroundImage, IplImage *resultImage ){
-	
-	//	‰æ‘œ‚ğ¶¬‚·‚é
-	IplImage *differenceImage = cvCreateImage(cvSize(currentImage->width, currentImage->height), IPL_DEPTH_8U, 3);	//	·•ª‰æ‘œ—pIplImage
-	IplImage *differenceRImage = cvCreateImage(cvSize(currentImage->width, currentImage->height), IPL_DEPTH_8U, 1);	//	R’l‚Ì·•ª—pIplImage
-	IplImage *differenceGImage = cvCreateImage(cvSize(currentImage->width, currentImage->height), IPL_DEPTH_8U, 1);	//	G’l‚Ì·•ª—pIplImage
-	IplImage *differenceBImage = cvCreateImage(cvSize(currentImage->width, currentImage->height), IPL_DEPTH_8U, 1);	//	B’l‚Ì·•ª—pIplImage
-
-	//	Œ»İ‚Ì”wŒi‚Æ‚Ì·‚Ìâ‘Î’l‚ğ¬•ª‚²‚Æ‚Éæ‚é
-	cvAbsDiff( currentImage, backgroundImage, differenceImage );
-
-	//	è‡’lˆ—‚ğs‚¤
-	cvThreshold( differenceImage, differenceImage, THRESHOLD, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY );
-
-	//	¬•ª‚²‚Æ‚Ì‰æ‘œ‚É•ªŠ„‚·‚é
-	cvSplit( differenceImage, differenceBImage, differenceGImage, differenceRImage, NULL );
-
-	//	OR‚Å‡¬‚·‚é
-	cvOr( differenceRImage, differenceGImage, resultImage );
-	cvOr( differenceBImage, resultImage, resultImage );
-
-	//	ƒƒ‚ƒŠ‚ğ‰ğ•ú‚·‚é
-	cvReleaseImage( &differenceImage );
-	cvReleaseImage( &differenceRImage );
-	cvReleaseImage( &differenceGImage );
-	cvReleaseImage( &differenceBImage );
-
-}
-
-//
-//	L*a*b*‚Å‹——£‚ğ•]‰¿‚·‚é
-//
-//	ˆø”:
-//		currentImage    : Œ»İ‚Ì‰æ‘œ—pIplImage
-//		backgroundImage : ”wŒi‰æ‘œ—pIplImage
-//		resultImage     : Œ‹‰Ê‰æ‘œ—pIplImage
-//
-void labDifference( IplImage *currentImage, IplImage *backgroundImage, IplImage *resultImage ){
-
-	//	‰æ‘œ‚ğ¶¬‚·‚é
-	IplImage *currentLabImage = cvCreateImage( cvSize(currentImage->width, currentImage->height),IPL_DEPTH_32F, 3 );		//	Œ»İ‚Ì‰æ‘œ‚ğL*a*b*‚É•ÏŠ·‚µ‚½‰æ‘œ—pIplImage
-	IplImage *backgroundLabImage = cvCreateImage( cvSize(currentImage->width, currentImage->height), IPL_DEPTH_32F, 3 );	//	”wŒi‚ğL*a*b*‚É•ÏŠ·‚µ‚½‰æ‘œ—pIplImage
-	IplImage *differenceLabImage = cvCreateImage( cvSize(currentImage->width, currentImage->height), IPL_DEPTH_32F, 3 );	//	·•ª‰æ‘œ—pIplImage
-	IplImage *differenceLImage = cvCreateImage( cvSize(currentImage->width, currentImage->height), IPL_DEPTH_32F, 1 );		//	L*’l‚Ì·•ª—pIplImage
-	IplImage *differenceAImage = cvCreateImage( cvSize(currentImage->width, currentImage->height), IPL_DEPTH_32F, 1 );		//	a*’l‚Ì·•ª—pIplImage
-	IplImage *differenceBImage = cvCreateImage( cvSize(currentImage->width, currentImage->height), IPL_DEPTH_32F, 1 );		//	b*’l‚Ì·•ª—pIplImage
-	IplImage *sqrDifferenceImage = cvCreateImage( cvSize(currentImage->width, currentImage->height), IPL_DEPTH_32F, 1 );	//	‹——£Zo—pIplImage
-
-	//	Œ»İ‚Ì‰æ‘œ‚Æ”wŒi‚ğ‹¤‚É CIE L*a*b* ‚É•ÏŠ·
-	cvConvertScale( currentImage, currentLabImage, SCALE );
-	cvConvertScale( backgroundImage, backgroundLabImage, SCALE );
-	cvCvtColor( currentLabImage, currentLabImage, CV_BGR2Lab );
-	cvCvtColor( backgroundLabImage, backgroundLabImage, CV_BGR2Lab );
-
-	//	‹——£‚Ì“ñæ‚ğŒvZ‚·‚é
-	cvSub( currentLabImage, backgroundLabImage, differenceLabImage );
-	cvPow( differenceLabImage, differenceLabImage, 2 );
-
-	//	¬•ª‚²‚Æ‚Ì‰æ‘œ‚É•ªŠ„‚·‚é
-	cvSplit( differenceLabImage, differenceLImage, differenceAImage, differenceBImage, NULL );
-
-	cvCopy( differenceLImage, sqrDifferenceImage );
-	cvAdd( differenceAImage, sqrDifferenceImage, sqrDifferenceImage );
-	cvAdd( differenceBImage, sqrDifferenceImage, sqrDifferenceImage );
-
-	//	è‡’lˆ—‚ğs‚¤
-	cvThreshold( sqrDifferenceImage, resultImage, THRESHOLD * THRESHOLD, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY );
-
-	//	ƒƒ‚ƒŠ‚ğ‰ğ•ú‚·‚é
-	cvReleaseImage( &currentLabImage );
-	cvReleaseImage( &backgroundLabImage );
-	cvReleaseImage( &differenceLabImage );
-	cvReleaseImage( &differenceLImage );
-	cvReleaseImage( &differenceAImage );
-	cvReleaseImage( &differenceBImage );
-	cvReleaseImage( &sqrDifferenceImage );
-}
-
-//
-//	ƒOƒŒ[ƒXƒP[ƒ‹‚Å•]‰¿‚·‚é
-//
-//	ˆø”:
-//		currentImage    : Œ»İ‚Ì‰æ‘œ—pIplImage
-//		backgroundImage : ”wŒi‰æ‘œ—pIplImage
-//		resultImage     : Œ‹‰Ê‰æ‘œ—pIplImage
-//
-void grayScaleDifference( IplImage *currentImage, IplImage *backgroundImage, IplImage *resultImage ){
-
-	//	‰æ‘œ‚ğ¶¬‚·‚é
-	IplImage *differenceImage = cvCreateImage( cvSize(currentImage->width, currentImage->height), IPL_DEPTH_8U, 3 );	//	·•ª‰æ‘œ—pIplImage
-
-	//	Œ»İ‚Ì”wŒi‚Æ‚Ì·‚Ìâ‘Î’l‚ğ¬•ª‚²‚Æ‚Éæ‚é
-	cvAbsDiff( currentImage, backgroundImage, differenceImage );
-
-	//	BGR‚©‚çƒOƒŒ[ƒXƒP[ƒ‹‚É•ÏŠ·‚·‚é
-	cvCvtColor( differenceImage, resultImage, CV_BGR2GRAY );
-
-	//	ƒOƒŒ[ƒXƒP[ƒ‹‚©‚ç2’l‚É•ÏŠ·‚·‚é
-	cvThreshold( resultImage, resultImage, THRESHOLD, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY );
-
-	//	ƒƒ‚ƒŠ‚ğ‰ğ•ú‚·‚é
-	cvReleaseImage( &differenceImage );
-}
 
 /*!
  * @brief constructor
@@ -222,10 +104,17 @@ RTC::ReturnCode_t BackGroundSubtractionSimple::onInitialize()
 
   // <rtc-template block="bind_config">
   // Bind variables and configuration variable
-  bindParameter("control_mode", m_cont_mode, "a");
-  bindParameter("image_height", m_img_height, "240");
-  bindParameter("image_width", m_img_width, "320");
+  bindParameter("control_mode", m_cont_mode, "b");
+  bindParameter("diff_mode", m_diff_mode, "0");
+  bindParameter("noise_mode", m_noise_mode, "0");
+  bindParameter("threshold_level", m_nThresholdLv, "20");
   // </rtc-template>
+
+	m_originalImage = NULL;
+	m_currentImage = NULL;
+	m_backgroundImage = NULL;
+	m_resultImage = NULL;
+	m_outputImage = NULL;
   
   return RTC::RTC_OK;
 }
@@ -254,28 +143,11 @@ RTC::ReturnCode_t BackGroundSubtractionSimple::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t BackGroundSubtractionSimple::onActivated(RTC::UniqueId ec_id)
 {	
-	captureOn = CAPTURE_ON;				//	”wŒi·•ª‚ğs‚¤‰æ‘œ‚ğXV‚·‚é‚©‚Ç‚¤‚©
-  differenceMode = COLOR_DIFFERENCE;	//	·•ª‚ÌŒvZƒ‚[ƒh
-	noiseMode = NOISE_KEEP;				//	ƒmƒCƒY‚ğœ‹‚·‚éƒ‚[ƒh
+  m_differenceMode = COLOR_DIFFERENCE;	//	å·®åˆ†ã®è¨ˆç®—ãƒ¢ãƒ¼ãƒ‰
+	m_noiseMode = NOISE_KEEP;				      //	ãƒã‚¤ã‚ºã‚’é™¤å»ã™ã‚‹ãƒ¢ãƒ¼ãƒ‰
 
-	g_temp_w = 0;
-	g_temp_h = 0;
-
-	if(originalImage != NULL){
-		cvReleaseImage(&originalImage);
-	}
-	if(currentImage != NULL){
-		cvReleaseImage(&currentImage);
-	}
-	if(resultImage != NULL){
-		cvReleaseImage(&resultImage);
-	}
-	if(outputImage != NULL){
-		cvReleaseImage(&outputImage);
-	}
-	if(backgroundImage != NULL){
-		cvReleaseImage(&backgroundImage);
-	}
+	m_temp_w = 0;
+	m_temp_h = 0;
 
 	return RTC::RTC_OK;
 }
@@ -283,22 +155,28 @@ RTC::ReturnCode_t BackGroundSubtractionSimple::onActivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t BackGroundSubtractionSimple::onDeactivated(RTC::UniqueId ec_id)
 {
-	if(originalImage != NULL){
-		cvReleaseImage(&originalImage);
+	if(m_originalImage != NULL){
+		cvReleaseImage(&m_originalImage);
 	}
-	if(currentImage != NULL){
-		cvReleaseImage(&currentImage);
+	if(m_currentImage != NULL){
+		cvReleaseImage(&m_currentImage);
 	}
-	if(resultImage != NULL){
-		cvReleaseImage(&resultImage);
+	if(m_resultImage != NULL){
+		cvReleaseImage(&m_resultImage);
 	}
-	if(outputImage != NULL){
-		cvReleaseImage(&outputImage);
+	if(m_outputImage != NULL){
+		cvReleaseImage(&m_outputImage);
 	}
-	if(backgroundImage != NULL){
-		cvReleaseImage(&backgroundImage);
+	if(m_backgroundImage != NULL){
+		cvReleaseImage(&m_backgroundImage);
 	}
 
+	m_originalImage = NULL;
+	m_currentImage = NULL;
+	m_backgroundImage = NULL;
+	m_resultImage = NULL;
+	m_outputImage = NULL;
+	
 	return RTC::RTC_OK;
 }
 
@@ -308,152 +186,126 @@ RTC::ReturnCode_t BackGroundSubtractionSimple::onExecute(RTC::UniqueId ec_id)
 	
 	if(m_img_origIn.isNew()) {
 		
-		//ƒCƒ[ƒWRead
+		//ã‚¤ãƒ¡ãƒ¼ã‚¸Read
 		m_img_origIn.read();
 		
-		if(originalImage == NULL){
-			originalImage = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 3);
+		if(m_originalImage == NULL){
+			m_originalImage = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 3);
 		}
-		if(currentImage == NULL){
-			currentImage = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 3);
+		if(m_currentImage == NULL){
+			m_currentImage = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 3);
 		}
 
-		if(m_img_orig.width != g_temp_w || m_img_orig.height != g_temp_h){
+		if(m_img_orig.width != m_temp_w || m_img_orig.height != m_temp_h){
 			
-			if(backgroundImage != NULL){
-				cvReleaseImage(&backgroundImage);
+			if(m_backgroundImage != NULL){
+				cvReleaseImage(&m_backgroundImage);
 			}
-			backgroundImage = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 3);
+			m_backgroundImage = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 3);
 		}
 		
-		if(resultImage == NULL){
-			resultImage =  cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 1);
+		if(m_resultImage == NULL){
+			m_resultImage =  cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 1);
 		}
-		if(outputImage == NULL){
-			outputImage = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 3);
+		if(m_outputImage == NULL){
+			m_outputImage = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 3);
 		}
 
-		//	‰æ‘œ‚ğ1–‡ƒLƒƒƒvƒ`ƒƒ‚µ”wŒi‚Æ‚µ‚Ä•Û‘¶‚·‚é
-		//backgroundImage = cvCloneImage( originalImage );
-
-		//	Œ»İ‚Ì‰æ‘œ‚Æ‚µ‚Ä‚à1–‡Šm•Û‚·‚é
-		//currentImage = cvCloneImage( originalImage );
-
-		//InPort‚Ì‰f‘œ‚Ìæ“¾
-		memcpy(originalImage->imageData,(void *)&(m_img_orig.pixels[0]),m_img_orig.pixels.length());
-
-		if( captureOn != 0){
-			if( currentImage != NULL){
-				cvReleaseImage( &currentImage );
-			}
-			currentImage = cvCloneImage( originalImage );
+		//InPortã®æ˜ åƒã®å–å¾—
+		memcpy(m_originalImage->imageData,(void *)&(m_img_orig.pixels[0]),m_img_orig.pixels.length());
+		m_currentImage = cvCloneImage( m_originalImage );
+		
+		//	å·®ã®è¨ˆç®—æ–¹æ³•ã®åˆ‡ã‚Šæ›¿ãˆ
+		if( m_differenceMode == COLOR_DIFFERENCE ){	
+			//	æˆåˆ†ã”ã¨ã«è©•ä¾¡ã‚’ã™ã‚‹
+			colorDifference();
+		} else if( m_differenceMode == LAB_DIFFERENCE ){	
+			//	L*a*b*ã§è·é›¢ã‚’è©•ä¾¡ã™ã‚‹
+			labDifference();
+		} else if( m_differenceMode == GRAY_DIFFERENCE ){
+			//	ã‚°ãƒ¬ãƒ¼ã‚¹ã‚±ãƒ¼ãƒ«ã§è©•ä¾¡ã‚’ã™ã‚‹
+			grayScaleDifference();
 		}
 		
-		//	·‚ÌŒvZ•û–@‚ÌØ‚è‘Ö‚¦
-		if( differenceMode == COLOR_DIFFERENCE ){	
-			//	¬•ª‚²‚Æ‚É•]‰¿‚ğ‚·‚é
-			colorDifference( currentImage, backgroundImage, resultImage );
-		} else if( differenceMode == LAB_DIFFERENCE ){	
-			//	L*a*b*‚Å‹——£‚ğ•]‰¿‚·‚é
-			labDifference( currentImage, backgroundImage, resultImage );
-		} else if( differenceMode == GRAY_DIFFERENCE ){
-			//	ƒOƒŒ[ƒXƒP[ƒ‹‚Å•]‰¿‚ğ‚·‚é
-			grayScaleDifference( currentImage, backgroundImage, resultImage );
+		//	ãƒã‚¤ã‚ºé™¤å»
+		if( m_noiseMode == NOISE_MORPHOLOGY ){
+			cvErode( m_resultImage, m_resultImage );
+			cvDilate( m_resultImage, m_resultImage );
+		}else if ( m_noiseMode == NOISE_MEDIAN ){
+			cvSmooth( m_resultImage, m_resultImage, CV_MEDIAN );
 		}
 		
-		//	ƒmƒCƒYœ‹
-		if( noiseMode == NOISE_MORPHOLOGY ){
-			cvErode( resultImage, resultImage );
-			cvDilate( resultImage, resultImage );
-		}else if ( noiseMode == NOISE_MEDIAN ){
-			cvSmooth( resultImage, resultImage, CV_MEDIAN );
-		}
-		
-		if( resultImage->origin == 0 ){
-			//@¶ã‚ªŒ´“_‚Ìê‡
-			//cvFlip( resultImage, resultImage, 0 );
-		}
-		
-		cvMerge( resultImage, resultImage, resultImage, NULL, outputImage );
+		cvMerge( m_resultImage, m_resultImage, m_resultImage, NULL, m_outputImage );
 
-		// ‰æ‘œƒf[ƒ^‚ÌƒTƒCƒYæ“¾
-		double len1 = (currentImage->nChannels * currentImage->width * currentImage->height);
-		double len2 = (outputImage->nChannels * outputImage->width * outputImage->height);
-		double len3 = (backgroundImage->nChannels * backgroundImage->width * backgroundImage->height);
+		// ç”»åƒãƒ‡ãƒ¼ã‚¿ã®ã‚µã‚¤ã‚ºå–å¾—
+		double len1 = (m_currentImage->nChannels * m_currentImage->width * m_currentImage->height);
+		double len2 = (m_outputImage->nChannels * m_outputImage->width * m_outputImage->height);
+		double len3 = (m_backgroundImage->nChannels * m_backgroundImage->width * m_backgroundImage->height);
 
 		m_img_curr.pixels.length(len1);
 		m_img_resu.pixels.length(len2);
 		m_img_back.pixels.length(len3);
 
-		// ŠY“–‚ÌƒCƒ[ƒW‚ğMemCopy‚·‚é
-		memcpy((void *)&(m_img_curr.pixels[0]), currentImage->imageData, len1);
-		memcpy((void *)&(m_img_resu.pixels[0]), outputImage->imageData, len2);
-		memcpy((void *)&(m_img_back.pixels[0]), backgroundImage->imageData, len3);
+		// è©²å½“ã®ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚’MemCopyã™ã‚‹
+		memcpy((void *)&(m_img_curr.pixels[0]), m_currentImage->imageData, len1);
+		memcpy((void *)&(m_img_resu.pixels[0]), m_outputImage->imageData, len2);
+		memcpy((void *)&(m_img_back.pixels[0]), m_backgroundImage->imageData, len3);
 
-		m_img_curr.width = originalImage->width;
-		m_img_curr.height = originalImage->height;
+		m_img_curr.width = m_originalImage->width;
+		m_img_curr.height = m_originalImage->height;
 
-		m_img_resu.width = originalImage->width;
-		m_img_resu.height = originalImage->height;
+		m_img_resu.width = m_originalImage->width;
+		m_img_resu.height = m_originalImage->height;
 
-		m_img_back.width = originalImage->width;
-		m_img_back.height = originalImage->height;
+		m_img_back.width = m_originalImage->width;
+		m_img_back.height = m_originalImage->height;
 
 		m_img_currOut.write();
 		m_img_resuOut.write();
 		m_img_backOut.write();
-
-		//	‰æ‘œ‚ğ•\¦‚·‚é
-		//cvShowImage( windowNameCurrent, currentImage );
-		//cvShowImage( windowNameResult, resultImage );
-		//cvShowImage( windowNameBackground, backgroundImage );
-				
-		//Key“ü—ÍRead
+			
+		//Keyå…¥åŠ›Read
 		if(m_keyIn.isNew()){
 			m_keyIn.read();
-		
-		  if(m_cont_mode == 'b'){
-			  if(backgroundImage != NULL) {
-				  cvReleaseImage(&backgroundImage);
+			
+		  if(m_cont_mode == 'b')
+		  {
+		    //èƒŒæ™¯ç”»åƒæ›´æ–°
+			  if(m_backgroundImage != NULL) {
+				  cvReleaseImage(&m_backgroundImage);
 			  }
-			  backgroundImage = cvCloneImage(originalImage);
-			  //backgroundImage = NULL;
-			  printf( "Background image update\n" );   //”wŒi‰æ‘œXV
+			  m_backgroundImage = cvCloneImage(m_originalImage);
+			  printf( "Background image update( %s : %s )\n", 
+			          differenceMethod[m_differenceMode].c_str(), noiseMethod[m_noiseMode].c_str() );   
 
-		  }else if(m_cont_mode == 'm'){
-			  differenceMode = differenceMode + 1;
-			  if( differenceMode > GRAY_DIFFERENCE ){
-				  differenceMode = COLOR_DIFFERENCE;
-			  }
-			  printf( "Evaluation method of difference: %s\n", differenceMethod[differenceMode].c_str() );   //·‚Ì•]‰¿•û–@
-		  }else if( m_cont_mode == 'n' ){ 
-			  //	'n'ƒL[‚ª‰Ÿ‚³‚ê‚½‚çƒmƒCƒYœ‹•û–@‚ğ•ÏX‚·‚é
-			  noiseMode = noiseMode + 1;
-			  if( noiseMode > NOISE_MEDIAN ){
-				  noiseMode = NOISE_KEEP;
-			  }
-			  printf( "Noise removal method: %s\n", noiseMethod[noiseMode].c_str() );  //ƒmƒCƒYœ‹•û–@
+      }else if(m_cont_mode == 'M')
+		  {
+		    //å·®ã®è©•ä¾¡æ–¹æ³•ãƒ»ãƒã‚¤ã‚ºé™¤å»æ–¹æ³•å¤‰æ›´
+		    m_differenceMode = (int)(m_diff_mode - '0');
+		    m_noiseMode = (int)(m_noise_mode - '0');
+		    printf( "Change method: (diff : noise) = (%s : %s)\n", 
+		            differenceMethod[m_differenceMode].c_str(), noiseMethod[m_noiseMode].c_str() );
 		  }
 		}
 		
-		if(originalImage != NULL){
-			cvReleaseImage(&originalImage);
+		if(m_originalImage != NULL){
+			cvReleaseImage(&m_originalImage);
 		}
-		if(currentImage != NULL){
-			cvReleaseImage(&currentImage);
+		if(m_currentImage != NULL){
+			cvReleaseImage(&m_currentImage);
 		}
-		if(resultImage != NULL){
-			cvReleaseImage(&resultImage);
+		if(m_resultImage != NULL){
+			cvReleaseImage(&m_resultImage);
 		}
-		if(outputImage != NULL){
-			cvReleaseImage(&outputImage);
+		if(m_outputImage != NULL){
+			cvReleaseImage(&m_outputImage);
 		}
 		//if(backgroundImage != NULL){
 		//	cvReleaseImage(&backgroundImage);
 		//}
 		
-		g_temp_w = m_img_orig.width;
-		g_temp_h = m_img_orig.height;
+		m_temp_w = m_img_orig.width;
+		m_temp_h = m_img_orig.height;
 			
 	}
 
@@ -495,7 +347,105 @@ RTC::ReturnCode_t BackGroundSubtractionSimple::onRateChanged(RTC::UniqueId ec_id
 }
 */
 
+//
+// æˆåˆ†ã”ã¨ã«è©•ä¾¡ã™ã‚‹
+//
+void BackGroundSubtractionSimple::colorDifference( void )
+{
+	
+	//	ç”»åƒã‚’ç”Ÿæˆã™ã‚‹
+	IplImage *differenceImage = cvCreateImage(cvSize(m_currentImage->width, m_currentImage->height), IPL_DEPTH_8U, 3);	//	å·®åˆ†ç”»åƒç”¨IplImage
+	IplImage *differenceRImage = cvCreateImage(cvSize(m_currentImage->width, m_currentImage->height), IPL_DEPTH_8U, 1);	//	Rå€¤ã®å·®åˆ†ç”¨IplImage
+	IplImage *differenceGImage = cvCreateImage(cvSize(m_currentImage->width, m_currentImage->height), IPL_DEPTH_8U, 1);	//	Gå€¤ã®å·®åˆ†ç”¨IplImage
+	IplImage *differenceBImage = cvCreateImage(cvSize(m_currentImage->width, m_currentImage->height), IPL_DEPTH_8U, 1);	//	Bå€¤ã®å·®åˆ†ç”¨IplImage
 
+	//	ç¾åœ¨ã®èƒŒæ™¯ã¨ã®å·®ã®çµ¶å¯¾å€¤ã‚’æˆåˆ†ã”ã¨ã«å–ã‚‹
+	cvAbsDiff( m_currentImage, m_backgroundImage, differenceImage );
+
+	//	é–¾å€¤å‡¦ç†ã‚’è¡Œã†
+	cvThreshold( differenceImage, differenceImage, m_nThresholdLv, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY );
+
+	//	æˆåˆ†ã”ã¨ã®ç”»åƒã«åˆ†å‰²ã™ã‚‹
+	cvSplit( differenceImage, differenceBImage, differenceGImage, differenceRImage, NULL );
+
+	//	ORã§åˆæˆã™ã‚‹
+	cvOr( differenceRImage, differenceGImage, m_resultImage );
+	cvOr( differenceBImage, m_resultImage, m_resultImage );
+
+	//	ãƒ¡ãƒ¢ãƒªã‚’è§£æ”¾ã™ã‚‹
+	cvReleaseImage( &differenceImage );
+	cvReleaseImage( &differenceRImage );
+	cvReleaseImage( &differenceGImage );
+	cvReleaseImage( &differenceBImage );
+
+}
+
+//
+//	L*a*b*ã§è·é›¢ã‚’è©•ä¾¡ã™ã‚‹
+//
+void BackGroundSubtractionSimple::labDifference( void )
+{
+
+	//	ç”»åƒã‚’ç”Ÿæˆã™ã‚‹
+	IplImage *currentLabImage = cvCreateImage( cvSize(m_currentImage->width, m_currentImage->height),IPL_DEPTH_32F, 3 );		//	ç¾åœ¨ã®ç”»åƒã‚’L*a*b*ã«å¤‰æ›ã—ãŸç”»åƒç”¨IplImage
+	IplImage *backgroundLabImage = cvCreateImage( cvSize(m_currentImage->width, m_currentImage->height), IPL_DEPTH_32F, 3 );	//	èƒŒæ™¯ã‚’L*a*b*ã«å¤‰æ›ã—ãŸç”»åƒç”¨IplImage
+	IplImage *differenceLabImage = cvCreateImage( cvSize(m_currentImage->width, m_currentImage->height), IPL_DEPTH_32F, 3 );	//	å·®åˆ†ç”»åƒç”¨IplImage
+	IplImage *differenceLImage = cvCreateImage( cvSize(m_currentImage->width, m_currentImage->height), IPL_DEPTH_32F, 1 );		//	L*å€¤ã®å·®åˆ†ç”¨IplImage
+	IplImage *differenceAImage = cvCreateImage( cvSize(m_currentImage->width, m_currentImage->height), IPL_DEPTH_32F, 1 );		//	a*å€¤ã®å·®åˆ†ç”¨IplImage
+	IplImage *differenceBImage = cvCreateImage( cvSize(m_currentImage->width, m_currentImage->height), IPL_DEPTH_32F, 1 );		//	b*å€¤ã®å·®åˆ†ç”¨IplImage
+	IplImage *sqrDifferenceImage = cvCreateImage( cvSize(m_currentImage->width, m_currentImage->height), IPL_DEPTH_32F, 1 );	//	è·é›¢ç®—å‡ºç”¨IplImage
+
+	//	ç¾åœ¨ã®ç”»åƒã¨èƒŒæ™¯ã‚’å…±ã« CIE L*a*b* ã«å¤‰æ›
+	cvConvertScale( m_currentImage, currentLabImage, SCALE );
+	cvConvertScale( m_backgroundImage, backgroundLabImage, SCALE );
+	cvCvtColor( currentLabImage, currentLabImage, CV_BGR2Lab );
+	cvCvtColor( backgroundLabImage, backgroundLabImage, CV_BGR2Lab );
+
+	//	è·é›¢ã®äºŒä¹—ã‚’è¨ˆç®—ã™ã‚‹
+	cvSub( currentLabImage, backgroundLabImage, differenceLabImage );
+	cvPow( differenceLabImage, differenceLabImage, 2 );
+
+	//	æˆåˆ†ã”ã¨ã®ç”»åƒã«åˆ†å‰²ã™ã‚‹
+	cvSplit( differenceLabImage, differenceLImage, differenceAImage, differenceBImage, NULL );
+
+	cvCopy( differenceLImage, sqrDifferenceImage );
+	cvAdd( differenceAImage, sqrDifferenceImage, sqrDifferenceImage );
+	cvAdd( differenceBImage, sqrDifferenceImage, sqrDifferenceImage );
+
+	//	é–¾å€¤å‡¦ç†ã‚’è¡Œã†
+	cvThreshold( sqrDifferenceImage, m_resultImage, m_nThresholdLv * m_nThresholdLv, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY );
+
+	//	ãƒ¡ãƒ¢ãƒªã‚’è§£æ”¾ã™ã‚‹
+	cvReleaseImage( &currentLabImage );
+	cvReleaseImage( &backgroundLabImage );
+	cvReleaseImage( &differenceLabImage );
+	cvReleaseImage( &differenceLImage );
+	cvReleaseImage( &differenceAImage );
+	cvReleaseImage( &differenceBImage );
+	cvReleaseImage( &sqrDifferenceImage );
+}
+
+//
+//	ã‚°ãƒ¬ãƒ¼ã‚¹ã‚±ãƒ¼ãƒ«ã§è©•ä¾¡ã™ã‚‹
+//
+void BackGroundSubtractionSimple::grayScaleDifference( void )
+{
+
+	//	ç”»åƒã‚’ç”Ÿæˆã™ã‚‹
+	IplImage *differenceImage = cvCreateImage( cvSize(m_currentImage->width, m_currentImage->height), IPL_DEPTH_8U, 3 );	//	å·®åˆ†ç”»åƒç”¨IplImage
+
+	//	ç¾åœ¨ã®èƒŒæ™¯ã¨ã®å·®ã®çµ¶å¯¾å€¤ã‚’æˆåˆ†ã”ã¨ã«å–ã‚‹
+	cvAbsDiff( m_currentImage, m_backgroundImage, differenceImage );
+
+	//	BGRã‹ã‚‰ã‚°ãƒ¬ãƒ¼ã‚¹ã‚±ãƒ¼ãƒ«ã«å¤‰æ›ã™ã‚‹
+	cvCvtColor( differenceImage, m_resultImage, CV_BGR2GRAY );
+
+	//	ã‚°ãƒ¬ãƒ¼ã‚¹ã‚±ãƒ¼ãƒ«ã‹ã‚‰2å€¤ã«å¤‰æ›ã™ã‚‹
+	cvThreshold( m_resultImage, m_resultImage, m_nThresholdLv, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY );
+
+	//	ãƒ¡ãƒ¢ãƒªã‚’è§£æ”¾ã™ã‚‹
+	cvReleaseImage( &differenceImage );
+}
 
 extern "C"
 {
