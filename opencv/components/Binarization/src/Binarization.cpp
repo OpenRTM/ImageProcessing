@@ -9,7 +9,7 @@
 
 #include "Binarization.h"
 
-#define THRESHOLD_MAX_VALUE	255	//	2’l‰»‚ÌÛ‚Ég—p‚·‚éÅ‘å’l
+#define THRESHOLD_MAX_VALUE	255	//	2å€¤åŒ–ã®éš›ã«ä½¿ç”¨ã™ã‚‹æœ€å¤§å€¤
 
 // Module specification
 // <rtc-template block="module_spec">
@@ -57,7 +57,7 @@ Binarization::~Binarization()
 {
 }
 
-IplImage *sourceImage;	//	Œ³‰æ‘œ—pIplImage
+IplImage *sourceImage;	//	å…ƒç”»åƒç”¨IplImage
 
 RTC::ReturnCode_t Binarization::onInitialize()
 {
@@ -109,7 +109,7 @@ RTC::ReturnCode_t Binarization::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Binarization::onActivated(RTC::UniqueId ec_id)
 {
-    // ƒCƒ[ƒW—pƒƒ‚ƒŠ‚ÌŠm•Û
+    // ã‚¤ãƒ¡ãƒ¼ã‚¸ç”¨ãƒ¡ãƒ¢ãƒªã®ç¢ºä¿
     m_image_buff       = NULL;
     m_image_binary     = NULL;
     m_image_gray       = NULL;
@@ -139,70 +139,69 @@ RTC::ReturnCode_t Binarization::onDeactivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Binarization::onExecute(RTC::UniqueId ec_id)
 {
-    // Common CV process
-    // V‚µ‚¢ƒf[ƒ^‚Ìƒ`ƒFƒbƒN
-    if (m_image_origIn.isNew()) 
+  // Common CV process
+  // æ–°ã—ã„ãƒ‡ãƒ¼ã‚¿ã®ãƒã‚§ãƒƒã‚¯
+  if (m_image_origIn.isNew()) 
+  {
+    // InPortãƒ‡ãƒ¼ã‚¿ã®èª­ã¿è¾¼ã¿
+    m_image_origIn.read();
+
+    // ã‚µã‚¤ã‚ºãŒå¤‰ã‚ã£ãŸã¨ãã ã‘å†ç”Ÿæˆã™ã‚‹
+    if(m_in_height != m_image_orig.height || m_in_width != m_image_orig.width)
     {
-        // InPortƒf[ƒ^‚Ì“Ç‚İ‚İ
-        m_image_origIn.read();
+      printf("[onExecute] Size of input image is not match!\n");
 
-        // ƒTƒCƒY‚ª•Ï‚í‚Á‚½‚Æ‚«‚¾‚¯Ä¶¬‚·‚é
-        if(m_in_height != m_image_orig.height || m_in_width != m_image_orig.width)
-        {
-            printf("[onExecute] Size of input image is not match!\n");
+      m_in_height = m_image_orig.height;
+      m_in_width  = m_image_orig.width;
 
-            m_in_height = m_image_orig.height;
-            m_in_width  = m_image_orig.width;
-            
-            if(m_image_buff       != NULL)
-                cvReleaseImage(&m_image_buff);
-            if(m_image_binary     != NULL)
-                cvReleaseImage(&m_image_binary);
-            if(m_image_gray       != NULL)
-                cvReleaseImage(&m_image_gray);
-            if(m_image_dest       != NULL)
-                cvReleaseImage(&m_image_dest);
+      if(m_image_buff       != NULL)
+        cvReleaseImage(&m_image_buff);
+      if(m_image_binary     != NULL)
+        cvReleaseImage(&m_image_binary);
+      if(m_image_gray       != NULL)
+        cvReleaseImage(&m_image_gray);
+      if(m_image_dest       != NULL)
+        cvReleaseImage(&m_image_dest);
 
-
-            // ƒTƒCƒY•ÏŠ·‚Ì‚½‚ßTempƒƒ‚ƒŠ[‚ğ‚æ‚¢‚·‚é
-	        m_image_buff   = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3);
-	        m_image_binary = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 1);
-            m_image_gray   = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 1);
-	        m_image_dest   = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3);
-        }
-
-        // InPort‚Ì‰æ‘œƒf[ƒ^‚ğIplImage‚ÌimageData‚ÉƒRƒs[
-        memcpy(m_image_buff->imageData,(void *)&(m_image_orig.pixels[0]),m_image_orig.pixels.length());
-
-        // Anternative process
-       	//	BGR‚©‚çƒOƒŒ[ƒXƒP[ƒ‹‚É•ÏŠ·‚·‚é
-	    cvCvtColor( m_image_buff, m_image_gray, CV_BGR2GRAY );
-
-	    //	ƒOƒŒ[ƒXƒP[ƒ‹‚©‚ç2’l‚É•ÏŠ·‚·‚é
-	    cvThreshold( m_image_gray, m_image_binary, m_nThresholdLv, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY );
-
-        // Convert to 3channel image
-        cvMerge(m_image_binary, m_image_binary, m_image_binary, NULL, m_image_dest);
-
-        // Common process
-        // ‰æ‘œƒf[ƒ^‚ÌƒTƒCƒYæ“¾
-        int len = m_image_dest->nChannels * m_image_dest->width * m_image_dest->height;
-                
-        // ‰æ–Ê‚ÌƒTƒCƒYî•ñ‚ğ“ü‚ê‚é
-        m_image_output.pixels.length(len);        
-        m_image_output.width  = m_image_dest->width;
-        m_image_output.height = m_image_dest->height;
-
-        // ”½“]‚µ‚½‰æ‘œƒf[ƒ^‚ğOutPort‚ÉƒRƒs[
-        memcpy((void *)&(m_image_output.pixels[0]), m_image_dest->imageData,len);
-
-        // ”½“]‚µ‚½‰æ‘œƒf[ƒ^‚ğOutPort‚©‚ço—Í‚·‚éB
-        m_image_outputOut.write();
-
-        //cvWaitKey( 0 );
+      // ã‚µã‚¤ã‚ºå¤‰æ›ã®ãŸã‚Tempãƒ¡ãƒ¢ãƒªãƒ¼ã‚’ã‚ˆã„ã™ã‚‹
+      m_image_buff   = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3);
+      m_image_binary = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 1);
+      m_image_gray   = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 1);
+      m_image_dest   = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3);
     }
 
-    return RTC::RTC_OK;
+    // InPortã®ç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’IplImageã®imageDataã«ã‚³ãƒ”ãƒ¼
+    memcpy(m_image_buff->imageData,(void *)&(m_image_orig.pixels[0]),m_image_orig.pixels.length());
+
+    // Anternative process
+    //	BGRã‹ã‚‰ã‚°ãƒ¬ãƒ¼ã‚¹ã‚±ãƒ¼ãƒ«ã«å¤‰æ›ã™ã‚‹
+    cvCvtColor( m_image_buff, m_image_gray, CV_BGR2GRAY );
+
+    //	ã‚°ãƒ¬ãƒ¼ã‚¹ã‚±ãƒ¼ãƒ«ã‹ã‚‰2å€¤ã«å¤‰æ›ã™ã‚‹
+    cvThreshold( m_image_gray, m_image_binary, m_nThresholdLv, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY );
+
+    // Convert to 3channel image
+    cvMerge(m_image_binary, m_image_binary, m_image_binary, NULL, m_image_dest);
+
+    // Common process
+    // ç”»åƒãƒ‡ãƒ¼ã‚¿ã®ã‚µã‚¤ã‚ºå–å¾—
+    int len = m_image_dest->nChannels * m_image_dest->width * m_image_dest->height;
+          
+    // ç”»é¢ã®ã‚µã‚¤ã‚ºæƒ…å ±ã‚’å…¥ã‚Œã‚‹
+    m_image_output.pixels.length(len);        
+    m_image_output.width  = m_image_dest->width;
+    m_image_output.height = m_image_dest->height;
+
+    // åè»¢ã—ãŸç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’OutPortã«ã‚³ãƒ”ãƒ¼
+    memcpy((void *)&(m_image_output.pixels[0]), m_image_dest->imageData,len);
+
+    // åè»¢ã—ãŸç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’OutPortã‹ã‚‰å‡ºåŠ›ã™ã‚‹ã€‚
+    m_image_outputOut.write();
+
+    //cvWaitKey( 0 );
+  }
+
+  return RTC::RTC_OK;
 }
 
 /*
