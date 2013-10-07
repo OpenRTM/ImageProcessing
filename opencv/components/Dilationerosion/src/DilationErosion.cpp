@@ -25,16 +25,15 @@ static const char* dilationerosion_spec[] =
     "language",          "C++",
     "lang_type",         "compile",
     // Configuration variables
-    "conf.default.dilation_count", "1",
-    "conf.default.erosion_count", "1",
-    "conf.default.image_height", "240",
-    "conf.default.image_width", "320",
+    "conf.default.dilation_count", "3",
+    "conf.default.erosion_count", "3",
+    "conf.default.threshold", "128",
     // Widget
     "conf.__widget__.dilation_count", "text",
     "conf.__widget__.erosion_count", "text",
-    "conf.__widget__.image_height", "text",
-    "conf.__widget__.image_width", "text",
+    "conf.__widget__.threshold", "slider.1",
     // Constraints
+    "conf.__constraints__.threshold", "0<=x<=255",
     ""
   };
 // </rtc-template>
@@ -86,10 +85,9 @@ RTC::ReturnCode_t DilationErosion::onInitialize()
 
   // <rtc-template block="bind_config">
   // Bind variables and configuration variable
-  bindParameter("dilation_count", m_count_dilation, "1");
-  bindParameter("erosion_count", m_count_erosion, "1");
-  bindParameter("image_height", m_img_height, "240");
-  bindParameter("image_width", m_img_width, "320");
+  bindParameter("dilation_count", m_count_dilation, "3");
+  bindParameter("erosion_count", m_count_erosion, "3");
+  bindParameter("threshold", m_nThreshold, "128");
   // </rtc-template>
   
   return RTC::RTC_OK;
@@ -119,7 +117,7 @@ RTC::ReturnCode_t DilationErosion::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t DilationErosion::onActivated(RTC::UniqueId ec_id)
 {
-  //ƒCƒ[ƒW—pƒƒ‚ƒŠ‚ÌŠm•Û
+  //ã‚¤ãƒ¡ãƒ¼ã‚¸ç”¨ãƒ¡ãƒ¢ãƒªã®ç¢ºä¿
 	
 	m_image_buff = NULL;
 	m_gray_buff = NULL;
@@ -140,7 +138,7 @@ RTC::ReturnCode_t DilationErosion::onActivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t DilationErosion::onDeactivated(RTC::UniqueId ec_id)
 {
-	//ƒƒ‚ƒŠ‰ð•ú
+	//ãƒ¡ãƒ¢ãƒªè§£æ”¾
 	if(m_image_buff != NULL){
 		cvReleaseImage(&m_image_buff);
 	}
@@ -185,10 +183,10 @@ RTC::ReturnCode_t DilationErosion::onDeactivated(RTC::UniqueId ec_id)
 RTC::ReturnCode_t DilationErosion::onExecute(RTC::UniqueId ec_id)
 {
 
-  //VƒCƒ[ƒW‚Ìƒ`ƒFƒbƒN
+  //æ–°ã‚¤ãƒ¡ãƒ¼ã‚¸ã®ãƒã‚§ãƒƒã‚¯
 	if(m_img_origIn.isNew()){
 
-		//ƒf[ƒ^‚Ì“Ç‚Ýž‚Ý
+		//ãƒ‡ãƒ¼ã‚¿ã®èª­ã¿è¾¼ã¿
 		m_img_origIn.read();
 
 		m_image_buff = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 3);
@@ -204,46 +202,46 @@ RTC::ReturnCode_t DilationErosion::onExecute(RTC::UniqueId ec_id)
 		m_ero_merge_img = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 3);
 		m_noise_merge_img = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 3);
 
-		// InPort‚Ì‰f‘œƒf[ƒ^
+		// InPortã®æ˜ åƒãƒ‡ãƒ¼ã‚¿
 		memcpy(m_image_buff->imageData,(void *)&(m_img_orig.pixels[0]), m_img_orig.pixels.length());
 
-		//	BGR‚©‚çƒOƒŒ[ƒXƒP[ƒ‹‚É•ÏŠ·‚·‚é
+		//	BGRã‹ã‚‰ã‚°ãƒ¬ãƒ¼ã‚¹ã‚±ãƒ¼ãƒ«ã«å¤‰æ›ã™ã‚‹
 		cvCvtColor( m_image_buff, m_gray_buff, CV_BGR2GRAY );
 
-		//	ƒOƒŒ[ƒXƒP[ƒ‹‚©‚ç2’l‚É•ÏŠ·‚·‚é
-		cvThreshold( m_gray_buff, m_binary_buff, THRESHOLD, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY );
+		//	ã‚°ãƒ¬ãƒ¼ã‚¹ã‚±ãƒ¼ãƒ«ã‹ã‚‰2å€¤ã«å¤‰æ›ã™ã‚‹
+		cvThreshold( m_gray_buff, m_binary_buff, m_nThreshold, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY );
 
-		//Dilation/Erosion‚ðs‚Á‚ÄƒmƒCƒY‚ðÁ‚·
+		//Dilation/Erosionã‚’è¡Œã£ã¦ãƒŽã‚¤ã‚ºã‚’æ¶ˆã™
 		cvDilate(m_binary_buff, m_dilation_buff, NULL, m_count_dilation);
 		cvErode(m_dilation_buff, m_erosion_buff, NULL, m_count_erosion);
 
-		//Dilation‚Ì‚Ýs‚¤
+		//Dilationã®ã¿è¡Œã†
 		cvDilate(m_binary_buff, m_dilation_image, NULL, m_count_dilation);
 
-		//Erosion‚Ì‚Ýs‚¤
+		//Erosionã®ã¿è¡Œã†
 		cvErode(m_binary_buff, m_erosion_image, NULL, m_count_erosion);
 		
-		// ‰æ‘œƒf[ƒ^‚ÌƒTƒCƒYŽæ“¾
+		// ç”»åƒãƒ‡ãƒ¼ã‚¿ã®ã‚µã‚¤ã‚ºå–å¾—
 		double len = (m_output_image_buff->nChannels * m_output_image_buff->width * m_output_image_buff->height);
 		m_img_out.pixels.length(len);
 		m_img_dilation.pixels.length(len);
 		m_img_erosion.pixels.length(len);
 
-		//DilationImage‚ðƒ}[ƒW‚·‚é
+		//DilationImageã‚’ãƒžãƒ¼ã‚¸ã™ã‚‹
 		cvMerge(m_dilation_image, m_dilation_image, m_dilation_image, NULL, m_dila_merge_img);
 		
-		//ErosionImage‚ðƒ}[ƒW‚·‚é
+		//ErosionImageã‚’ãƒžãƒ¼ã‚¸ã™ã‚‹
 		cvMerge(m_erosion_image, m_erosion_image, m_erosion_image, NULL, m_ero_merge_img);
 
-		//ƒmƒCƒY‚ðÁ‚µ‚½Image‚ðƒ}[ƒW‚·‚é
+		//ãƒŽã‚¤ã‚ºã‚’æ¶ˆã—ãŸImageã‚’ãƒžãƒ¼ã‚¸ã™ã‚‹
 		cvMerge(m_erosion_buff, m_erosion_buff, m_erosion_buff, NULL, m_noise_merge_img);
 		
-		// ŠY“–‚ÌƒCƒ[ƒW‚ðMemCopy‚·‚é
+		// è©²å½“ã®ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚’MemCopyã™ã‚‹
 		memcpy((void *)&(m_img_out.pixels[0]), m_noise_merge_img->imageData, len);
 		memcpy((void *)&(m_img_dilation.pixels[0]), m_dila_merge_img->imageData, len);
 		memcpy((void *)&(m_img_erosion.pixels[0]), m_ero_merge_img->imageData, len);
 		
-		// ”½“]‚µ‚½‰æ‘œƒf[ƒ^‚ðOutPort‚©‚ço—Í‚·‚éB
+		// åè»¢ã—ãŸç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’OutPortã‹ã‚‰å‡ºåŠ›ã™ã‚‹ã€‚
 		m_img_out.width = m_image_buff->width;
 		m_img_out.height = m_image_buff->height;
 

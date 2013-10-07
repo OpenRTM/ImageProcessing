@@ -10,8 +10,7 @@
 #ifndef DILATIONEROSION_H
 #define DILATIONEROSION_H
 
-#define THRESHOLD	128			//	2値化の際の閾値
-#define THRESHOLD_MAX_VALUE	255	//	2値化の際に使用する最大値
+#define THRESHOLD_MAX_VALUE	255	//	2蛟､蛹悶�ｮ髫帙↓菴ｿ逕ｨ縺吶ｋ譛螟ｧ蛟､
 
 #include <rtm/Manager.h>
 #include <rtm/DataFlowComponentBase.h>
@@ -22,7 +21,7 @@
 #include <rtm/idl/ExtendedDataTypesSkel.h>
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
-// OpenCVHeadファイルのIncluding
+// OpenCVHead繝輔ぃ繧､繝ｫ縺ｮIncluding
 #include <cv.h>
 #include <cxcore.h>
 #include <highgui.h>
@@ -234,27 +233,21 @@ class DilationErosion
   /*!
    * 
    * - Name:  count_dilation
-   * - DefaultValue: 1
+   * - DefaultValue: 3
    */
   int m_count_dilation;
   /*!
    * 
    * - Name:  count_erosion
-   * - DefaultValue: 1
+   * - DefaultValue: 3
    */
   int m_count_erosion;
   /*!
    * 
-   * - Name:  img_height
-   * - DefaultValue: 240
+   * - Name:  nThreshold
+   * - DefaultValue: 128
    */
-  int m_img_height;
-  /*!
-   * 
-   * - Name:  img_width
-   * - DefaultValue: 320
-   */
-  int m_img_width;
+  int m_nThreshold;
 
   // </rtc-template>
 
