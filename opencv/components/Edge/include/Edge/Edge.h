@@ -24,13 +24,9 @@
 #include <cxcore.h>
 #include <highgui.h>
 
-#define SOBEL_X_APERTURE_SIZE	3	//	SobelƒIƒyƒŒ[ƒ^‚ÌƒTƒCƒY (ƒŠƒtƒ@ƒŒƒ“ƒXŽQÆ)
-#define SOBEL_Y_APERTURE_SIZE	3	//	SobelƒIƒyƒŒ[ƒ^‚ÌƒTƒCƒY (ƒŠƒtƒ@ƒŒƒ“ƒXŽQÆ)
-#define LAPLACIAN_APERTURE_SIZE	3	//	LaplacianƒIƒyƒŒ[ƒ^‚ÌƒTƒCƒY (ƒŠƒtƒ@ƒŒƒ“ƒXŽQÆ)
-
-//	cvConvertScaleAbs—p’è”
-#define SCALE	1					//	ScaleAbsŒW”
-#define	SHIFT	0					//	ƒXƒP[ƒŠƒ“ƒO‚µ‚½“ü—Í”z—ñ‚Ì—v‘f‚É‰Á‚¦‚é’l
+//	cvConvertScaleAbsç”¨å®šæ•°
+#define SCALE	1					//	ScaleAbsä¿‚æ•°
+#define	SHIFT	0					//	ã‚¹ã‚±ãƒ¼ãƒªãƒ³ã‚°ã—ãŸå…¥åŠ›é…åˆ—ã®è¦ç´ ã«åŠ ãˆã‚‹å€¤
 
 // Service implementation headers
 // <rtc-template block="service_impl_h">
@@ -236,7 +232,24 @@ class Edge
 
   // Configuration variable declaration
   // <rtc-template block="config_declare">
-
+  /*!
+   * 
+   * - Name:  sobel_x_size
+   * - DefaultValue: 3
+   */
+  int m_sobel_x_size;
+  /*!
+   * 
+   * - Name:  sobel_y_size
+   * - DefaultValue: 3
+   */
+  int m_sobel_y_size;
+  /*!
+   * 
+   * - Name:  laplacian_size
+   * - DefaultValue: 3
+   */
+  int m_laplacian_size;
   // </rtc-template>
 
   // DataInPort declaration
@@ -289,7 +302,7 @@ class Edge
   // <rtc-template block="private_operation">
   
   // </rtc-template>
-  IplImage* imageBuff;					// ƒJƒƒ‰ƒCƒ[ƒW
+  IplImage* imageBuff;					// ã‚«ãƒ¡ãƒ©ã‚¤ãƒ¡ãƒ¼ã‚¸
   IplImage* grayImage;
   IplImage* destinationImage_x;
   IplImage* destinationImage_y;

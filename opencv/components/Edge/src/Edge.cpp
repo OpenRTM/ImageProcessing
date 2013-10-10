@@ -27,6 +27,18 @@ static const char* edge_spec[] =
     "max_instance",      "1",
     "language",          "C++",
     "lang_type",         "compile",
+    // Configuration variables
+    "conf.default.sobel_x_size", "3",
+    "conf.default.sobel_y_size", "3",
+    "conf.default.laplacian_size", "3",
+    // Widget
+    "conf.__widget__.sobel_x_size", "radio",
+    "conf.__widget__.sobel_y_size", "radio",
+    "conf.__widget__.laplacian_size", "radio",
+    // Constraints
+    "conf.__constraints__.sobel_x_size", "(1,3,5,7)",
+    "conf.__constraints__.sobel_y_size", "(1,3,5,7)",
+    "conf.__constraints__.laplacian_size", "(1,3,5,7)",
     ""
   };
 // </rtc-template>
@@ -77,6 +89,9 @@ RTC::ReturnCode_t Edge::onInitialize()
   // </rtc-template>
 
   // <rtc-template block="bind_config">
+  bindParameter("sobel_x_size", m_sobel_x_size, "3");
+  bindParameter("sobel_y_size", m_sobel_y_size, "3");
+  bindParameter("laplacian_size", m_laplacian_size, "3");
   // </rtc-template>
   
   return RTC::RTC_OK;
@@ -106,7 +121,7 @@ RTC::ReturnCode_t Edge::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Edge::onActivated(RTC::UniqueId ec_id)
 {
-  //  ƒCƒ[ƒW—pƒƒ‚ƒŠ‚Ì‰Šú‰»
+  //  ã‚¤ãƒ¡ãƒ¼ã‚¸ç”¨ãƒ¡ãƒ¢ãƒªã®åˆæœŸåŒ–
   imageBuff = NULL;
   grayImage = NULL;
   destinationImage_x = NULL;
@@ -115,7 +130,7 @@ RTC::ReturnCode_t Edge::onActivated(RTC::UniqueId ec_id)
   destinationEdge = NULL;
   edgeImage = NULL;
 
-  //  OutPort‰æ–ÊƒTƒCƒY‚Ì‰Šú‰»
+  //  OutPortç”»é¢ã‚µã‚¤ã‚ºã®åˆæœŸåŒ–
   m_image_edge_sobel_x.width = m_image_edge_sobel_y.width = m_image_edge_LAPLACIAN.width = 0;
   m_image_edge_sobel_x.height = m_image_edge_sobel_y.height = m_image_edge_LAPLACIAN.height = 0;
 
@@ -129,7 +144,7 @@ RTC::ReturnCode_t Edge::onDeactivated(RTC::UniqueId ec_id)
 {
   if(imageBuff != NULL)
   {
-    //  ƒCƒ[ƒW—pƒƒ‚ƒŠ‚Ì‰ğ•ú
+    //  ã‚¤ãƒ¡ãƒ¼ã‚¸ç”¨ãƒ¡ãƒ¢ãƒªã®è§£æ”¾
     cvReleaseImage(&imageBuff);
     cvReleaseImage(&destinationImage_x);
     cvReleaseImage(&destinationImage_y);
@@ -145,18 +160,18 @@ RTC::ReturnCode_t Edge::onDeactivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Edge::onExecute(RTC::UniqueId ec_id)
 {
-	//  V‚µ‚¢ƒf[ƒ^‚Ìƒ`ƒFƒbƒN
+	//  æ–°ã—ã„ãƒ‡ãƒ¼ã‚¿ã®ãƒã‚§ãƒƒã‚¯
   if(m_image_origIn.isNew()){
-	  //  InPortƒf[ƒ^‚Ì“Ç‚İ‚İ
+	  //  InPortãƒ‡ãƒ¼ã‚¿ã®èª­ã¿è¾¼ã¿
 	  m_image_origIn.read();
 
-	  // InPort‚ÆOutPort‚Ì‰æ–ÊƒTƒCƒYˆ—‚¨‚æ‚ÑƒCƒ[ƒW—pƒƒ‚ƒŠ‚ÌŠm•Û
+	  // InPortã¨OutPortã®ç”»é¢ã‚µã‚¤ã‚ºå‡¦ç†ãŠã‚ˆã³ã‚¤ãƒ¡ãƒ¼ã‚¸ç”¨ãƒ¡ãƒ¢ãƒªã®ç¢ºä¿
 	  if( m_image_orig.width != m_image_edge_sobel_x.width || m_image_orig.height != m_image_edge_sobel_x.height)
 	  {
 		  m_image_edge_sobel_x.width = m_image_edge_sobel_y.width = m_image_edge_LAPLACIAN.width = m_image_orig.width;
 		  m_image_edge_sobel_x.height = m_image_edge_sobel_y.height = m_image_edge_LAPLACIAN.height = m_image_orig.height;
 
-		  //  InPort‚ÌƒCƒ[ƒWƒTƒCƒY‚ª•ÏX‚³‚ê‚½ê‡
+		  //  InPortã®ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚µã‚¤ã‚ºãŒå¤‰æ›´ã•ã‚ŒãŸå ´åˆ
 		  if(imageBuff != NULL)
 		  {
 			  cvReleaseImage(&imageBuff);
@@ -168,7 +183,7 @@ RTC::ReturnCode_t Edge::onExecute(RTC::UniqueId ec_id)
 			  cvReleaseImage(&edgeImage);
 		  }
 
-		  //  ƒCƒ[ƒW—pƒƒ‚ƒŠ‚ÌŠm•Û
+		  //  ã‚¤ãƒ¡ãƒ¼ã‚¸ç”¨ãƒ¡ãƒ¢ãƒªã®ç¢ºä¿
 		  imageBuff = cvCreateImage( cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_8U, 3 );
 		  grayImage = cvCreateImage( cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_8U, 1 );
 		  destinationImage_x = cvCreateImage( cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_16S, 1 );
@@ -178,36 +193,36 @@ RTC::ReturnCode_t Edge::onExecute(RTC::UniqueId ec_id)
 		  edgeImage = cvCreateImage( cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_8U, 3 );
 	  }
 
-	  //  InPort‚Ì‰æ–Êƒf[ƒ^‚ğƒRƒs[
+	  //  InPortã®ç”»é¢ãƒ‡ãƒ¼ã‚¿ã‚’ã‚³ãƒ”ãƒ¼
 	  memcpy( imageBuff->imageData, (void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length() );
 
-	  //  RGB‚©‚çƒOƒŒ[ƒXƒP[ƒ‹‚É•ÏŠ·
+	  //  RGBã‹ã‚‰ã‚°ãƒ¬ãƒ¼ã‚¹ã‚±ãƒ¼ãƒ«ã«å¤‰æ›
 	  cvCvtColor( imageBuff, grayImage, CV_RGB2GRAY );
 
 	  //  Sobel_X
-	  //  X•ûŒü‚ÌSobelƒIƒyƒŒ[ƒ^‚ğ‚©‚¯‚é
-	  cvSobel( grayImage, destinationImage_x, 1, 0, SOBEL_X_APERTURE_SIZE );
+	  //  Xæ–¹å‘ã®Sobelã‚ªãƒšãƒ¬ãƒ¼ã‚¿ã‚’ã‹ã‘ã‚‹
+	  cvSobel( grayImage, destinationImage_x, 1, 0, m_sobel_x_size );
 
-	  //  16ƒrƒbƒg‚Ì•„†‚ ‚èƒf[ƒ^‚ğ8ƒrƒbƒg‚Ì•„†‚È‚µƒf[ƒ^‚É•ÏŠ·‚·‚é
+	  //  16ãƒ“ãƒƒãƒˆã®ç¬¦å·ã‚ã‚Šãƒ‡ãƒ¼ã‚¿ã‚’8ãƒ“ãƒƒãƒˆã®ç¬¦å·ãªã—ãƒ‡ãƒ¼ã‚¿ã«å¤‰æ›ã™ã‚‹
 	  cvConvertScaleAbs( destinationImage_x, destinationEdge, SCALE, SHIFT );
 
-	  //  ƒOƒŒ[ƒXƒP[ƒ‹‚©‚çRGB‚É•ÏŠ·
+	  //  ã‚°ãƒ¬ãƒ¼ã‚¹ã‚±ãƒ¼ãƒ«ã‹ã‚‰RGBã«å¤‰æ›
 	  cvCvtColor( destinationEdge, edgeImage, CV_GRAY2RGB );
 
-	  //  ‰æ‘œƒf[ƒ^‚ÌƒTƒCƒYæ“¾
+	  //  ç”»åƒãƒ‡ãƒ¼ã‚¿ã®ã‚µã‚¤ã‚ºå–å¾—
 	  len = edgeImage->nChannels * edgeImage->width * edgeImage->height;
 	  m_image_edge_sobel_x.pixels.length(len);
 
-	  //  ”½“]‚µ‚½‰æ‘œƒf[ƒ^‚ğOutPort‚ÉƒRƒs[
+	  //  åè»¢ã—ãŸç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’OutPortã«ã‚³ãƒ”ãƒ¼
 	  memcpy( (void *)&(m_image_edge_sobel_x.pixels[0]), edgeImage->imageData, len );
 
-	  //  ”½“]‚µ‚½‰æ‘œƒf[ƒ^‚ğOutPort‚©‚ço—Í
+	  //  åè»¢ã—ãŸç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’OutPortã‹ã‚‰å‡ºåŠ›
 	  m_image_edge_sobel_xOut.write();
 
 
 	  //  Sobel_Y
-	  //  Y•ûŒü‚ÌSobelƒIƒyƒŒ[ƒ^‚ğ‚©‚¯‚é
-	  cvSobel( grayImage, destinationImage_y, 0, 1, SOBEL_Y_APERTURE_SIZE );
+	  //  Yæ–¹å‘ã®Sobelã‚ªãƒšãƒ¬ãƒ¼ã‚¿ã‚’ã‹ã‘ã‚‹
+	  cvSobel( grayImage, destinationImage_y, 0, 1, m_sobel_y_size );
 
 	  cvConvertScaleAbs( destinationImage_y, destinationEdge, SCALE, SHIFT );
 
@@ -221,7 +236,7 @@ RTC::ReturnCode_t Edge::onExecute(RTC::UniqueId ec_id)
 
 
 	  // LAPLACIAN
-	  cvLaplace( grayImage, destinationImage_LAPLACIAN, LAPLACIAN_APERTURE_SIZE );
+	  cvLaplace( grayImage, destinationImage_LAPLACIAN, m_laplacian_size );
 
 	  cvConvertScaleAbs( destinationImage_LAPLACIAN, destinationEdge, SCALE, SHIFT );
 
