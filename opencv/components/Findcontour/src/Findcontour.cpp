@@ -27,9 +27,15 @@ static const char* findcontour_spec[] =
     "language",          "C++",
     "lang_type",         "compile",
     // Configuration variables
-    "conf.default.threshold_level", "10",
+    "conf.default.threshold_level", "100",
+    "conf.default.contour_level", "1",
+    "conf.default.line_thickness", "2",
+    "conf.default.line_type", "CV_AA", 
     // Widget
     "conf.__widget__.threshold_level", "slider.1",
+    "conf.__widget__.contour_level", "text",
+    "conf.__widget__.line_thickness", "text",
+    "conf.__widget__.line_type", "text",
     // Constraints
     "conf.__constraints__.threshold_level", "0<=x<=255",
     ""
@@ -78,7 +84,10 @@ RTC::ReturnCode_t Findcontour::onInitialize()
   // </rtc-template>
 
   // <rtc-template block="bind_config">
-  bindParameter("threshold_level", m_nThresholdLv, "10");
+  bindParameter("threshold_level", m_nThresholdLv, "100");
+  bindParameter("contour_level", m_nContourLv, "1");
+  bindParameter("line_thickness", m_nLineThickness, "2");
+  bindParameter("line_type", m_nLineType, "CV_AA");
   // </rtc-template>
   
   return RTC::RTC_OK;
@@ -108,18 +117,19 @@ RTC::ReturnCode_t Findcontour::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Findcontour::onActivated(RTC::UniqueId ec_id)
 {
-  //  ƒCƒ[ƒW—pƒƒ‚ƒŠ‚Ì‰Šú‰»
+  //  ã‚¤ãƒ¡ãƒ¼ã‚¸ç”¨ãƒ¡ãƒ¢ãƒªã®åˆæœŸåŒ–
   imageBuff = NULL;
   grayImage = NULL;
   binaryImage = NULL;
   contourImage = NULL;
 
-  //  OutPort‰æ–ÊƒTƒCƒY‚Ì‰Šú‰»
+  //  OutPortç”»é¢ã‚µã‚¤ã‚ºã®åˆæœŸåŒ–
   m_image_contour.width = 0;
   m_image_contour.height = 0;
 
   find_contour = NULL;
   red = CV_RGB( 255, 0, 0 );
+  green = CV_RGB( 0, 255, 0 );
 
   return RTC::RTC_OK;
 }
@@ -129,7 +139,7 @@ RTC::ReturnCode_t Findcontour::onDeactivated(RTC::UniqueId ec_id)
 {
   if(imageBuff != NULL )
   {
-    //  ƒCƒ[ƒW—pƒƒ‚ƒŠ‚Ì‰ğ•ú
+    //  ã‚¤ãƒ¡ãƒ¼ã‚¸ç”¨ãƒ¡ãƒ¢ãƒªã®è§£æ”¾
 	cvReleaseImage(&imageBuff);
 	cvReleaseImage(&grayImage);
     cvReleaseImage(&binaryImage);
@@ -142,18 +152,18 @@ RTC::ReturnCode_t Findcontour::onDeactivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Findcontour::onExecute(RTC::UniqueId ec_id)
 {
-	//  V‚µ‚¢ƒf[ƒ^‚Ìƒ`ƒFƒbƒN
+	//  æ–°ã—ã„ãƒ‡ãƒ¼ã‚¿ã®ãƒã‚§ãƒƒã‚¯
   if(m_image_origIn.isNew()){
-	  //  InPortƒf[ƒ^‚Ì“Ç‚İ‚İ
+	  //  InPortãƒ‡ãƒ¼ã‚¿ã®èª­ã¿è¾¼ã¿
 	  m_image_origIn.read();
 
-	  //  InPort‚ÆOutPort‚Ì‰æ–ÊƒTƒCƒYˆ—‚¨‚æ‚ÑƒCƒ[ƒW—pƒƒ‚ƒŠŠm•Û
+	  //  InPortã¨OutPortã®ç”»é¢ã‚µã‚¤ã‚ºå‡¦ç†ãŠã‚ˆã³ã‚¤ãƒ¡ãƒ¼ã‚¸ç”¨ãƒ¡ãƒ¢ãƒªç¢ºä¿
 	  if( m_image_orig.width != m_image_contour.width || m_image_orig.height != m_image_contour.height)
 	  {
 		  m_image_contour.width = m_image_orig.width;
 		  m_image_contour.height = m_image_orig.height;
 
-		  //  InPort‚ÌƒCƒ[ƒWƒTƒCƒY‚ª•ÏX‚³‚ê‚½ê‡
+		  //  InPortã®ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚µã‚¤ã‚ºãŒå¤‰æ›´ã•ã‚ŒãŸå ´åˆ
 		  if(imageBuff != NULL)
 		  {
 			  cvReleaseImage(&imageBuff);
@@ -162,59 +172,59 @@ RTC::ReturnCode_t Findcontour::onExecute(RTC::UniqueId ec_id)
 			  cvReleaseImage(&contourImage);
 		  }
 
-		  //  ƒCƒ[ƒW—pƒƒ‚ƒŠ‚ÌŠm•Û
+		  //  ã‚¤ãƒ¡ãƒ¼ã‚¸ç”¨ãƒ¡ãƒ¢ãƒªã®ç¢ºä¿
 		  imageBuff = cvCreateImage( cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_8U, 3 );
 		  grayImage = cvCreateImage( cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_8U, 1 );
 		  binaryImage = cvCreateImage( cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_8U, 1);
 		  contourImage = cvCreateImage( cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_8U, 3);
 	  }
 
-	  //  InPort‚Ì‰æ–Êƒf[ƒ^‚ğƒRƒs[
+	  //  InPortã®ç”»é¢ãƒ‡ãƒ¼ã‚¿ã‚’ã‚³ãƒ”ãƒ¼
 	  memcpy( imageBuff->imageData, (void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length() );
 	  memcpy( contourImage->imageData, (void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length() );
 
-	  //  RGB‚©‚çƒOƒŒ[ƒXƒP[ƒ‹‚É•ÏŠ·
+	  //  RGBã‹ã‚‰ã‚°ãƒ¬ãƒ¼ã‚¹ã‚±ãƒ¼ãƒ«ã«å¤‰æ›
 	  cvCvtColor( imageBuff, grayImage, CV_RGB2GRAY);
 
-	  //  ƒOƒŒ[ƒXƒP[ƒ‹‚©‚ç2’l‚É•ÏŠ·‚·‚é
+	  //  ã‚°ãƒ¬ãƒ¼ã‚¹ã‚±ãƒ¼ãƒ«ã‹ã‚‰2å€¤ã«å¤‰æ›ã™ã‚‹
 	  cvThreshold( grayImage, binaryImage, m_nThresholdLv, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY );
 
-	  //  ’Šo‚³‚ê‚½—ÖŠs‚ğ•Û‘¶‚·‚é—Ìˆæ 
+	  //  æŠ½å‡ºã•ã‚ŒãŸè¼ªéƒ­ã‚’ä¿å­˜ã™ã‚‹é ˜åŸŸ 
 	  CvMemStorage* storage = cvCreateMemStorage( 0 );
 	
-	  //  2’l‰æ‘œ’†‚Ì—ÖŠs‚ğŒ©‚Â‚¯A‚»‚Ì”‚ğ•Ô‚·
+	  //  2å€¤ç”»åƒä¸­ã®è¼ªéƒ­ã‚’è¦‹ã¤ã‘ã€ãã®æ•°ã‚’è¿”ã™
 	  find_contour_num = cvFindContours( 
-		binaryImage,			//	“ü—Í‰æ‘œ(‚WƒrƒbƒgƒVƒ“ƒOƒ‹ƒ`ƒƒƒ“ƒlƒ‹j
-		storage,				//	’Šo‚³‚ê‚½—ÖŠs‚ğ•Û‘¶‚·‚é—Ìˆæ
-		&find_contour,			//	ˆê”ÔŠO‘¤‚Ì—ÖŠs‚Ö‚Ìƒ|ƒCƒ“ƒ^‚Ö‚Ìƒ|ƒCƒ“ƒ^
-		sizeof( CvContour ),	//	ƒV[ƒPƒ“ƒXƒwƒbƒ_‚ÌƒTƒCƒY
-		CV_RETR_LIST,			//	’Šoƒ‚[ƒh 
-		CV_CHAIN_APPROX_NONE,	//	„’èè–@
-		cvPoint( 0, 0 )			//	ƒIƒtƒZƒbƒg
+		binaryImage,			//	å…¥åŠ›ç”»åƒ(ï¼˜ãƒ“ãƒƒãƒˆã‚·ãƒ³ã‚°ãƒ«ãƒãƒ£ãƒ³ãƒãƒ«ï¼‰
+		storage,				//	æŠ½å‡ºã•ã‚ŒãŸè¼ªéƒ­ã‚’ä¿å­˜ã™ã‚‹é ˜åŸŸ
+		&find_contour,			//	ä¸€ç•ªå¤–å´ã®è¼ªéƒ­ã¸ã®ãƒã‚¤ãƒ³ã‚¿ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+		sizeof( CvContour ),	//	ã‚·ãƒ¼ã‚±ãƒ³ã‚¹ãƒ˜ãƒƒãƒ€ã®ã‚µã‚¤ã‚º
+		CV_RETR_LIST,			//	æŠ½å‡ºãƒ¢ãƒ¼ãƒ‰ 
+		CV_CHAIN_APPROX_NONE,	//	æ¨å®šæ‰‹æ³•
+		cvPoint( 0, 0 )			//	ã‚ªãƒ•ã‚»ãƒƒãƒˆ
 	  );
 
 	  cvDrawContours( 
-		contourImage,			//	—ÖŠs‚ğ•`‰æ‚·‚é‰æ‘œ
-		find_contour,			//	Å‰‚Ì—ÖŠs‚Ö‚Ìƒ|ƒCƒ“ƒ^
-		red,					//	ŠO‘¤—ÖŠsü‚ÌF
-		red,					//	“à‘¤—ÖŠsüiŒŠj‚ÌF
-		CONTOUR_MAX_LEVEL,		//	•`‰æ‚³‚ê‚é—ÖŠs‚ÌÅ‘åƒŒƒxƒ‹
-		LINE_THICKNESS,			//	•`‰æ‚³‚ê‚é—ÖŠsü‚Ì‘¾‚³
-		LINE_TYPE,				//	ü‚Ìí—Ş
-		cvPoint( 0, 0 )			//	ƒIƒtƒZƒbƒg
+		contourImage,			//	è¼ªéƒ­ã‚’æç”»ã™ã‚‹ç”»åƒ
+		find_contour,			//	æœ€åˆã®è¼ªéƒ­ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+		red,					//	å¤–å´è¼ªéƒ­ç·šã®è‰²
+		green, 					//	å†…å´è¼ªéƒ­ç·šï¼ˆç©´ï¼‰ã®è‰²
+		m_nContourLv,		//	æç”»ã•ã‚Œã‚‹è¼ªéƒ­ã®æœ€å¤§ãƒ¬ãƒ™ãƒ«
+		m_nLineThickness,			//	æç”»ã•ã‚Œã‚‹è¼ªéƒ­ç·šã®å¤ªã•
+		m_nLineType,				//	ç·šã®ç¨®é¡
+		cvPoint( 0, 0 )			//	ã‚ªãƒ•ã‚»ãƒƒãƒˆ
 	  );
 
-	  //  ‰æ‘œƒf[ƒ^‚ÌƒTƒCƒYæ“¾
+	  //  ç”»åƒãƒ‡ãƒ¼ã‚¿ã®ã‚µã‚¤ã‚ºå–å¾—
 	  int len = contourImage->nChannels * contourImage->width * contourImage->height;
 	  m_image_contour.pixels.length(len);
 
-	  //  •Ï“]‚µ‚½‰æ‘œƒf[ƒ^‚ğOutPort‚ÉƒRƒs[
+	  //  å¤‰è»¢ã—ãŸç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’OutPortã«ã‚³ãƒ”ãƒ¼
 	  memcpy((void *)&(m_image_contour.pixels[0]), contourImage->imageData, len);
 
-	  //  •Ï“]‚µ‚½‰æ‘œƒf[ƒ^‚ğOutPort‚©‚ço—Í
+	  //  å¤‰è»¢ã—ãŸç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’OutPortã‹ã‚‰å‡ºåŠ›
 	  m_image_contourOut.write();
 
-	  //  ’Šo‚³‚ê‚½—ÖŠs‚ğ‰ğ•ú
+	  //  æŠ½å‡ºã•ã‚ŒãŸè¼ªéƒ­ã‚’è§£æ”¾
 	  cvReleaseMemStorage( &storage );
 
   }
