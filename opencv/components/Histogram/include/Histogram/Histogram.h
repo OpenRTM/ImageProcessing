@@ -24,15 +24,15 @@
 #include <cxcore.h>
 #include <highgui.h>
 
-#define DIMENSIONS	1				//	ƒqƒXƒgƒOƒ‰ƒ€‚ÌŸŒ³”
-#define UNIFORM	1					//	ˆê—l«‚ÉŠÖ‚·‚éƒtƒ‰ƒO
-#define	ACCUMULATE	0				//	ŒvZƒtƒ‰ƒO
-#define TRACKBAR_MAX_VALUE	200		//	ƒgƒ‰ƒbƒNƒo[‚ÌÅ‘å’l
+#define DIMENSIONS	1     //	ãƒ’ã‚¹ãƒˆã‚°ãƒ©ãƒ ã®æ¬¡å…ƒæ•°
+#define UNIFORM	1         //	ä¸€æ§˜æ€§ã«é–¢ã™ã‚‹ãƒ•ãƒ©ã‚°
+#define ACCUMULATE	0     //	è¨ˆç®—ãƒ•ãƒ©ã‚°
+#define TRACKBAR_MAX_VALUE	200 //	ãƒˆãƒ©ãƒƒã‚¯ãƒãƒ¼ã®æœ€å¤§å€¤
 
-#define SCALE_SHIFT	0				//	ƒXƒP[ƒŠƒ“ƒO‚µ‚½“ü—Í”z—ñ‚Ì—v‘f‚É‰Á‚¦‚é’l
-#define LINE_THICKNESS	-1			//	ü‚Ì‘¾‚³
-#define	LINE_TYPE	1				//	ü‚Ìí—Ş
-#define SHIFT	0					//	À•W‚Ì¬”“_ˆÈ‰º‚ÌŒ…‚ğ•\‚·ƒrƒbƒg”
+#define SCALE_SHIFT	0     //	ã‚¹ã‚±ãƒ¼ãƒªãƒ³ã‚°ã—ãŸå…¥åŠ›é…åˆ—ã®è¦ç´ ã«åŠ ãˆã‚‹å€¤
+#define LINE_THICKNESS	-1  //	ç·šã®å¤ªã•
+#define LINE_TYPE	1     //	ç·šã®ç¨®é¡
+#define SHIFT	0         //	åº§æ¨™ã®å°æ•°ç‚¹ä»¥ä¸‹ã®æ¡ã‚’è¡¨ã™ãƒ“ãƒƒãƒˆæ•°
 
 // Service implementation headers
 // <rtc-template block="service_impl_h">
@@ -299,14 +299,14 @@ class Histogram
   // <rtc-template block="private_operation">
   
   // </rtc-template>
-  IplImage* imageBuff;				// ƒJƒƒ‰‚ÌƒCƒ[ƒW
+  IplImage* imageBuff;				// ã‚«ãƒ¡ãƒ©ã®ã‚¤ãƒ¡ãƒ¼ã‚¸
   IplImage* grayImage;				
   IplImage* destinationImage;
   IplImage* histogramImage;
   IplImage* histogramBarImage;
 
   CvHistogram *histogram;
-  CvMat* lookUpTableMatrix;			//	”Z“x‘Î‰s—ñ
+  CvMat* lookUpTableMatrix;			//	æ¿ƒåº¦å¯¾å¿œè¡Œåˆ—
 
   int histogramSize;
   int bin_w;

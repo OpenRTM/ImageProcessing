@@ -115,35 +115,35 @@ RTC::ReturnCode_t Histogram::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Histogram::onActivated(RTC::UniqueId ec_id)
 {
-  //  ƒCƒ[ƒW—pƒƒ‚ƒŠ‚Ì‰Šú‰»
+  //  ã‚¤ãƒ¡ãƒ¼ã‚¸ç”¨ãƒ¡ãƒ¢ãƒªã®åˆæœŸåŒ–
   imageBuff = NULL;
   grayImage = NULL;
   destinationImage = NULL;
   histogramImage = NULL;
   histogramBarImage = NULL;
 
-  //  OutPort‰æ–ÊƒTƒCƒY‚Ì‰Šú‰»
+  //  OutPortç”»é¢ã‚µã‚¤ã‚ºã®åˆæœŸåŒ–
   m_image_histogram.width = 0;
   m_image_histogram.height = 0;
   m_image_histogramImage.width = 0;
   m_image_histogramImage.height = 0;
 
-  //  ƒqƒXƒgƒOƒ‰ƒ€‚É•`‰æ‚³‚ê‚éc–_‚Ì”
+  //  ãƒ’ã‚¹ãƒˆã‚°ãƒ©ãƒ ã«æç”»ã•ã‚Œã‚‹ç¸¦æ£’ã®æ•°
   histogramSize = 128;
-  //  ƒqƒXƒgƒOƒ‰ƒ€‚Ì”ÍˆÍ
+  //  ãƒ’ã‚¹ãƒˆã‚°ãƒ©ãƒ ã®ç¯„å›²
   range_0[0] = 0;
   range_0[1] = 256;
 
-  //  ƒqƒXƒgƒOƒ‰ƒ€ŠeŸŒ³‚Ì”ÍˆÍ‚ğ¦‚·”z—ñ‚Ìƒ|ƒCƒ“ƒ^
+  //  ãƒ’ã‚¹ãƒˆã‚°ãƒ©ãƒ å„æ¬¡å…ƒã®ç¯„å›²ã‚’ç¤ºã™é…åˆ—ã®ãƒã‚¤ãƒ³ã‚¿
   ranges[0] = range_0 ;
 
-  //  ƒqƒXƒgƒOƒ‰ƒ€‚ğ¶¬
+  //  ãƒ’ã‚¹ãƒˆã‚°ãƒ©ãƒ ã‚’ç”Ÿæˆ
   histogram = cvCreateHist( DIMENSIONS, &histogramSize, CV_HIST_ARRAY, ranges, UNIFORM );
 
-  //  s—ñ‚ğ¶¬
+  //  è¡Œåˆ—ã‚’ç”Ÿæˆ
   lookUpTableMatrix = cvCreateMatHeader( 1, 256, CV_8UC1 );
 
-  //  ”Z“x‘Î‰s—ñ‚É”Z“x‘Î‰•\‚ğƒZƒbƒg
+  //  æ¿ƒåº¦å¯¾å¿œè¡Œåˆ—ã«æ¿ƒåº¦å¯¾å¿œè¡¨ã‚’ã‚»ãƒƒãƒˆ
   cvSetData( lookUpTableMatrix, lookUpTable, NULL );
   
   return RTC::RTC_OK;
@@ -154,7 +154,7 @@ RTC::ReturnCode_t Histogram::onDeactivated(RTC::UniqueId ec_id)
 {
   if( imageBuff != NULL )
   {
-	  //  ƒCƒ[ƒW—pƒƒ‚ƒŠ‚Ì‰ğ•ú
+	  //  ã‚¤ãƒ¡ãƒ¼ã‚¸ç”¨ãƒ¡ãƒ¢ãƒªã®è§£æ”¾
 	  cvReleaseImage(&imageBuff);
 	  cvReleaseImage(&grayImage);
 	  cvReleaseImage(&destinationImage);
@@ -168,18 +168,18 @@ RTC::ReturnCode_t Histogram::onDeactivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Histogram::onExecute(RTC::UniqueId ec_id)
 {
-	// V‚µ‚¢ƒf[ƒ^‚Ìƒ`ƒFƒbƒN
+	// æ–°ã—ã„ãƒ‡ãƒ¼ã‚¿ã®ãƒã‚§ãƒƒã‚¯
   if(m_image_origIn.isNew()){
-	  //  InPortƒf[ƒ^‚Ì“Ç‚İ‚İ
+	  //  InPortãƒ‡ãƒ¼ã‚¿ã®èª­ã¿è¾¼ã¿
 	  m_image_origIn.read();
 
-	  //  InPort‚ÆOutPort‚Ì‰æ–ÊƒTƒCƒYˆ—‚¨‚æ‚ÑƒCƒ[ƒW—pƒƒ‚ƒŠŠm•Û
+	  //  InPortã¨OutPortã®ç”»é¢ã‚µã‚¤ã‚ºå‡¦ç†ãŠã‚ˆã³ã‚¤ãƒ¡ãƒ¼ã‚¸ç”¨ãƒ¡ãƒ¢ãƒªç¢ºä¿
 	  if(m_image_orig.width != m_image_histogram.width || m_image_orig.height != m_image_histogram.height)
 	  {
 		  m_image_histogram.width = m_image_histogramImage.width = m_image_orig.width;
 		  m_image_histogram.height = m_image_histogramImage.height = m_image_orig.height;
 
-		  //  InPort‚ÌƒCƒ[ƒWƒTƒCƒY‚ª•ÏX‚³‚ê‚½ê‡
+		  //  InPortã®ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚µã‚¤ã‚ºãŒå¤‰æ›´ã•ã‚ŒãŸå ´åˆ
 		  if( imageBuff != NULL )
 		  {
 			  cvReleaseImage(&imageBuff);
@@ -189,108 +189,108 @@ RTC::ReturnCode_t Histogram::onExecute(RTC::UniqueId ec_id)
 			  cvReleaseImage(&histogramBarImage);
 		  }
 
-		  //  ƒCƒ[ƒW—pƒƒ‚ƒŠ‚ÌŠm•Û
+		  //  ã‚¤ãƒ¡ãƒ¼ã‚¸ç”¨ãƒ¡ãƒ¢ãƒªã®ç¢ºä¿
 		  imageBuff = cvCreateImage( cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_8U, 3 );
 		  grayImage = cvCreateImage( cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_8U, 1 );
 		  destinationImage = cvCreateImage( cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_8U, 1 );
 		  histogramImage = cvCreateImage( cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_8U, 3 );
 		  histogramBarImage = cvCreateImage( cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_8U, 3 );
 
-		  //	ƒqƒXƒgƒOƒ‰ƒ€‚Ìc–_‚Ì‰¡•‚ğŒvZ‚·‚é
+		  //	ãƒ’ã‚¹ãƒˆã‚°ãƒ©ãƒ ã®ç¸¦æ£’ã®æ¨ªå¹…ã‚’è¨ˆç®—ã™ã‚‹
 		  bin_w = cvRound( ( double )histogramBarImage->width / histogramSize );
 	  }
 
-	  //  InPort‚Ì‰æ–Êƒf[ƒ^‚ğƒRƒs[
+	  //  InPortã®ç”»é¢ãƒ‡ãƒ¼ã‚¿ã‚’ã‚³ãƒ”ãƒ¼
 	  memcpy(imageBuff->imageData,(void *)&(m_image_orig.pixels[0]),m_image_orig.pixels.length());
 
-	  //  RGB‚©‚çƒOƒŒ[ƒXƒP[ƒ‹‚É•ÏŠ·
+	  //  RGBã‹ã‚‰ã‚°ãƒ¬ãƒ¼ã‚¹ã‚±ãƒ¼ãƒ«ã«å¤‰æ›
 	  cvCvtColor( imageBuff, grayImage, CV_RGB2GRAY);
 	  
-	  int brightness = m_brightness - TRACKBAR_MAX_VALUE / 2;	//	‹P“x’l
-      int contrast = m_contrast - TRACKBAR_MAX_VALUE / 2;		//	ƒRƒ“ƒgƒ‰ƒXƒg
+	  int brightness = m_brightness - TRACKBAR_MAX_VALUE / 2;	//	è¼åº¦å€¤
+    int contrast = m_contrast - TRACKBAR_MAX_VALUE / 2;		//	ã‚³ãƒ³ãƒˆãƒ©ã‚¹ãƒˆ
 
 	  if ( contrast > 0 ) {
-        double delta = 127.0 * contrast / 100.0;
-        double a = 255.0 / ( 255.0 - delta * 2 );
-        double b = a * ( brightness - delta );
-        for (int i = 0; i < 256; i++ ){
-			//	•ÏŠ·Œã‚ÌŠK’²‚ğ‹‚ß‚é
-            int v = cvRound( a * i + b );
-			if( v < 0 ){
-                v = 0;
-			}
-			if( v > 255 ){
-                v = 255;
-			}
-            lookUpTable[i] = ( unsigned char )v;
+      double delta = 127.0 * contrast / 100.0;
+      double a = 255.0 / ( 255.0 - delta * 2 );
+      double b = a * ( brightness - delta );
+      for (int i = 0; i < 256; i++ ){
+        //	å¤‰æ›å¾Œã®éšèª¿ã‚’æ±‚ã‚ã‚‹
+        int v = cvRound( a * i + b );
+			  if( v < 0 ){
+          v = 0;
         }
-	   } else {
-        double delta = -128.0 * contrast / 100.0;
-        double a = (256.0 - delta * 2.0) / 255.0;
-        double b = a * brightness + delta;
-        for(int i = 0; i < 256; i++ ){
-            int v = cvRound( a * i + b);
-			if( v < 0 ){
-                v = 0;
-			}
-			if( v > 255 ){
-                v = 255;
-			}
-            lookUpTable[i] = ( unsigned char )v;
+        if( v > 255 ){
+          v = 255;
         }
+        lookUpTable[i] = ( unsigned char )v;
       }
+    } else {
+      double delta = -128.0 * contrast / 100.0;
+      double a = (256.0 - delta * 2.0) / 255.0;
+      double b = a * brightness + delta;
+      for(int i = 0; i < 256; i++ ){
+        int v = cvRound( a * i + b);
+        if( v < 0 ){
+          v = 0;
+        }
+        if( v > 255 ){
+          v = 255;
+        }
+        lookUpTable[i] = ( unsigned char )v;
+      }
+    }
 	  
-	  //  ”Z“x‘Î‰s—ñ‚ğ—p‚¢‚½”Z“xŠK’²•ÏŠ·‚ğs‚¤
+	  //  æ¿ƒåº¦å¯¾å¿œè¡Œåˆ—ã‚’ç”¨ã„ãŸæ¿ƒåº¦éšèª¿å¤‰æ›ã‚’è¡Œã†
 	  cvLUT( grayImage, destinationImage, lookUpTableMatrix );
 
-	  //  ƒOƒŒ[ƒXƒP[ƒ‹‚©‚çRGB‚É•ÏŠ·
+	  //  ã‚°ãƒ¬ãƒ¼ã‚¹ã‚±ãƒ¼ãƒ«ã‹ã‚‰RGBã«å¤‰æ›
 	  cvCvtColor( destinationImage, histogramImage, CV_GRAY2RGB );
 
-	  //  ‰æ‘œƒf[ƒ^‚ÌƒTƒCƒYæ“¾
+	  //  ç”»åƒãƒ‡ãƒ¼ã‚¿ã®ã‚µã‚¤ã‚ºå–å¾—
 	  int len = histogramImage->nChannels * histogramImage->width * histogramImage->height;
 	  m_image_histogramImage.pixels.length(len);
 
-	  //  •Ï“]‚µ‚½‰æ‘œƒf[ƒ^‚ğOutPort‚ÉƒRƒs[
+	  //  å¤‰è»¢ã—ãŸç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’OutPortã«ã‚³ãƒ”ãƒ¼
 	  memcpy((void *)&(m_image_histogramImage.pixels[0]), histogramImage->imageData,len);
 
-	  //  •Ï“]‚µ‚½‰æ‘œƒf[ƒ^‚ğOutPort‚©‚ço—Í
+	  //  å¤‰è»¢ã—ãŸç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’OutPortã‹ã‚‰å‡ºåŠ›
 	  m_image_histogramImageOut.write();
 
-	  //  ‰æ‘œ‚ÌƒqƒXƒgƒOƒ‰ƒ€‚ğŒvZ‚·‚é
+	  //  ç”»åƒã®ãƒ’ã‚¹ãƒˆã‚°ãƒ©ãƒ ã‚’è¨ˆç®—ã™ã‚‹
 	  cvCalcHist( &destinationImage, histogram, ACCUMULATE, NULL );
 
 	  float max_value = 0;
-	  //  ƒqƒXƒgƒOƒ‰ƒ€’l‚ÌÅ‘å’l‚ğ“¾‚é
-      cvGetMinMaxHistValue( histogram, NULL, &max_value, NULL, NULL );
+	  //  ãƒ’ã‚¹ãƒˆã‚°ãƒ©ãƒ å€¤ã®æœ€å¤§å€¤ã‚’å¾—ã‚‹
+    cvGetMinMaxHistValue( histogram, NULL, &max_value, NULL, NULL );
 
-	  //  ƒqƒXƒgƒOƒ‰ƒ€‚ğÅ‘å’l‚É‚æ‚Á‚Ä³‹K‰»‚·‚é
+	  //  ãƒ’ã‚¹ãƒˆã‚°ãƒ©ãƒ ã‚’æœ€å¤§å€¤ã«ã‚ˆã£ã¦æ­£è¦åŒ–ã™ã‚‹
 	  cvConvertScale( histogram->bins, histogram->bins, 
 		( ( double )histogramBarImage->height ) / max_value, SCALE_SHIFT );
 
-	  //	ƒqƒXƒgƒOƒ‰ƒ€‰æ‘œ‚ğ”’‚Å‰Šú‰»‚·‚é
+	  //	ãƒ’ã‚¹ãƒˆã‚°ãƒ©ãƒ ç”»åƒã‚’ç™½ã§åˆæœŸåŒ–ã™ã‚‹
 	  cvSet( histogramBarImage, cvScalarAll( 255 ), NULL );
 
-	  //	ƒqƒXƒgƒOƒ‰ƒ€‚Ìc–_‚ğ•`‰æ‚·‚é
+	  //	ãƒ’ã‚¹ãƒˆã‚°ãƒ©ãƒ ã®ç¸¦æ£’ã‚’æç”»ã™ã‚‹
 	  for ( int i = 0; i < histogramSize; i++ ) {
-          cvRectangle(
-		  	histogramBarImage,
-		  	cvPoint( i * bin_w, histogramBarImage->height ),
-			cvPoint( ( i + 1 ) * bin_w,histogramBarImage->height - cvRound( cvGetReal1D( histogram->bins, i) ) ),
-			cvScalarAll( 0 ),
-			LINE_THICKNESS,
-			LINE_TYPE,
-			SHIFT
-		  );
+      cvRectangle(
+        histogramBarImage,
+        cvPoint( i * bin_w, histogramBarImage->height ),
+        cvPoint( ( i + 1 ) * bin_w,histogramBarImage->height - cvRound( cvGetReal1D( histogram->bins, i) ) ),
+        cvScalarAll( 0 ),
+        LINE_THICKNESS,
+        LINE_TYPE,
+        SHIFT
+      );
 	  }
 
-	  //  ‰æ‘œƒf[ƒ^‚ÌƒTƒCƒYæ“¾
+	  //  ç”»åƒãƒ‡ãƒ¼ã‚¿ã®ã‚µã‚¤ã‚ºå–å¾—
 	  len = histogramBarImage->nChannels * histogramBarImage->width * histogramBarImage->height;
 	  m_image_histogram.pixels.length(len);
 
-	  //  •Ï“]‚µ‚½‰æ‘œƒf[ƒ^‚ğOutPort‚ÉƒRƒs[
+	  //  å¤‰è»¢ã—ãŸç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’OutPortã«ã‚³ãƒ”ãƒ¼
 	  memcpy((void *)&(m_image_histogram.pixels[0]), histogramBarImage->imageData,len);
 
-	  //  •Ï“]‚µ‚½‰æ‘œƒf[ƒ^‚ğOutPort‚©‚ço—Í
+	  //  å¤‰è»¢ã—ãŸç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’OutPortã‹ã‚‰å‡ºåŠ›
 	  m_image_histogramOut.write();
 
   }
