@@ -24,9 +24,7 @@
 #include <highgui.h>
 
 #define	NUM_OF_BACKGROUND_FRAMES	50	//	背景モデルを生成するのに使用する画像の枚数
-#define	THRESHOLD_COEFFICIENT		5.0	//	閾値を決める際に使用する標準偏差にかける数
 
-#define	CONSTANT_THRESHOLD	20	//	画像で1つの閾値を使う際の閾値
 #define CONSTANT_MODE		0	//	画像全体で1つの閾値を用いるフラグ値
 #define DYNAMIC_MODE		1	//	画素ごとに閾値を設けるフラグ値
 
@@ -236,6 +234,12 @@ class ImageSubstraction
   // <rtc-template block="config_declare">
   /*!
    * 
+   * - Name:  cont_mode
+   * - DefaultValue: b
+   */
+  char m_cont_mode;
+  /*!
+   * 
    * - Name:  img_height
    * - DefaultValue: 240
    */
@@ -246,7 +250,19 @@ class ImageSubstraction
    * - DefaultValue: 320
    */
   int m_img_width;
-
+  /*!
+   * 
+   * - Name:  thre_coefficient
+   * - DefaultValue: 5.0
+   */
+  double m_thre_coefficient;
+  /*!
+   * 
+   * - Name:  constant_thre
+   * - DefaultValue: 20
+   */
+  int m_constant_thre;
+  
   // </rtc-template>
 
   // DataInPort declaration

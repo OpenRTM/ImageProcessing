@@ -25,19 +25,26 @@ static const char* imagesubstraction_spec[] =
     "language",          "C++",
     "lang_type",         "compile",
     // Configuration variables
+    "conf.default.control_mode", "b",
     "conf.default.image_height", "240",
     "conf.default.image_width", "320",
+    "conf.default.threshold_coefficient", "5.0",
+    "conf.default.constant_threshold", "20",
     // Widget
+    "conf.__widget__.control_mode", "radio",
     "conf.__widget__.image_height", "text",
     "conf.__widget__.image_width", "text",
+    "conf.__widget__.threshold_coefficient", "text",
+    "conf.__widget__.constant_threshold", "slider.1",
     // Constraints
+    "conf.__constraints__.control_mode", "(b,m)",
+    "conf.__constraints__.constant_threshold", "0<=x<=255",
     ""
   };
 // </rtc-template>
 
 int ImageSubstraction_count = 0;
-int key;		//	キー入力用の変数
-int	mode = 0;	// 0: 画素ごとに異なる閾値 / 1: 画像全体で一つの閾値
+int	mode = DYNAMIC_MODE;	// DYNAMIC_MODE: 画素ごとに異なる閾値 / CONSTANT_MODE: 画像全体で一つの閾値
 int g_temp_w = 0;
 int g_temp_h = 0;
 
@@ -46,9 +53,9 @@ int g_temp_h = 0;
 //char *windowNameBackground = "Background";	//	背景画像を表示するウィンドウの名前
 //char *windowNameThreshold = "Threshold";	//	閾値を表示するウィンドウの名前
 
-char *mode_str[2] = {
-	"画素単位",
-	"画像で一つ"
+std::string mode_str[2] = {
+	"DYNAMIC_MODE",   //画素単位
+	"CONSTANT_MODE"    //画像で一つ
 };
 
 IplImage *backgroundAverageImage = NULL;	//	背景の平均値保存用IplImage
@@ -83,7 +90,7 @@ void showFlipImage( char *windowName, IplImage *image ) {
 //		num  : 背景モデルを生成するのに使用する画像の枚数
 //		size : 画像サイズ
 //
-void initializeBackgroundModel( int num, CvSize size ){
+void initializeBackgroundModel( int num, CvSize size, double thre_coefficient ){
 	int i;
 
 	// 以前の背景情報があれば破棄
@@ -103,15 +110,15 @@ void initializeBackgroundModel( int num, CvSize size ){
 	cvSetZero( acc2 );
 
 	//	画像情報の蓄積
-	printf( "背景取得中...\n" );
+	printf( "Getting background...\n" ); //背景取得中
 	//IplImage *frameImage;
 	for( i = 0; i < num; i++ ){
 		//frameImage = cvQueryFrame( capture );
 		cvAcc( originalImage, acc );
 		cvSquareAcc( originalImage, acc2 );
-		printf( "%d 枚中 %d 枚目\n", num, i + 1 );
+    printf( "%d / %d image\n", i + 1, num );
 	}
-	printf( "背景取得完了\n" );
+	printf( "Completion!\n" ); //背景取得完了
 
 	//	cvAddS, cvSubS はあるが cvMulS はないので、cvConvertScale を使う
 	cvConvertScale( acc, acc, 1.0 / num );		// 平均
@@ -132,7 +139,7 @@ void initializeBackgroundModel( int num, CvSize size ){
 
 	//	閾値を計算する
 	backgroundThresholdImage = cvCreateImage( size, IPL_DEPTH_8U, 3 );
-	cvConvertScale( sd, backgroundThresholdImage, THRESHOLD_COEFFICIENT );
+	cvConvertScale( sd, backgroundThresholdImage, thre_coefficient );
 
 	//	メモリを解放する
 	cvReleaseImage( &acc );
@@ -149,7 +156,7 @@ ImageSubstraction::ImageSubstraction(RTC::Manager* manager)
     // <rtc-template block="initializer">
   : RTC::DataFlowComponentBase(manager),
     m_img_origIn("original_image", m_img_orig),
-	m_keyIn("Key", m_key),
+    m_keyIn("Key", m_key),
     m_img_captureOut("capture_image", m_img_capture),
     m_img_resultOut("result_image", m_img_result),
     m_img_backOut("back_image", m_img_back),
@@ -192,8 +199,11 @@ RTC::ReturnCode_t ImageSubstraction::onInitialize()
 
   // <rtc-template block="bind_config">
   // Bind variables and configuration variable
+  bindParameter("control_mode", m_cont_mode, "b");
   bindParameter("image_height", m_img_height, "240");
   bindParameter("image_width", m_img_width, "320");
+  bindParameter("threshold_coefficient", m_thre_coefficient, "5.0");
+  bindParameter("constant_threshold", m_constant_thre, "20");
   // </rtc-template>
   
   return RTC::RTC_OK;
@@ -231,6 +241,9 @@ RTC::ReturnCode_t ImageSubstraction::onActivated(RTC::UniqueId ec_id)
 	outputImage = NULL;
 	resultImage = NULL;
 	differenceImage = NULL;
+	
+  //閾値の初期設定を表示
+  printf( "threshold: %s\n", mode_str[1-mode].c_str() );
 
 	return RTC::RTC_OK;
 }
@@ -258,7 +271,23 @@ RTC::ReturnCode_t ImageSubstraction::onDeactivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t ImageSubstraction::onExecute(RTC::UniqueId ec_id)
 {	
-	
+	//	キー入力判定
+  if(m_keyIn.isNew()){
+    m_keyIn.read();
+
+	  if( m_cont_mode == 'b' ){
+		  //	'b'キーが押されたらその時点での画像を背景画像とする
+		  initializeBackgroundModel( NUM_OF_BACKGROUND_FRAMES, cvSize(m_img_width, m_img_height), m_thre_coefficient);
+		
+		  printf( "Background image update\n" );   //背景情報更新
+		
+	  } else if( m_cont_mode == 'm' ){
+		  //	'm'キーが押されたら閾値の設定方法を変更する
+		  mode = 1 - mode;
+		  printf( "threshold: %s\n", mode_str[mode].c_str() );
+	  }
+	}
+				
 	//初期値を取得する。
 	if(ImageSubstraction_count == 0 && m_img_origIn.isNew()) {
 		
@@ -295,7 +324,7 @@ RTC::ReturnCode_t ImageSubstraction::onExecute(RTC::UniqueId ec_id)
 				resultImage = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height),IPL_DEPTH_8U, 1);
 			}
 
-			initializeBackgroundModel( NUM_OF_BACKGROUND_FRAMES, cvSize(m_img_orig.width, m_img_orig.height) );
+			initializeBackgroundModel( NUM_OF_BACKGROUND_FRAMES, cvSize(m_img_orig.width, m_img_orig.height) , m_thre_coefficient);
 			
 			ImageSubstraction_count = 1;
 			g_temp_w = m_img_orig.width;
@@ -325,21 +354,16 @@ RTC::ReturnCode_t ImageSubstraction::onExecute(RTC::UniqueId ec_id)
 				outputImage = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 3);
 			}
 
-			if(m_keyIn.isNew()) {
-				m_keyIn.read();
-				key = (int)m_key.data;
-			}
-
 			memcpy(originalImage->imageData,(void *)&(m_img_orig.pixels[0]), m_img_orig.pixels.length());
 
 			//	現在の背景との差の絶対値を成分ごとに取る
 			cvAbsDiff( originalImage, backgroundAverageImage, differenceImage );
 			
 			//	Sub はマイナスになったら0に切り詰めてくれる
-			if( mode == 0 ){
+			if( mode == DYNAMIC_MODE ){
 				cvSub( differenceImage, backgroundThresholdImage, differenceImage );
 			} else{
-				cvSubS( differenceImage, cvScalarAll( CONSTANT_THRESHOLD ), differenceImage );
+				cvSubS( differenceImage, cvScalarAll( m_constant_thre ), differenceImage );
 			}
 			
 			//	differenceImage の要素が1つでも0以上だったら前景
@@ -395,26 +419,10 @@ RTC::ReturnCode_t ImageSubstraction::onExecute(RTC::UniqueId ec_id)
 			m_img_thresholdOut.write();
 			
 			cvReleaseImage( &tmp );
-			//	キー入力判定
-			cvWaitKey( 1 );
-			//key = (int)m_key.data;
-
-			if( key == 'b' ){
-				//	'b'キーが押されたらその時点での画像を背景画像とする
-				initializeBackgroundModel( NUM_OF_BACKGROUND_FRAMES, cvSize(m_img_width, m_img_height));
-				
-				printf( "背景情報更新\n" );
-				
-			} else if( key == 'm' ){
-				//	'm'キーが押されたら閾値の設定方法を変更する
-				mode = 1 - mode;
-				printf( "閾値: %s\n", mode_str[mode] );
-			}
 
 			cvReleaseImage(&originalImage);
 			cvReleaseImage(&outputImage);
 			
-			key = '0';
 			g_temp_w = m_img_orig.width;
 			g_temp_h = m_img_orig.height;
 		

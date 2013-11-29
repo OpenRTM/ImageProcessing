@@ -19,32 +19,23 @@
 #include <rtm/idl/ExtendedDataTypesSkel.h>
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
-// OpenCVHeadファイルのIncluding
+// OpenCVHead繝輔ぃ繧､繝ｫ縺ｮIncluding
 #include <cv.h>
 #include <cxcore.h>
 #include <highgui.h>
 
-#include "LabellingW.h"
+#include <string>
+#include "Labeling.h"
 
-#define	ITERATIONS	4	//	膨張、収縮の回数
+//閧瑚牡謚ｽ蜃ｺ逕ｨ髢ｾ蛟､
+#define HMAX 20			//	H蛟､縺ｮ荳企剞縺ｮ髢ｾ蛟､
+#define HMIN 0			//	H蛟､縺ｮ荳矩剞縺ｮ髢ｾ蛟､
+#define SMAX 255*1		//	S蛟､縺ｮ荳企剞縺ｮ髢ｾ蛟､
+#define SMIN 255*0.2	//	S蛟､縺ｮ荳矩剞縺ｮ髢ｾ蛟､
+#define VMAX 255*1.0	//	V蛟､縺ｮ荳企剞縺ｮ髢ｾ蛟､
+#define VMIN 255*0		//	V蛟､縺ｮ荳矩剞縺ｮ髢ｾ蛟､
 
-//肌色抽出用閾値
-#define HMAX 20			//	H値の上限の閾値
-#define HMIN 0			//	H値の下限の閾値
-#define SMAX 255*1		//	S値の上限の閾値
-#define SMIN 255*0.2	//	S値の下限の閾値
-#define VMAX 255*1.0	//	V値の上限の閾値
-#define VMIN 255*0		//	V値の下限の閾値
-
-//ジャンケン判定用閾値
-#define ROCKMAX 1.0		//	グーと判定する上限の閾値
-#define ROCKMIN 0.85	//	グーと判定する下限の閾値
-#define SCISSORMAX 0.85	//	チョキと判定する上限の閾値
-#define SCISSORMIN 0.7	//	チョキと判定する下限の閾値
-#define PAPERMAX 0.7	//	パーと判定する上限の閾値
-#define PAPERMIN 0.5	//	パーと判定する下限の閾値
-
-#define IGNORE_SIZE 1000	//無視する領域サイズ(ラベリング用)
+#define IGNORE_SIZE 1000	//辟｡隕悶☆繧矩伜沺繧ｵ繧､繧ｺ(繝ｩ繝吶Μ繝ｳ繧ｰ逕ｨ)
 
 // Service implementation headers
 // <rtc-template block="service_impl_h">
@@ -252,16 +243,46 @@ class RockPaperScissors
   // <rtc-template block="config_declare">
   /*!
    * 
-   * - Name:  img_height
-   * - DefaultValue: 240
+   * - Name:  rock_max
+   * - DefaultValue: 1.0
    */
-  int m_img_height;
+  double m_rock_max;
   /*!
    * 
-   * - Name:  img_width
-   * - DefaultValue: 320
+   * - Name:  rock_min
+   * - DefaultValue: 0.85
    */
-  int m_img_width;
+  double m_rock_min;
+  /*!
+   * 
+   * - Name:  scissor_max
+   * - DefaultValue: 0.85
+   */
+  double m_scissor_max;
+  /*!
+   * 
+   * - Name:  scissor_min
+   * - DefaultValue: 0.7
+   */
+  double m_scissor_min;
+  /*!
+   * 
+   * - Name:  paper_max
+   * - DefaultValue: 0.7
+   */
+  double m_paper_max;
+  /*!
+   * 
+   * - Name:  paper_min
+   * - DefaultValue: 0.5
+   */
+  double m_paper_min;
+  /*!
+   * 
+   * - Name:  iterations
+   * - DefaultValue: 4
+   */
+  int m_iterations;
   /*!
    * 
    * - Name:  out_mode
@@ -288,6 +309,11 @@ class RockPaperScissors
    */
   OutPort<RTC::CameraImage> m_img_outputOut;
   
+  RTC::TimedString m_result;
+  /*!
+   */
+  OutPort<RTC::TimedString> m_resultOut;
+  
   // </rtc-template>
 
   // CORBA Port declaration
@@ -313,7 +339,18 @@ class RockPaperScissors
   // <rtc-template block="private_operation">
   
   // </rtc-template>
+  
+  void extractSkinColor( void );
+  void interpolate( void );
+  int  pickupMaxArea( void );
+  void createConvexHull( int handarea, CvPoint **handpoint, int **hull,
+					  CvMat *pointMatrix, CvMat *hullMatrix );
+  void drawConvexHull( CvPoint *handpoint, int *hull, int hullcount );
+  int  calcConvexHullArea( CvPoint *handpoint, int *hull, int hullcount );
+  void decide( int handarea, int hullarea );
+  
 	int dummy;
+	std::string m_prev_judge;   //蜑榊屓縺ｮ蛻､螳壹繧ｰ繝ｼ / 繝√Ι繧ｭ / 繝代�ｼ
 	
 	IplImage* m_frame_image;
 	IplImage* m_image_buff;

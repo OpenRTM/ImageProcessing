@@ -8,7 +8,7 @@
 #include "Labeling.h"
 
 #define Label LabelingBS
-/*
+
 Label *createLabeling(){
 	return new LabelingBS();
 }
@@ -26,5 +26,6 @@ int getNumOfResultRegions(Label *label){
 void releaseLabeling(Label *label){
 	delete label;
 }
-*/
-#endif LABELINGW_H
+
+#endif //LABELINGW_H
+

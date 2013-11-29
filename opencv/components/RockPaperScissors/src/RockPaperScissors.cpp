@@ -8,9 +8,9 @@
  */
 
 #include "RockPaperScissors.h"
+#define Label LabelingBS
 
 using namespace std;
-
 
 CvCapture *capture = NULL;
 
@@ -30,14 +30,31 @@ static const char* rockpaperscissors_spec[] =
     "language",          "C++",
     "lang_type",         "compile",
     // Configuration variables
-    "conf.default.image_height", "240",
-    "conf.default.image_width", "320",
+    "conf.default.rock_max", "1.0",
+    "conf.default.rock_min", "0.85",
+    "conf.default.scissor_max", "0.85",
+    "conf.default.scissor_min", "0.7",
+    "conf.default.paper_max", "0.7",
+    "conf.default.paper_min", "0.5",
+    "conf.default.iterations", "4",
     "conf.default.out_mode", "1",
     // Widget
-    "conf.__widget__.image_height", "text",
-    "conf.__widget__.image_width", "text",
-    "conf.__widget__.out_mode", "text",
+    "conf.__widget__.rock_max", "text",
+    "conf.__widget__.rock_min", "text",
+    "conf.__widget__.scissor_max", "text",
+    "conf.__widget__.scissor_min", "text",
+    "conf.__widget__.paper_max", "text",
+    "conf.__widget__.paper_min", "text",
+    "conf.__widget__.iterations", "text",
+    "conf.__widget__.out_mode", "radio",
     // Constraints
+    "conf.__constraints__.rock_max", "0<=x<=1.0",
+    "conf.__constraints__.rock_min", "0<=x<=1.0",
+    "conf.__constraints__.scissor_max", "0<=x<=1.0",
+    "conf.__constraints__.scissor_min", "0<=x<=1.0",
+    "conf.__constraints__.paper_max", "0<=x<=1.0",
+    "conf.__constraints__.paper_min", "0<=x<=1.0",
+    "conf.__constraints__.out_mode", "(0,1)",
     ""
   };
 // </rtc-template>
@@ -60,200 +77,6 @@ void releaseLabeling(Label *label){
 	delete label;
 }
 
-	//
-	//	”§F‚ğ’Šo‚·‚é
-	//
-	//	ˆø”:
-	//		frameImage : ƒLƒƒƒvƒ`ƒƒ‚µ‚½‰æ‘œ—pIplImage
-	//		hsvImage   : HSV‰æ‘œ—pIplImage
-	//		skinImage  : ”§F’Šo‰æ‘œ—pIplImage
-	//
-void extractSkinColor( IplImage *frameImage, IplImage *hsvImage, IplImage *skinImage ) {
-	CvScalar color;		//	HSV•\FŒn‚Å•\‚µ‚½F
-	unsigned char h;	//	H¬•ª
-	unsigned char s;	//	S¬•ª
-	unsigned char v;	//	V¬•ª
-	
-	//	BGR‚©‚çHSV‚É•ÏŠ·‚·‚é
-	
-	cvCvtColor( frameImage, hsvImage, CV_BGR2HSV );
-	
-	//”§F’Šo
-	for( int x = 0; x < skinImage->width; x++ ) {
-		for( int y = 0 ; y < skinImage->height; y++ ) {
-
-			color = cvGet2D( hsvImage, y, x );
-			h = color.val[0];
-			s = color.val[1];
-			v = color.val[2];
-
-			if( h <= HMAX && h >= HMIN &&
-				s <= SMAX && s >= SMIN &&
-					v <= VMAX && v >= VMIN ) {
-				//	”§F‚Ìê‡
-				cvSetReal2D( skinImage, y, x, 255 );
-			} else {
-				cvSetReal2D( skinImage, y, x, 0 );
-			}
-		}
-	}
-}
-
-	//
-	//	Œ‡‘¹—Ìˆæ‚ğ•âŠÔ‚·‚é
-	//
-	//	ˆø”:
-	//		skinImage : ”§F’Šo‰æ‘œ—pIplImage
-	//		temp      : ˆê•Û‘¶—pIplImage
-	//
-void interpolate( IplImage *skinImage, IplImage *temp ) {
-	//–c’£‚ğITERATIONS‰ñs‚¤
-	cvDilate( skinImage, temp, NULL, ITERATIONS );
-
-	//ûk‚ğITERATIONS‰ñs‚¤
-	cvErode( temp, skinImage, NULL, ITERATIONS );
-}
-
-	//
-	//	Å‘å—Ìˆæ(è—Ìˆæ)‚Ì’Šo‚ğs‚¤
-	//
-	//	ˆø”:
-	//		skinImage       : ”§F’Šo‰æ‘œ—pIplImage
-	//		label           : ƒ‰ƒxƒŠƒ“ƒO‚µ‚½Œ‹‰Ê
-	//		convexHullImage : ConvexHull‰æ‘œ—pIplImage
-	//
-	//	–ß‚è’l:
-	//		è—Ìˆæ‚Ì–ÊÏ
-	//
-int pickupMaxArea(IplImage *skinImage, IplImage *label, IplImage *convexHullImage ) {
-
-	int handarea = 0;	//	è—Ìˆæ‚Ì–ÊÏ
-
-	for(int x = 0; x < skinImage->width; x++ ) {
-		for( int y=0; y < skinImage->height; y++ ) {
-			if( cvGetReal2D( label, y, x ) == 1 ) {
-				//	Å‘å—Ìˆæ‚¾‚Á‚½ê‡
-				handarea++;
-				cvSet2D( convexHullImage, y, x, CV_RGB( 255, 255, 255 ) );
-			} else {
-				cvSetReal2D( skinImage, y, x, 0 );
-				cvSet2D( convexHullImage, y, x, CV_RGB( 0, 0, 0 ) );
-			}
-		}
-	}
-	return handarea;
-}
-
-	//
-	//	ConvexHull‚ğ¶¬‚·‚é
-	//
-	//	ˆø”:
-	//		skinImage   : ”§F’Šo‰æ‘œ—pIplImage
-	//		handarea    : è—Ìˆæ‚Ì–ÊÏ(“_‚Ì”)
-	//		handpoint   : è—Ìˆæ“à‚Ì“_‚ÌÀ•W”z—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^
-	//		hull        : ConvexHull‚Ì’¸“_‚Ìhandpoint‚É‚¨‚¯‚éindex”Ô†‚Ö‚Ìƒ|ƒCƒ“ƒ^
-	//		pointMatrix : è—Ìˆæ—ps—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^
-	//		hullMatrix  : ConvexHull—ps—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^
-	//
-void createConvexHull(IplImage *skinImage, int handarea, CvPoint **handpoint, int **hull,
-					  CvMat *pointMatrix, CvMat *hullMatrix ) {
-	int i=0;
-
-	//	ConvexHull‚ğŒvZ‚·‚é‚½‚ß‚É•K—v‚Ès—ñ‚ğ¶¬‚·‚é
-	*handpoint=( CvPoint * )malloc( sizeof( CvPoint ) * handarea );
-	*hull = ( int * )malloc( sizeof( int ) * handarea );
-	*pointMatrix = cvMat( 1, handarea, CV_32SC2, *handpoint );
-	*hullMatrix = cvMat( 1, handarea, CV_32SC1, *hull );
-
-	for( int x = 0; x < skinImage->width; x++ ) {
-		for(  int y = 0; y < skinImage->height; y++ ) {
-			if( cvGetReal2D( skinImage, y, x ) == 255 ) {
-				( *handpoint )[i].x = x;
-				( *handpoint )[i].y = y;
-				i++;
-			}
-		}
-	}
-
-	//	ConvexHull‚ğ¶¬‚·‚é
-	cvConvexHull2( pointMatrix, hullMatrix, CV_CLOCKWISE, 0 );
-}
-
-	//
-	//	ConvexHull‚ğ•`‰æ‚·‚é
-	//
-	//	ˆø”:
-	//		convexHullImage : ConvexHull‰æ‘œ—pIplImage
-	//		handpoint       : è—Ìˆæ“à‚Ì“_‚ÌÀ•W”z—ñ
-	//		hull            : ConvexHull‚Ì’¸“_‚Ìhandpoint‚É‚¨‚¯‚éindex”Ô†
-	//		hullcount       : ConvexHull‚Ì’¸“_‚Ì”
-	//
-void drawConvexHull(IplImage *convexHullImage, CvPoint *handpoint, int *hull, int hullcount ) {
-	CvPoint pt0 = handpoint[hull[hullcount-1]];
-	for( int i = 0; i < hullcount; i++ ) {
-		CvPoint pt = handpoint[hull[i]];
-		cvLine( convexHullImage, pt0, pt, CV_RGB( 0, 255, 0 ) );
-		pt0 = pt;
-	}
-}
-
-	//
-	//	ConvexHull“à‚Ì–ÊÏ‚ğ‹‚ß‚é
-	//
-	//	ˆø”:
-	//		convexHullImage : ConvexHull‰æ‘œ—pIplImage
-	//		handpoint       : è—Ìˆæ“à‚Ì“_‚ÌÀ•W”z—ñ
-	//		hull            : ConvexHull‚Ì’¸“_‚Ìhandpoint‚É‚¨‚¯‚éindex”Ô†
-	//		hullcount       : ConvexHull‚Ì’¸“_‚Ì”@@
-	//
-	//	–ß‚è’l:
-	//		ConvexHull“à‚Ì–ÊÏ
-	//
-int calcConvexHullArea( IplImage *convexHullImage, CvPoint *handpoint, int *hull, int hullcount ) {
-
-	//	ConvexHull‚Ì’¸“_‚©‚ç‚È‚és—ñ‚ğ¶¬
-	CvPoint *hullpoint = ( CvPoint * )malloc( sizeof( CvPoint ) * hullcount );
-	CvMat hMatrix = cvMat( 1, hullcount, CV_32SC2, hullpoint );
-	for( int i = 0; i < hullcount; i++ ) {
-		hullpoint[i]=handpoint[hull[i]];
-	}
-
-	//	ConvexHull“à‚Ì“_‚Ì”‚ğ”‚¦‚é
-	int hullarea = 0;
-	for( int x = 0; x < convexHullImage->width; x++ ) {
-		for( int y = 0;y < convexHullImage->height; y++ ) {
-			if( cvPointPolygonTest( &hMatrix, cvPoint2D32f( x, y ), 0 ) > 0) {
-				hullarea++;
-			}
-		}
-	}
-
-	free( hullpoint );
-	return hullarea;
-}
-
-	//
-	//	ƒWƒƒƒ“ƒPƒ“‚Ì”»’è‚ğs‚¤
-	//
-	//	ˆø”:
-	//		handarea : è—Ìˆæ‚Ì–ÊÏ
-	//		hullarea : ConvexHull“à‚Ì–ÊÏ
-	//
-void decide( int handarea, int hullarea ) {
-	double ratio;	//	ConvexHull“à‚Ì–ÊÏ‚É‘Î‚·‚éè—Ìˆæ‚Ì–ÊÏ‚ÌŠ„‡
-	
-	ratio=handarea / ( double )hullarea;	
-	printf( "Ratio = %lf\n", ratio );
-
-	if( ratio >= ROCKMIN && ratio <= ROCKMAX ) {
-		printf( "ƒO[\n" );
-	} else if( ratio >= SCISSORMIN && ratio <= SCISSORMAX ) {
-		printf( "ƒ`ƒ‡ƒL\n" );
-	} else if( ratio >= PAPERMIN && ratio <= PAPERMAX ) {
-		printf( "ƒp[\n" );
-	}
-}
-
 /*!
  * @brief constructor
  * @param manager Maneger Object
@@ -262,7 +85,8 @@ RockPaperScissors::RockPaperScissors(RTC::Manager* manager)
     // <rtc-template block="initializer">
   : RTC::DataFlowComponentBase(manager),
     m_img_inputIn("image_input", m_img_input),
-    m_img_outputOut("image_output", m_img_output)
+    m_img_outputOut("image_output", m_img_output),
+    m_resultOut("result", m_result)
 
     // </rtc-template>
 {
@@ -276,7 +100,6 @@ RockPaperScissors::~RockPaperScissors()
 }
 
 
-
 RTC::ReturnCode_t RockPaperScissors::onInitialize()
 {
   // Registration: InPort/OutPort/Service
@@ -286,6 +109,7 @@ RTC::ReturnCode_t RockPaperScissors::onInitialize()
   
   // Set OutPort buffer
   addOutPort("image_output", m_img_outputOut);
+  addOutPort("result", m_resultOut);
   
   // Set service provider to Ports
   
@@ -297,8 +121,13 @@ RTC::ReturnCode_t RockPaperScissors::onInitialize()
 
   // <rtc-template block="bind_config">
   // Bind variables and configuration variable
-  bindParameter("image_height", m_img_height, "240");
-  bindParameter("image_width", m_img_width, "320");
+  bindParameter("rock_max", m_rock_max, "1.0");
+  bindParameter("rock_min", m_rock_min, "0.85");
+  bindParameter("scissor_max", m_scissor_max, "0.85");
+  bindParameter("scissor_min", m_scissor_min, "0.7");
+  bindParameter("paper_max", m_paper_max, "0.7");
+  bindParameter("paper_min", m_paper_min, "0.5");
+  bindParameter("iterations", m_iterations, "4");
   bindParameter("out_mode", m_out_mode, "1");
   // </rtc-template>
   
@@ -330,13 +159,14 @@ RTC::ReturnCode_t RockPaperScissors::onShutdown(RTC::UniqueId ec_id)
 RTC::ReturnCode_t RockPaperScissors::onActivated(RTC::UniqueId ec_id)
 {
 
-	m_image_buff = NULL; // “ü—ÍImage
-	m_hsv_buff = NULL; // HSV—p
-	m_convexHull_buff = NULL; // ConvexHull—p
-	m_skin_buff = NULL; // ”§F’Šo—p
-	m_temp_buff = NULL; // ˆê•Û‘¶—p
-	m_label_buff = NULL; // ƒ‰ƒxƒ‹Œ‹‰Ê•Û‘¶—p
-	m_output_buff = NULL; // o—Í—p
+	m_image_buff = NULL; // å…¥åŠ›Image
+	m_hsv_buff = NULL; // HSVç”¨
+	m_convexHull_buff = NULL; // ConvexHullç”¨
+	m_skin_buff = NULL; // è‚Œè‰²æŠ½å‡ºç”¨
+	m_temp_buff = NULL; // ä¸€æ™‚ä¿å­˜ç”¨
+	m_label_buff = NULL; // ãƒ©ãƒ™ãƒ«çµæœä¿å­˜ç”¨
+	m_output_buff = NULL; // å‡ºåŠ›ç”¨
+	m_prev_judge = "";    // æœªåˆ¤å®š
 
 	return RTC::RTC_OK;
 }
@@ -372,68 +202,66 @@ RTC::ReturnCode_t RockPaperScissors::onDeactivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t RockPaperScissors::onExecute(RTC::UniqueId ec_id)
 {	
-	int key;
-	
-	//Vƒf[ƒ^‚Ìƒ`ƒFƒbƒN
+	//æ–°ãƒ‡ãƒ¼ã‚¿ã®ãƒã‚§ãƒƒã‚¯
 	if(m_img_inputIn.isNew()){
-		//ƒf[ƒ^‚Ì“Ç‚İ‚İ
+		//ãƒ‡ãƒ¼ã‚¿ã®èª­ã¿è¾¼ã¿
 		m_img_inputIn.read();
 
-		m_image_buff = cvCreateImage(cvSize(m_img_input.width, m_img_input.height), IPL_DEPTH_8U, 3); // “ü—ÍImage
-		m_hsv_buff = cvCreateImage(cvSize(m_img_input.width, m_img_input.height), IPL_DEPTH_8U, 3); // HSV—p
-		m_convexHull_buff = cvCreateImage(cvSize(m_img_input.width, m_img_input.height), IPL_DEPTH_8U, 3); // ConvexHull—p
-		m_skin_buff = cvCreateImage(cvSize(m_img_input.width, m_img_input.height), IPL_DEPTH_8U, 1); // ”§F’Šo—p
-		m_temp_buff = cvCreateImage(cvSize(m_img_input.width, m_img_input.height), IPL_DEPTH_8U, 1); // ˆê•Û‘¶—p
-		m_label_buff = cvCreateImage(cvSize(m_img_input.width, m_img_input.height), IPL_DEPTH_16S, 1); // ƒ‰ƒxƒ‹Œ‹‰Ê•Û‘¶—p
-		m_output_buff = cvCreateImage(cvSize(m_img_input.width, m_img_input.height), IPL_DEPTH_8U, 3); // o—Í—p
+		m_image_buff = cvCreateImage(cvSize(m_img_input.width, m_img_input.height), IPL_DEPTH_8U, 3); // å…¥åŠ›Image
+		m_hsv_buff = cvCreateImage(cvSize(m_img_input.width, m_img_input.height), IPL_DEPTH_8U, 3); // HSVç”¨
+		m_convexHull_buff = cvCreateImage(cvSize(m_img_input.width, m_img_input.height), IPL_DEPTH_8U, 3); // ConvexHullç”¨
+		m_skin_buff = cvCreateImage(cvSize(m_img_input.width, m_img_input.height), IPL_DEPTH_8U, 1); // è‚Œè‰²æŠ½å‡ºç”¨
+		m_temp_buff = cvCreateImage(cvSize(m_img_input.width, m_img_input.height), IPL_DEPTH_8U, 1); // ä¸€æ™‚ä¿å­˜ç”¨
+		m_label_buff = cvCreateImage(cvSize(m_img_input.width, m_img_input.height), IPL_DEPTH_16S, 1); // ãƒ©ãƒ™ãƒ«çµæœä¿å­˜ç”¨
+		m_output_buff = cvCreateImage(cvSize(m_img_input.width, m_img_input.height), IPL_DEPTH_8U, 3); // å‡ºåŠ›ç”¨
 		
-		//InPort‚Ì‰f‘œ‚Ìæ“¾
+		//InPortã®æ˜ åƒã®å–å¾—
 		memcpy(m_image_buff->imageData,(void *)&(m_img_input.pixels[0]),m_img_input.pixels.length());
 		
-		// ”§F‚ğ’Šo‚·‚éB
-		extractSkinColor( m_image_buff, m_hsv_buff, m_skin_buff);
+		// è‚Œè‰²ã‚’æŠ½å‡ºã™ã‚‹ã€‚
+		extractSkinColor();
 		
-		// Œ‡‘¹—Ìˆæ‚ğ•âŠÔ‚·‚é
-		interpolate( m_skin_buff, m_temp_buff );
+		// æ¬ æé ˜åŸŸã‚’è£œé–“ã™ã‚‹
+		interpolate();
 		
-		//	ƒ‰ƒxƒŠƒ“ƒO‚ğs‚¤
+		//	ãƒ©ãƒ™ãƒªãƒ³ã‚°ã‚’è¡Œã†
 		Label *labeling = createLabeling();
 		exec( labeling, m_skin_buff, m_label_buff, true, IGNORE_SIZE );
 
 		if(getNumOfResultRegions( labeling ) > 0 ) {
-			//	IGNORE_SIZE‚æ‚è‚à‘å‚«‚È—Ìˆæ‚ª‚ ‚Á‚½ê‡
-			int handarea;		//	è—Ìˆæ‚Ì–ÊÏ
-			int hullarea;		//	ConvexHull“à‚Ì–ÊÏ
-			int hullcount;		//	ConvexHull‚Ì’¸“_‚Ì”
-			CvPoint *handpoint;	//	è—Ìˆæ“à‚Ì“_‚ÌÀ•W”z—ñ
-			int *hull;			//	ConvexHull‚Ì’¸“_‚Ìhandpoint‚É‚¨‚¯‚éindex”Ô†
-			CvMat pointMatrix;	//	è—Ìˆæ—ps—ñ
-			CvMat hullMatrix;	//	ConvexHull—ps—ñ
+			//	IGNORE_SIZEã‚ˆã‚Šã‚‚å¤§ããªé ˜åŸŸãŒã‚ã£ãŸå ´åˆ
+			int handarea;		//	æ‰‹é ˜åŸŸã®é¢ç©
+			int hullarea;		//	ConvexHullå†…ã®é¢ç©
+			int hullcount;		//	ConvexHullã®é ‚ç‚¹ã®æ•°
+			CvPoint *handpoint;	//	æ‰‹é ˜åŸŸå†…ã®ç‚¹ã®åº§æ¨™é…åˆ—
+			int *hull;			//	ConvexHullã®é ‚ç‚¹ã®handpointã«ãŠã‘ã‚‹indexç•ªå·
+			CvMat pointMatrix;	//	æ‰‹é ˜åŸŸç”¨è¡Œåˆ—
+			CvMat hullMatrix;	//	ConvexHullç”¨è¡Œåˆ—
 
-			//	Å‘å—Ìˆæ(è—Ìˆæ)‚Ì’Šo‚ğs‚¤
-			handarea = pickupMaxArea( m_skin_buff, m_label_buff, m_convexHull_buff );
+			//	æœ€å¤§é ˜åŸŸ(æ‰‹é ˜åŸŸ)ã®æŠ½å‡ºã‚’è¡Œã†
+			handarea = pickupMaxArea();
 
-			//	ConvexHull‚ğ¶¬‚·‚é
-			createConvexHull( m_skin_buff, handarea, &handpoint, &hull, &pointMatrix, &hullMatrix );
+			//	ConvexHullã‚’ç”Ÿæˆã™ã‚‹
+			createConvexHull( handarea, &handpoint, &hull, &pointMatrix, &hullMatrix );
 			
 			hullcount = hullMatrix.cols;
 
-			//	ConvexHull‚ğ•`‰æ‚·‚é
-			drawConvexHull( m_convexHull_buff, handpoint, hull, hullcount );
+			//	ConvexHullã‚’æç”»ã™ã‚‹
+			drawConvexHull( handpoint, hull, hullcount );
 
-			//	ConvexHull“à‚Ì–ÊÏ‚ğ‹‚ß‚é
-			hullarea = calcConvexHullArea( m_convexHull_buff, handpoint,hull, hullcount );
+			//	ConvexHullå†…ã®é¢ç©ã‚’æ±‚ã‚ã‚‹
+			hullarea = calcConvexHullArea( handpoint,hull, hullcount );
 
-			//	ƒWƒƒƒ“ƒPƒ“‚Ì”»’è‚ğs‚¤
+			//	ã‚¸ãƒ£ãƒ³ã‚±ãƒ³ã®åˆ¤å®šã‚’è¡Œã†
 			decide( handarea, hullarea );
 
-			//	ƒƒ‚ƒŠ‚ğ‰ğ•ú‚·‚é
+			//	ãƒ¡ãƒ¢ãƒªã‚’è§£æ”¾ã™ã‚‹
 			free( handpoint );
 			free( hull );
-			
+
 		} else {
 		
-			//	‰æ‘œ‚ğ‰Šú‰»‚·‚é
+			//	ç”»åƒã‚’åˆæœŸåŒ–ã™ã‚‹
 			cvSetZero( m_convexHull_buff );
 
 		}
@@ -441,23 +269,23 @@ RTC::ReturnCode_t RockPaperScissors::onExecute(RTC::UniqueId ec_id)
 		releaseLabeling( labeling );
 
 		if ( m_skin_buff->origin == 0 ) {
-			//@¶ã‚ªŒ´“_‚Ìê‡
+			//ã€€å·¦ä¸ŠãŒåŸç‚¹ã®å ´åˆ
 			cvFlip( m_skin_buff, m_skin_buff, 0 );
 		}
 		if ( m_convexHull_buff->origin == 0 ) {
-			//@¶ã‚ªŒ´“_‚Ìê‡
+			//ã€€å·¦ä¸ŠãŒåŸç‚¹ã®å ´åˆ
 			cvFlip( m_convexHull_buff, m_convexHull_buff, 0 );
 		}
 
-		// ‰æ‘œƒf[ƒ^‚ÌƒTƒCƒYæ“¾
+		// ç”»åƒãƒ‡ãƒ¼ã‚¿ã®ã‚µã‚¤ã‚ºå–å¾—
 		double len = (m_output_buff->nChannels * m_output_buff->width * m_output_buff->height);
 		
 		m_img_output.pixels.length(len);
 
-		// ŠY“–‚ÌƒCƒ[ƒW‚ğMemCopy‚·‚é
+		// è©²å½“ã®ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚’MemCopyã™ã‚‹
 		memcpy((void *)&(m_img_output.pixels[0]), m_convexHull_buff->imageData, len);
 		
-		// ”½“]‚µ‚½‰æ‘œƒf[ƒ^‚ğOutPort‚©‚ço—Í‚·‚éB
+		// åè»¢ã—ãŸç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’OutPortã‹ã‚‰å‡ºåŠ›ã™ã‚‹ã€‚
 		m_img_output.width = m_image_buff->width;
 		m_img_output.height = m_image_buff->height;
 
@@ -511,6 +339,218 @@ RTC::ReturnCode_t RockPaperScissors::onRateChanged(RTC::UniqueId ec_id)
 }
 */
 
+//
+//	è‚Œè‰²ã‚’æŠ½å‡ºã™ã‚‹
+//
+void RockPaperScissors::extractSkinColor( void )
+{
+	CvScalar color;		//	HSVè¡¨è‰²ç³»ã§è¡¨ã—ãŸè‰²
+	unsigned char h;	//	Hæˆåˆ†
+	unsigned char s;	//	Sæˆåˆ†
+	unsigned char v;	//	Væˆåˆ†
+	
+	//	BGRã‹ã‚‰HSVã«å¤‰æ›ã™ã‚‹
+	
+	cvCvtColor( m_image_buff, m_hsv_buff, CV_BGR2HSV );
+	
+	//è‚Œè‰²æŠ½å‡º
+	for( int x = 0; x < m_skin_buff->width; x++ ) {
+		for( int y = 0 ; y < m_skin_buff->height; y++ ) {
+
+			color = cvGet2D( m_hsv_buff, y, x );
+			h = color.val[0];
+			s = color.val[1];
+			v = color.val[2];
+
+			if( h <= HMAX && h >= HMIN &&
+				s <= SMAX && s >= SMIN &&
+					v <= VMAX && v >= VMIN ) {
+				//	è‚Œè‰²ã®å ´åˆ
+				cvSetReal2D( m_skin_buff, y, x, 255 );
+			} else {
+				cvSetReal2D( m_skin_buff, y, x, 0 );
+			}
+		}
+
+	}
+}
+
+//
+//	æ¬ æé ˜åŸŸã‚’è£œé–“ã™ã‚‹
+//
+void RockPaperScissors::interpolate( void )
+{
+	//è†¨å¼µã‚’ITERATIONSå›è¡Œã†
+	cvDilate( m_skin_buff, m_temp_buff, NULL, m_iterations );
+
+	//åç¸®ã‚’ITERATIONSå›è¡Œã†
+	cvErode( m_temp_buff, m_skin_buff, NULL, m_iterations );
+}
+
+//
+//	æœ€å¤§é ˜åŸŸ(æ‰‹é ˜åŸŸ)ã®æŠ½å‡ºã‚’è¡Œã†
+//
+//	æˆ»ã‚Šå€¤:
+//		æ‰‹é ˜åŸŸã®é¢ç©
+//
+int RockPaperScissors::pickupMaxArea( void )
+{
+	int handarea = 0;	//	æ‰‹é ˜åŸŸã®é¢ç©
+
+	for(int x = 0; x < m_skin_buff->width; x++ ) {
+		for( int y=0; y < m_skin_buff->height; y++ ) {
+			if( cvGetReal2D( m_label_buff, y, x ) == 1 ) {
+				//	æœ€å¤§é ˜åŸŸã ã£ãŸå ´åˆ
+				handarea++;
+				cvSet2D( m_convexHull_buff, y, x, CV_RGB( 255, 255, 255 ) );
+			} else {
+				cvSetReal2D( m_skin_buff, y, x, 0 );
+				cvSet2D( m_convexHull_buff, y, x, CV_RGB( 0, 0, 0 ) );
+			}
+		}
+	}
+	return handarea;
+}
+
+//
+//	ConvexHullã‚’ç”Ÿæˆã™ã‚‹
+//
+//	å¼•æ•°:
+//		handarea    : æ‰‹é ˜åŸŸã®é¢ç©(ç‚¹ã®æ•°)
+//		handpoint   : æ‰‹é ˜åŸŸå†…ã®ç‚¹ã®åº§æ¨™é…åˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+//		hull        : ConvexHullã®é ‚ç‚¹ã®handpointã«ãŠã‘ã‚‹indexç•ªå·ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+//		pointMatrix : æ‰‹é ˜åŸŸç”¨è¡Œåˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+//		hullMatrix  : ConvexHullç”¨è¡Œåˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+//
+void RockPaperScissors::createConvexHull( int handarea, CvPoint **handpoint, int **hull,
+					  CvMat *pointMatrix, CvMat *hullMatrix )
+{
+	int i=0;
+
+	//	ConvexHullã‚’è¨ˆç®—ã™ã‚‹ãŸã‚ã«å¿…è¦ãªè¡Œåˆ—ã‚’ç”Ÿæˆã™ã‚‹
+	*handpoint=( CvPoint * )malloc( sizeof( CvPoint ) * handarea );
+	*hull = ( int * )malloc( sizeof( int ) * handarea );
+	*pointMatrix = cvMat( 1, handarea, CV_32SC2, *handpoint );
+	*hullMatrix = cvMat( 1, handarea, CV_32SC1, *hull );
+
+	for( int x = 0; x < m_skin_buff->width; x++ ) {
+		for(  int y = 0; y < m_skin_buff->height; y++ ) {
+			if( cvGetReal2D( m_skin_buff, y, x ) == 255 ) {
+				( *handpoint )[i].x = x;
+				( *handpoint )[i].y = y;
+				i++;
+			}
+		}
+	}
+
+	//	ConvexHullã‚’ç”Ÿæˆã™ã‚‹
+	cvConvexHull2( pointMatrix, hullMatrix, CV_CLOCKWISE, 0 );
+}
+
+//
+//	ConvexHullã‚’æç”»ã™ã‚‹
+//
+//	å¼•æ•°:
+//		handpoint       : æ‰‹é ˜åŸŸå†…ã®ç‚¹ã®åº§æ¨™é…åˆ—
+//		hull            : ConvexHullã®é ‚ç‚¹ã®handpointã«ãŠã‘ã‚‹indexç•ªå·
+//		hullcount       : ConvexHullã®é ‚ç‚¹ã®æ•°
+//
+void RockPaperScissors::drawConvexHull( CvPoint *handpoint, int *hull, int hullcount )
+{
+	CvPoint pt0 = handpoint[hull[hullcount-1]];
+	for( int i = 0; i < hullcount; i++ ) {
+		CvPoint pt = handpoint[hull[i]];
+		cvLine( m_convexHull_buff, pt0, pt, CV_RGB( 0, 255, 0 ) );
+		pt0 = pt;
+	}
+}
+
+//
+//	ConvexHullå†…ã®é¢ç©ã‚’æ±‚ã‚ã‚‹
+//
+//	å¼•æ•°:
+//		handpoint       : æ‰‹é ˜åŸŸå†…ã®ç‚¹ã®åº§æ¨™é…åˆ—
+//		hull            : ConvexHullã®é ‚ç‚¹ã®handpointã«ãŠã‘ã‚‹indexç•ªå·
+//		hullcount       : ConvexHullã®é ‚ç‚¹ã®æ•°ã€€ã€€
+//
+//	æˆ»ã‚Šå€¤:
+//		ConvexHullå†…ã®é¢ç©
+//
+int RockPaperScissors::calcConvexHullArea( CvPoint *handpoint, int *hull, int hullcount )
+{
+	//	ConvexHullã®é ‚ç‚¹ã‹ã‚‰ãªã‚‹è¡Œåˆ—ã‚’ç”Ÿæˆ
+	CvPoint *hullpoint = ( CvPoint * )malloc( sizeof( CvPoint ) * hullcount );
+
+	CvMat hMatrix = cvMat( 1, hullcount, CV_32SC2, hullpoint );
+	for( int i = 0; i < hullcount; i++ ) {
+		hullpoint[i]=handpoint[hull[i]];
+	}
+
+	//	ConvexHullå†…ã®ç‚¹ã®æ•°ã‚’æ•°ãˆã‚‹
+	int hullarea = 0;
+	for( int x = 0; x < m_convexHull_buff->width; x++ ) {
+		for( int y = 0;y < m_convexHull_buff->height; y++ ) {
+
+			if( cvPointPolygonTest( &hMatrix, cvPoint2D32f( x, y ), 0 ) > 0) {
+				hullarea++;
+			}
+		}
+	}
+
+	free( hullpoint );
+	return hullarea;
+}
+
+
+//
+//	ã‚¸ãƒ£ãƒ³ã‚±ãƒ³ã®åˆ¤å®šã‚’è¡Œã†
+//
+//	å¼•æ•°:
+//		handarea : æ‰‹é ˜åŸŸã®é¢ç©
+//		hullarea : ConvexHullå†…ã®é¢ç©
+//
+void RockPaperScissors::decide( int handarea, int hullarea )
+{
+	double ratio;	//	ConvexHullå†…ã®é¢ç©ã«å¯¾ã™ã‚‹æ‰‹é ˜åŸŸã®é¢ç©ã®å‰²åˆ
+	string judge = "é–¾å€¤å¤–";
+	
+	ratio=handarea / ( double )hullarea;	
+
+	if( ratio >= m_rock_min && ratio <= m_rock_max ) {
+	  judge = "ã‚°ãƒ¼";
+	}
+	else if( ratio >= m_scissor_min && ratio <= m_scissor_max )
+	{
+    judge = "ãƒãƒ§ã‚­";
+	}
+	else if( ratio >= m_paper_min && ratio <= m_paper_max )
+	{
+    judge = "ãƒ‘ãƒ¼";
+	}
+	
+	if( m_out_mode == 1 )
+	{
+	  //å‰å›ã¨ã‚¸ãƒ£ãƒ³ã‚±ãƒ³ã®ç¨®é¡ãŒç•°ãªã‚‹å ´åˆã®ã¿å‡ºåŠ›ã™ã‚‹
+	  //ConvexHullé ˜åŸŸã¯ä¸€å®šä»¥ä¸Šã®å¤§ãã•ã§ãªã„ã¨ã€ã‚¸ãƒ£ãƒ³ã‚±ãƒ³ã®åˆ¤å®šã¯æ„å‘³ãŒãªã„
+	  //ã“ã“ã§ã¯æš«å®šçš„ã«10000ä»¥ä¸Šã®é ˜åŸŸã«å¯¾ã—ã¦ã‚¸ãƒ£ãƒ³ã‚±ãƒ³ã‚’åˆ¤å®šã™ã‚‹ã‚‚ã®ã¨ã™ã‚‹
+	  if( judge != "é–¾å€¤å¤–" && m_prev_judge != judge && hullarea >= 10000 )
+	  {
+	    //printf( "Ratio = %lf\n", ratio );
+	    printf( "Ratio = %lf  : åˆ¤å®šé ˜åŸŸã®å¤§ãã• = %d\n", ratio,  hullarea );
+      printf( "%s\n", judge.c_str() );
+      m_prev_judge = judge;
+
+      m_result.data = judge.c_str();
+      m_resultOut.write();
+    }
+  }
+  else
+  {
+    //ã™ã¹ã¦ã®çµæœã‚’å‡ºåŠ›ã™ã‚‹
+    printf( "Ratio = %lf  : åˆ¤å®šé ˜åŸŸã®å¤§ãã• = %d\n", ratio,  hullarea );
+    printf( "%s\n", judge.c_str() );
+  }
+}
 
 
 extern "C"
