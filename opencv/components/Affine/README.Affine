@@ -20,7 +20,7 @@
 # <rtc-template block="module">
 Module Name: Affine
 Description: Affine image component
-Version:     1.0.0
+Version:     1.1.0
 Vendor:      AIST
 Category:    Category
 Kind:        DataFlowComponent

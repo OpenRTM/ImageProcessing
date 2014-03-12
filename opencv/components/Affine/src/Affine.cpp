@@ -20,7 +20,7 @@ static const char* affine_spec[] =
     "implementation_id", "Affine",
     "type_name",         "Affine",
     "description",       "Affine image component",
-    "version",           "1.0.0",
+    "version",           "1.1.0",
     "vendor",            "AIST",
     "category",          "Category",
     "activity_type",     "PERIODIC",
@@ -29,8 +29,10 @@ static const char* affine_spec[] =
     "language",          "C++",
     "lang_type",         "compile",
     // Configuration variables
-    "conf.default.affine_matrix",  "0.825,-0.167,40;-0.1,0.83,30",
-
+    "conf.default.affine_matrix", "0.825,-0.167,40;-0.1,0.83,30",
+    // Widget
+    "conf.__widget__.affine_matrix", "text",
+    // Constraints
     ""
   };
 // </rtc-template>
@@ -144,101 +146,98 @@ RTC::ReturnCode_t Affine::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Affine::onActivated(RTC::UniqueId ec_id)
 {
-    // ƒCƒ[ƒW—pƒƒ‚ƒŠ‚ÌŠm•Û
-    m_affineMatrix     = cvCreateMat( 2, 3, CV_32FC1);
+  /* ã‚¤ãƒ¡ãƒ¼ã‚¸ç”¨ãƒ¡ãƒ¢ãƒªã®ç¢ºä¿ */
+  m_affineMatrix     = cvCreateMat( 2, 3, CV_32FC1);
 
-    m_in_height  = 0;
-    m_in_width   = 0;
+  m_in_height  = 0;
+  m_in_width   = 0;
 
-    m_image_buff = NULL;
-    m_image_dest = NULL; 
+  m_image_buff = NULL;
+  m_image_dest = NULL; 
 
-    return RTC::RTC_OK;
+  return RTC::RTC_OK;
 }
 
 
 RTC::ReturnCode_t Affine::onDeactivated(RTC::UniqueId ec_id)
 {
-    if(m_image_buff       != NULL)
-        cvReleaseImage(&m_image_buff);
-    if(m_image_dest         != NULL)
-        cvReleaseImage(&m_image_dest);
+  if(m_image_buff != NULL)
+      cvReleaseImage(&m_image_buff);
+  if(m_image_dest != NULL)
+      cvReleaseImage(&m_image_dest);
 
-    cvReleaseMat(&m_affineMatrix);
+  cvReleaseMat(&m_affineMatrix);
 
-    return RTC::RTC_OK;
+  return RTC::RTC_OK;
 }
 
 
 RTC::ReturnCode_t Affine::onExecute(RTC::UniqueId ec_id)
 {    
-    // Common CV actions
-    // V‚µ‚¢ƒf[ƒ^‚Ìƒ`ƒFƒbƒN
-    if (m_image_origIn.isNew()) 
+  /* Common CV actions */
+  /* æ–°ã—ã„ãƒ‡ãƒ¼ã‚¿ã®ãƒã‚§ãƒƒã‚¯ */
+  if (m_image_origIn.isNew()) 
+  {
+    /* InPortãƒ‡ãƒ¼ã‚¿ã®èª­ã¿è¾¼ã¿ */
+    m_image_origIn.read();
+
+    /* ã‚µã‚¤ã‚ºãŒå¤‰ã‚ã£ãŸã¨ãã ã‘å†ç”Ÿæˆã™ã‚‹ */
+    if(m_in_height != m_image_orig.height || m_in_width != m_image_orig.width)
     {
-        // InPortƒf[ƒ^‚Ì“Ç‚İ‚İ
-        m_image_origIn.read();
+      printf("[onExecute] Size of input image is not match!\n");
 
-        // ƒTƒCƒY‚ª•Ï‚í‚Á‚½‚Æ‚«‚¾‚¯Ä¶¬‚·‚é
-        if(m_in_height != m_image_orig.height || m_in_width != m_image_orig.width)
-        {
-            printf("[onExecute] Size of input image is not match!\n");
+      m_in_height = m_image_orig.height;
+      m_in_width  = m_image_orig.width;
 
-            m_in_height = m_image_orig.height;
-            m_in_width  = m_image_orig.width;
-            
-            if(m_image_buff       != NULL)
-                cvReleaseImage(&m_image_buff);
-            if(m_image_dest         != NULL)
-                cvReleaseImage(&m_image_dest);
+      if(m_image_buff != NULL)
+        cvReleaseImage(&m_image_buff);
+      if(m_image_dest != NULL)
+        cvReleaseImage(&m_image_dest);
 
-
-            // ƒTƒCƒY•ÏŠ·‚Ì‚½‚ßTempƒƒ‚ƒŠ[‚ğ‚æ‚¢‚·‚é
-	        m_image_buff = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3);
-	        m_image_dest = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3);
-        }
-
-        // InPort‚Ì‰æ‘œƒf[ƒ^‚ğIplImage‚ÌimageData‚ÉƒRƒs[
-        memcpy(m_image_buff->imageData,(void *)&(m_image_orig.pixels[0]),m_image_orig.pixels.length());
-
-        // Anternative actions
-
-    	//	•ÏŠ·Œã‚ÌÀ•W‚ğİ’è‚·‚é
-        // Check configuration validations
-        if(isConfigurationValidated())
-        {
-            cvmSet(m_affineMatrix, 0, 0, m_ve2dbMatrix[0][0]);
-            cvmSet(m_affineMatrix, 0, 1, m_ve2dbMatrix[0][1]);
-            cvmSet(m_affineMatrix, 0, 2, m_ve2dbMatrix[0][2]);
-            cvmSet(m_affineMatrix, 1, 0, m_ve2dbMatrix[1][0]);
-            cvmSet(m_affineMatrix, 1, 1, m_ve2dbMatrix[1][1]);
-            cvmSet(m_affineMatrix, 1, 2, m_ve2dbMatrix[1][2]);            
-        }else
-        {
-            cout<<"ƒRƒ“ƒtƒBƒOƒŒ[ƒVƒ‡ƒ“î•ñ‚ª³‚µ‚­‚ ‚è‚Ü‚¹‚ñB"<<endl;
-
-            return RTC::RTC_ERROR;
-        }
-        
-        //	•ÏŠ·s—ñ‚ğ”½‰f‚³‚¹‚é
-	    cvWarpAffine( m_image_buff, m_image_dest, m_affineMatrix, CV_INTER_LINEAR | CV_WARP_FILL_OUTLIERS, cvScalarAll(0));
-
-        // ‰æ‘œƒf[ƒ^‚ÌƒTƒCƒYæ“¾
-        int len = m_image_dest->nChannels * m_image_dest->width * m_image_dest->height;
-
-        // ‰æ–Ê‚ÌƒTƒCƒYî•ñ‚ğ“ü‚ê‚é
-        m_image_affine.pixels.length(len);        
-        m_image_affine.width  = m_image_dest->width;
-        m_image_affine.height = m_image_dest->height;
-
-        // ”½“]‚µ‚½‰æ‘œƒf[ƒ^‚ğOutPort‚ÉƒRƒs[
-        memcpy((void *)&(m_image_affine.pixels[0]), m_image_dest->imageData,len);
-
-        // ”½“]‚µ‚½‰æ‘œƒf[ƒ^‚ğOutPort‚©‚ço—Í‚·‚éB
-        m_image_affineOut.write();
+      /* ã‚µã‚¤ã‚ºå¤‰æ›ã®ãŸã‚Tempãƒ¡ãƒ¢ãƒªãƒ¼ã‚’ç”¨æ„ã™ã‚‹ */
+      m_image_buff = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3);
+      m_image_dest = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3);
     }
 
-    return RTC::RTC_OK;
+    /* InPortã®ç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’IplImageã®imageDataã«ã‚³ãƒ”ãƒ¼ */
+    memcpy(m_image_buff->imageData,(void *)&(m_image_orig.pixels[0]),m_image_orig.pixels.length());
+
+   	/* å¤‰æ›å¾Œã®åº§æ¨™ã‚’è¨­å®šã™ã‚‹ */
+    // Check configuration validations
+    if(isConfigurationValidated())
+    {
+      cvmSet(m_affineMatrix, 0, 0, m_ve2dbMatrix[0][0]);
+      cvmSet(m_affineMatrix, 0, 1, m_ve2dbMatrix[0][1]);
+      cvmSet(m_affineMatrix, 0, 2, m_ve2dbMatrix[0][2]);
+      cvmSet(m_affineMatrix, 1, 0, m_ve2dbMatrix[1][0]);
+      cvmSet(m_affineMatrix, 1, 1, m_ve2dbMatrix[1][1]);
+      cvmSet(m_affineMatrix, 1, 2, m_ve2dbMatrix[1][2]);            
+    }else
+    {
+      cout<<"ã‚³ãƒ³ãƒ•ã‚£ã‚°ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³æƒ…å ±ãŒæ­£ã—ãã‚ã‚Šã¾ã›ã‚“ã€‚"<<endl;
+
+      return RTC::RTC_ERROR;
+    }
+        
+    /* å¤‰æ›è¡Œåˆ—ã‚’åæ˜ ã•ã›ã‚‹ */
+    cvWarpAffine( m_image_buff, m_image_dest, m_affineMatrix, CV_INTER_LINEAR | CV_WARP_FILL_OUTLIERS, cvScalarAll(0));
+
+    /* ç”»åƒãƒ‡ãƒ¼ã‚¿ã®ã‚µã‚¤ã‚ºå–å¾— */
+    int len = m_image_dest->nChannels * m_image_dest->width * m_image_dest->height;
+
+    /* ç”»é¢ã®ã‚µã‚¤ã‚ºæƒ…å ±ã‚’å…¥ã‚Œã‚‹ */
+    m_image_affine.pixels.length(len);        
+    m_image_affine.width  = m_image_dest->width;
+    m_image_affine.height = m_image_dest->height;
+
+    /* åè»¢ã—ãŸç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’OutPortã«ã‚³ãƒ”ãƒ¼ */
+    memcpy((void *)&(m_image_affine.pixels[0]), m_image_dest->imageData,len);
+
+    /* åè»¢ã—ãŸç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’OutPortã‹ã‚‰å‡ºåŠ›ã™ã‚‹ */
+    m_image_affineOut.write();
+  }
+
+  return RTC::RTC_OK;
 }
 
 /*
@@ -276,19 +275,19 @@ RTC::ReturnCode_t Affine::onRateChanged(RTC::UniqueId ec_id)
 }
 */
 
-// Martix‚ÌƒTƒCƒY‚¾‚¯ƒ`ƒFƒbƒN‚·‚é
+/* Martixã®ã‚µã‚¤ã‚ºã ã‘ãƒã‚§ãƒƒã‚¯ã™ã‚‹ */
 bool Affine::isConfigurationValidated()
 {
-    // Affine‚ÌMartix‚ÌƒTƒCƒY‚Í2*3
-    if(m_ve2dbMatrix.size() < 2)
-        return false;
+  /* Affineã®Martixã®ã‚µã‚¤ã‚ºã¯2*3 */
+  if(m_ve2dbMatrix.size() < 2)
+    return false;
 
-    if(m_ve2dbMatrix[0].size() < 3)
-        return false;
-    if(m_ve2dbMatrix[1].size() < 3)
-        return false;
+  if(m_ve2dbMatrix[0].size() < 3)
+    return false;
+  if(m_ve2dbMatrix[1].size() < 3)
+    return false;
 
-    return true;
+  return true;
 }
 
 
