@@ -1,5 +1,3 @@
-cmake_policy(SET CMP0002 OLD)
-
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
     # Search for Sphinx
@@ -19,7 +17,7 @@ if(DOXYGEN_FOUND)
     # Doxygen part
     set(doxyfile "${CMAKE_CURRENT_BINARY_DIR}/doxyfile")
     configure_file(doxyfile.in ${doxyfile})
-    add_custom_target(${PROJECT_NAME}_doxygen_doc ${DOXYGEN_EXECUTABLE} ${doxyfile})
+    add_custom_target(doxygen_doc ${DOXYGEN_EXECUTABLE} ${doxyfile})
 
     # Sphinx part
     #set(conf_dir "${CMAKE_CURRENT_BINARY_DIR}/conf")

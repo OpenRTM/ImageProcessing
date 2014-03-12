@@ -23,15 +23,15 @@
 #include <cxcore.h>
 #include <highgui.h>
 
-#define THRESHOLD_MAX_VALUE	255				//	2値化の際に使用する最大値
-#define	SCALE				( 1.0 / 255.0 )	//	L*a*b*に変換するために必要なスケールファクタ
+#define THRESHOLD_MAX_VALUE	255				/* 2値化の際に使用する最大値 */
+#define	SCALE				( 1.0 / 255.0 )	/* L*a*b*に変換するために必要なスケールファクタ */
 
-#define COLOR_DIFFERENCE	0	//	RGB各成分における差分算出のフラグ値
-#define LAB_DIFFERENCE		1	//	L*a*b*表色系における差分算出のフラグ値
-#define GRAY_DIFFERENCE		2	//	グレースケールにおける差分算出のフラグ値
-#define NOISE_KEEP			0	//	ノイズを除去しないフラグ値
-#define	NOISE_MORPHOLOGY	1	//	モルフォロジー演算によるノイズ除去のフラグ値
-#define NOISE_MEDIAN		2	//	メディアンフィルタによるノイズ除去のフラグ値
+#define COLOR_DIFFERENCE  0   /* RGB各成分における差分算出のフラグ値 */
+#define LAB_DIFFERENCE    1   /* L*a*b*表色系における差分算出のフラグ値 */
+#define GRAY_DIFFERENCE   2   /* グレースケールにおける差分算出のフラグ値 */
+#define NOISE_KEEP        0   /* ノイズを除去しないフラグ値 */
+#define	NOISE_MORPHOLOGY  1   /* モルフォロジー演算によるノイズ除去のフラグ値 */
+#define NOISE_MEDIAN      2   /* メディアンフィルタによるノイズ除去のフラグ値 */
 
 
 // Service implementation headers
@@ -244,16 +244,16 @@ class BackGroundSubtractionSimple
    * - DefaultValue: b
    */
   char m_cont_mode;
-    /*!
+  /*!
    * 
    * - Name:  diff_mode
-   * - DefaultValue: b
+   * - DefaultValue: 0
    */
   char m_diff_mode;
-    /*!
+  /*!
    * 
    * - Name:  noise_mode
-   * - DefaultValue: b
+   * - DefaultValue: 0
    */
   char m_noise_mode;
   /*!
@@ -329,8 +329,8 @@ class BackGroundSubtractionSimple
 	IplImage *m_resultImage;
 	IplImage *m_outputImage;
 	
-	int	m_differenceMode;		//	差分の計算モード
-	int	m_noiseMode;				//	ノイズを除去するモード
+	int	m_differenceMode;   /* 差分の計算モード */
+	int	m_noiseMode;        /* ノイズを除去するモード */
 	int m_temp_w;
 	int m_temp_h;
 

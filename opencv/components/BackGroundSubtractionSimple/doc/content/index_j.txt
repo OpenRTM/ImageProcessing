@@ -98,9 +98,10 @@ BackGroundSubtractionSimpleは ``BackGroundSubtractionSimpleComp`` を実行（ 
 ================ ================== ================ ====
 パラメータ       データ型           デフォルト値     意味
 ================ ================== ================ ====
-control_mode     char               a                
-image_height     int                240              
-image_width      int                320              
+control_mode     char               b                
+diff_mode        char               0                
+noise_mode       char               0                
+threshold_level  int                20               
 ================ ================== ================ ====
 
 ポート
