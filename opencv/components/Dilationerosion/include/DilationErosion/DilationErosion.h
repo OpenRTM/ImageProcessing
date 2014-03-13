@@ -10,7 +10,7 @@
 #ifndef DILATIONEROSION_H
 #define DILATIONEROSION_H
 
-#define THRESHOLD_MAX_VALUE	255	//	2値化の際に使用する最大値
+#define THRESHOLD_MAX_VALUE	255   /* 2値化の際に使用する最大値 */
 
 #include <rtm/Manager.h>
 #include <rtm/DataFlowComponentBase.h>
@@ -21,7 +21,7 @@
 #include <rtm/idl/ExtendedDataTypesSkel.h>
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
-// OpenCVHeadファイルのIncluding
+/* OpenCVHeadファイルのIncluding */
 #include <cv.h>
 #include <cxcore.h>
 #include <highgui.h>
@@ -301,19 +301,19 @@ class DilationErosion
   // <rtc-template block="private_operation">
   
   // </rtc-template>
-	 int dummy;
-	IplImage* m_image_buff;
-	IplImage* m_output_image_buff;
-	IplImage* m_gray_buff;
-	IplImage* m_binary_buff;
-	IplImage* m_dilation_buff;
-	IplImage* m_erosion_buff;
-	IplImage* m_merge_Image;
-	IplImage* m_dilation_image;
-	IplImage* m_erosion_image;
-	IplImage* m_dila_merge_img;
-	IplImage* m_ero_merge_img;
-	IplImage* m_noise_merge_img;
+  int dummy;
+  IplImage* m_image_buff;
+  IplImage* m_output_image_buff;
+  IplImage* m_gray_buff;
+  IplImage* m_binary_buff;
+  IplImage* m_dilation_buff;
+  IplImage* m_erosion_buff;
+  IplImage* m_merge_Image;
+  IplImage* m_dilation_image;
+  IplImage* m_erosion_image;
+  IplImage* m_dila_merge_img;
+  IplImage* m_ero_merge_img;
+  IplImage* m_noise_merge_img;
 
 };
 

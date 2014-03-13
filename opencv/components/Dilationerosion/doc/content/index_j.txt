@@ -98,10 +98,9 @@ DilationErosionは ``DilationErosionComp`` を実行（ ``${prefix}/components/b
 ================ ================== ================ ====
 パラメータ       データ型           デフォルト値     意味
 ================ ================== ================ ====
-dilation_count   int                1                
-erosion_count    int                1                
-image_height     int                240              
-image_width      int                320              
+dilation_count   int                3                
+erosion_count    int                3                
+threshold        int                128              
 ================ ================== ================ ====
 
 ポート

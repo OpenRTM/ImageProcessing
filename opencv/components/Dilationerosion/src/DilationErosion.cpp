@@ -16,7 +16,7 @@ static const char* dilationerosion_spec[] =
     "implementation_id", "DilationErosion",
     "type_name",         "DilationErosion",
     "description",       "Dilation and erosion component",
-    "version",           "1.0.0",
+    "version",           "1.1.0",
     "vendor",            "AIST",
     "category",          "Category",
     "activity_type",     "PERIODIC",
@@ -117,7 +117,7 @@ RTC::ReturnCode_t DilationErosion::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t DilationErosion::onActivated(RTC::UniqueId ec_id)
 {
-  //イメージ用メモリの確保
+  /* イメージ用メモリの確保 */
 	
 	m_image_buff = NULL;
 	m_gray_buff = NULL;
@@ -138,7 +138,7 @@ RTC::ReturnCode_t DilationErosion::onActivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t DilationErosion::onDeactivated(RTC::UniqueId ec_id)
 {
-	//メモリ解放
+	/* メモリ解放 */
 	if(m_image_buff != NULL){
 		cvReleaseImage(&m_image_buff);
 	}
@@ -182,11 +182,9 @@ RTC::ReturnCode_t DilationErosion::onDeactivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t DilationErosion::onExecute(RTC::UniqueId ec_id)
 {
-
-  //新イメージのチェック
+  /* 新イメージのチェック */
 	if(m_img_origIn.isNew()){
 
-		//データの読み込み
 		m_img_origIn.read();
 
 		m_image_buff = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 3);
