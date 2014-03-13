@@ -98,6 +98,10 @@ Findcontourは ``FindcontourComp`` を実行（ ``${prefix}/components/bin`` に
 ================ ================== ================ ====
 パラメータ       データ型           デフォルト値     意味
 ================ ================== ================ ====
+threshold_level  int                100              
+contour_level    int                1                
+line_thickness   int                2                
+line_type        int                CV_AA            
 ================ ================== ================ ====
 
 ポート

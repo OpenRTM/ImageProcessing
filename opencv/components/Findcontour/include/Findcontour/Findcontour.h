@@ -24,7 +24,7 @@
 #include <cxcore.h>
 #include <highgui.h>
 
-#define THRESHOLD_MAX_VALUE	255	//	2値化の際に使用する最大値
+#define THRESHOLD_MAX_VALUE	255	  /* 2値化の際に使用する最大値 */
 
 // Service implementation headers
 // <rtc-template block="service_impl_h">
@@ -230,30 +230,31 @@ class Findcontour
 
   // Configuration variable declaration
   // <rtc-template block="config_declare">
-    /*!
-  * 
-  * - Name:  nThresholdLv
-  * - DefaultValue: 100
-  */
+  /*!
+   * 
+   * - Name:  nThresholdLv
+   * - DefaultValue: 100
+   */
   int m_nThresholdLv;
   /*!
-  * 
-  * - Name:  nContourLv
-  * - DefaultValue: 1
-  */
+   * 
+   * - Name:  nContourLv
+   * - DefaultValue: 1
+   */
   int m_nContourLv;
   /*!
-  * 
-  * - Name:  nLineThickness
-  * - DefaultValue: 2
-  */
+   * 
+   * - Name:  nLineThickness
+   * - DefaultValue: 2
+   */
   int m_nLineThickness;
   /*!
-  * 
-  * - Name:  nLineType
-  * - DefaultValue: CV_AA
-  */
+   * 
+   * - Name:  nLineType
+   * - DefaultValue: CV_AA
+   */
   int m_nLineType;
+
   // </rtc-template>
 
   // DataInPort declaration
@@ -298,7 +299,7 @@ class Findcontour
   // <rtc-template block="private_operation">
   
   // </rtc-template>
-  IplImage* imageBuff;				// カメライメージ
+  IplImage* imageBuff;
   IplImage* grayImage;
   IplImage* binaryImage;
   IplImage* contourImage;

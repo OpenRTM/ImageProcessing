@@ -106,6 +106,10 @@ The available configuration parameters are described below:
 ================ ================== ================ ======
 Parameter        Data type          Default Value    Effect
 ================ ================== ================ ======
+threshold_level  int                100              
+contour_level    int                1                
+line_thickness   int                2                
+line_type        int                CV_AA            
 ================ ================== ================ ======
 
 Ports

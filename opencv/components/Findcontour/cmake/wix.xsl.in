@@ -6,7 +6,7 @@
 
   <xsl:template match="/wix:Wix">
     <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-      <Product xmlns="http://schemas.microsoft.com/wix/2006/wi" Id="D900DA3D-E3D9-465A-B983-BC3BEA87014C" Name="@CPACK_PACKAGE_NAME@ @CPACK_PACKAGE_VERSION@" Language="1041" Codepage="932" Version="@CPACK_PACKAGE_VERSION@" Manufacturer="@CPACK_PACKAGE_VENDOR@" UpgradeCode="BD46F947-A4DB-41A6-8FC3-ECFB6878F1A7">
+      <Product xmlns="http://schemas.microsoft.com/wix/2006/wi" Id="A029FD88-83CF-4F87-9D4D-78AE941896FD" Name="@CPACK_PACKAGE_NAME@ @CPACK_PACKAGE_VERSION@" Language="1041" Codepage="932" Version="@CPACK_PACKAGE_VERSION@" Manufacturer="@CPACK_PACKAGE_VENDOR@" UpgradeCode="17FFF8B9-3A94-42A6-95E4-5D8CACB4E699">
         <Package InstallerVersion="300" Compressed="yes" Languages='1041' SummaryCodepage='932' />
         <Media Id="1" Cabinet="@CPACK_PACKAGE_NAME@.cab" EmbedCab="yes" />
         <Directory Id="TARGETDIR" Name="SourceDir" >
