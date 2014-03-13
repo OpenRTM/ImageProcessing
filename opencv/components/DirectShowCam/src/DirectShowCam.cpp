@@ -9,32 +9,32 @@
 
 #include "DirectShowCam.h"
 
-//‰f‘œ‚ğã‰º•ÏŠ·
+/* æ˜ åƒã‚’ä¸Šä¸‹å¤‰æ› */
 void m_flip(char *pBuffer,int Width, int Height, int Channel)
 {
-	int i;
-	int nHeight;
-	int nStride;
-	char *pSource, *pDestination;
-	char *pTempBuffer;
+  int i;
+  int nHeight;
+  int nStride;
+  char *pSource, *pDestination;
+  char *pTempBuffer;
 
-	nStride = Width * Channel;
-	nHeight = Height;
-	pSource = pBuffer;
-	pDestination = pBuffer;
-	pDestination += nStride * (nHeight -1);
-	pTempBuffer = new char[nStride];
+  nStride = Width * Channel;
+  nHeight = Height;
+  pSource = pBuffer;
+  pDestination = pBuffer;
+  pDestination += nStride * (nHeight -1);
+  pTempBuffer = new char[nStride];
 
-	for(i=0;i<nHeight/2;i++)
-	{
-		memcpy(pTempBuffer, pDestination, nStride);
-		memcpy(pDestination, pSource, nStride);
-		memcpy(pSource, pTempBuffer, nStride);
-		pSource += nStride;
-		pDestination -= nStride;
-	}
+  for(i=0;i<nHeight/2;i++)
+  {
+    memcpy(pTempBuffer, pDestination, nStride);
+    memcpy(pDestination, pSource, nStride);
+    memcpy(pSource, pTempBuffer, nStride);
+    pSource += nStride;
+    pDestination -= nStride;
+  }
 
-	delete [] pTempBuffer;
+  delete [] pTempBuffer;
 
 }
 
@@ -45,7 +45,7 @@ static const char* directshowcam_spec[] =
     "implementation_id", "DirectShowCam",
     "type_name",         "DirectShowCam",
     "description",       "DirectShowCam Module",
-    "version",           "1.0.0",
+    "version",           "1.1.0",
     "vendor",            "AIST",
     "category",          "Category",
     "activity_type",     "PERIODIC",
@@ -126,7 +126,7 @@ RTC::ReturnCode_t DirectShowCam::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t DirectShowCam::onActivated(RTC::UniqueId ec_id)
 {
-  //•Ï”‰Šú‰»
+  /* å¤‰æ•°åˆæœŸåŒ– */
   hr = NULL;
   pGraph = NULL;
   pSrc = NULL;
@@ -137,10 +137,10 @@ RTC::ReturnCode_t DirectShowCam::onActivated(RTC::UniqueId ec_id)
   v_Width = v_Height = v_Channel = 0;
   bFound = false;
 
-  //ƒCƒxƒ“ƒgƒnƒ“ƒhƒ‹¶¬
+  /* ã‚¤ãƒ™ãƒ³ãƒˆãƒãƒ³ãƒ‰ãƒ«ç”Ÿæˆ */
   m_cb.hEvent=CreateEvent(NULL, FALSE, FALSE, NULL);
 
-  //COMƒ‰ƒCƒuƒ‰ƒŠƒ[ƒh
+  /* COMãƒ©ã‚¤ãƒ–ãƒ©ãƒªãƒ­ãƒ¼ãƒ‰ */
   hr = CoInitialize(NULL);
 
   if(FAILED(hr))
@@ -149,7 +149,7 @@ RTC::ReturnCode_t DirectShowCam::onActivated(RTC::UniqueId ec_id)
 	return RTC::RTC_ERROR;
   }
   
-  //ƒfƒoƒCƒXƒhƒ‰ƒCƒo‚ğ’Tõƒ‹[ƒ`ƒ“
+  /* ãƒ‡ãƒã‚¤ã‚¹ãƒ‰ãƒ©ã‚¤ãƒã‚’æ¢ç´¢ãƒ«ãƒ¼ãƒãƒ³ */
   ICreateDevEnum *pDevEnum = NULL;
   IEnumMoniker *pClassEnum = NULL;
 
@@ -160,84 +160,84 @@ RTC::ReturnCode_t DirectShowCam::onActivated(RTC::UniqueId ec_id)
 
   if(SUCCEEDED(hr))
   {
-	  IMoniker *pMoniker = NULL;
+    IMoniker *pMoniker = NULL;
 
-	  //ƒJƒeƒSƒŠ‚ÅÅ‰Œq‚ª‚Á‚Ä‚¢‚éƒfƒoƒCƒX‘I‘ğ
-	  if (pClassEnum->Next(1, &pMoniker, NULL) == S_OK)
-	  {
-		  pMoniker->BindToObject(0, 0, IID_IBaseFilter, (void **)&pSrc);
-		  pMoniker->Release();
-		  bFound = true;
-	  }
-	  pClassEnum->Release();
+    /* ã‚«ãƒ†ã‚´ãƒªã§æœ€åˆç¹‹ãŒã£ã¦ã„ã‚‹ãƒ‡ãƒã‚¤ã‚¹é¸æŠ */
+    if (pClassEnum->Next(1, &pMoniker, NULL) == S_OK)
+    {
+      pMoniker->BindToObject(0, 0, IID_IBaseFilter, (void **)&pSrc);
+      pMoniker->Release();
+      bFound = true;
+    }
+    pClassEnum->Release();
   }
   pDevEnum->Release();
 
   if(!bFound)
   {
-	  std::cout<<"ƒrƒfƒIƒLƒƒƒvƒ`ƒƒƒfƒoƒCƒX‚Í‘¶İ‚µ‚Ü‚¹‚ñ"<<std::endl;
+	  std::cout<<"ãƒ“ãƒ‡ã‚ªã‚­ãƒ£ãƒ—ãƒãƒ£ãƒ‡ãƒã‚¤ã‚¹ã¯å­˜åœ¨ã—ã¾ã›ã‚“"<<std::endl;
 	  return RTC::RTC_ERROR;
   }
 
-  //IGraphBuilder¶¬
+  /* IGraphBuilderç”Ÿæˆ */
   CoCreateInstance(CLSID_FilterGraph, NULL, CLSCTX_INPROC_SERVER,
 					 IID_IGraphBuilder, reinterpret_cast<void**>(&pGraph));
   pGraph->AddFilter(pSrc, L"Video Capture");
 
-  //MediaControl’Ç‰Á
+  /* MediaControlè¿½åŠ  */
   pGraph->QueryInterface(IID_IMediaControl, (void **)&pMediaControl);
 
-  //_“î‚ÈCaptureƒfƒoƒCƒX‚ğg‚¤‚½‚ßCputreGraphBuilder2g‚¤
+  /* æŸ”è»ŸãªCaptureãƒ‡ãƒã‚¤ã‚¹ã‚’ä½¿ã†ãŸã‚CputreGraphBuilder2ä½¿ã† */
   CoCreateInstance(CLSID_CaptureGraphBuilder2, NULL, CLSCTX_INPROC_SERVER,
 				   IID_ICaptureGraphBuilder2, reinterpret_cast<void**>(&pBuilder));
 
   pBuilder->SetFiltergraph(pGraph);
 
-  //CAPTUREƒtƒBƒ‹ƒ^
+  /* CAPTUREãƒ•ã‚£ãƒ«ã‚¿ */
   IAMStreamConfig *pConfig = NULL;
   pBuilder->FindInterface(&PIN_CATEGORY_CAPTURE, 0,
 						  pSrc, IID_IAMStreamConfig,reinterpret_cast<void**>(&pConfig));
 
-  //ƒfƒoƒCƒXî•ñæ“¾
+  /* ãƒ‡ãƒã‚¤ã‚¹æƒ…å ±å–å¾— */
   bFound = false;
   int iCount=0, iSize=0;
   pConfig->GetNumberOfCapabilities(&iCount,&iSize);	
 	
   if(iSize == sizeof(VIDEO_STREAM_CONFIG_CAPS))
   {
-	  for(int iFormat = 0; iFormat < iCount; iFormat++)
-	  {
-		  VIDEO_STREAM_CONFIG_CAPS scc;
-		  AM_MEDIA_TYPE *pmtConfig;
-		  hr = pConfig->GetStreamCaps(iFormat, &pmtConfig, (BYTE*)&scc);
-		
-		  if(SUCCEEDED(hr))
-		  {
-			  if(pmtConfig->majortype == MEDIATYPE_Video)
-			  {
-				  VIDEOINFOHEADER *pVih = (VIDEOINFOHEADER*)pmtConfig->pbFormat;
-				  std::cout<<"Width : "<<pVih->bmiHeader.biWidth<<", Height : "<<abs(pVih->bmiHeader.biHeight);
-				  std::cout<<", biBitCount : "<<pVih->bmiHeader.biBitCount<<std::endl;
-				  if(RGB_CHANNELBIT <= pVih->bmiHeader.biBitCount)
-				  {
-					  //‰æ–ÊƒTƒCƒY
-					  v_Width = pVih->bmiHeader.biWidth;
-					  v_Height = pVih->bmiHeader.biHeight;
-					  v_Channel = RGB_CHANNEL;
-					  pConfig->SetFormat(pmtConfig);
-					  bFound = true;
-				  }
-			  }
-			  DeleteMediaType(pmtConfig);
+    for(int iFormat = 0; iFormat < iCount; iFormat++)
+    {
+      VIDEO_STREAM_CONFIG_CAPS scc;
+      AM_MEDIA_TYPE *pmtConfig;
+      hr = pConfig->GetStreamCaps(iFormat, &pmtConfig, (BYTE*)&scc);
 
-			  if(bFound){
-				  break;
-			  }
-		  }
-	  }
+      if(SUCCEEDED(hr))
+      {
+        if(pmtConfig->majortype == MEDIATYPE_Video)
+        {
+          VIDEOINFOHEADER *pVih = (VIDEOINFOHEADER*)pmtConfig->pbFormat;
+          std::cout<<"Width : "<<pVih->bmiHeader.biWidth<<", Height : "<<abs(pVih->bmiHeader.biHeight);
+          std::cout<<", biBitCount : "<<pVih->bmiHeader.biBitCount<<std::endl;
+          if(RGB_CHANNELBIT <= pVih->bmiHeader.biBitCount)
+          {
+            /* ç”»é¢ã‚µã‚¤ã‚º */
+            v_Width = pVih->bmiHeader.biWidth;
+            v_Height = pVih->bmiHeader.biHeight;
+            v_Channel = RGB_CHANNEL;
+            pConfig->SetFormat(pmtConfig);
+            bFound = true;
+          }
+        }
+        DeleteMediaType(pmtConfig);
+
+        if(bFound){
+          break;
+        }
+      }
+    }
   }
 
-  //æ“¾‚·‚éƒCƒ[ƒW‚ÌBuffer€”õ
+  /* å–å¾—ã™ã‚‹ã‚¤ãƒ¡ãƒ¼ã‚¸ã®Bufferæº–å‚™ */
   CoCreateInstance(CLSID_SampleGrabber, NULL, CLSCTX_INPROC_SERVER,
 				   IID_IBaseFilter, reinterpret_cast<void**>(&pF));
   pF->QueryInterface(IID_ISampleGrabber,(void**)&pGrab);
@@ -257,8 +257,8 @@ RTC::ReturnCode_t DirectShowCam::onActivated(RTC::UniqueId ec_id)
   pGrab->GetConnectedMediaType(&mt);
   VIDEOINFOHEADER *pVideoHeader = (VIDEOINFOHEADER*)mt.pbFormat;
 	
-  // ƒrƒfƒI ƒwƒbƒ_[‚É‚ÍCƒrƒbƒgƒ}ƒbƒvî•ñ‚ªŠÜ‚Ü‚ê‚é
-  // ƒrƒbƒgƒ}ƒbƒvî•ñ‚ğ BITMAPINFO \‘¢‘Ì‚ÉƒRƒs[
+  /* ãƒ“ãƒ‡ã‚ª ãƒ˜ãƒƒãƒ€ãƒ¼ã«ã¯ï¼Œãƒ“ãƒƒãƒˆãƒãƒƒãƒ—æƒ…å ±ãŒå«ã¾ã‚Œã‚‹ */
+  /* ãƒ“ãƒƒãƒˆãƒãƒƒãƒ—æƒ…å ±ã‚’ BITMAPINFO æ§‹é€ ä½“ã«ã‚³ãƒ”ãƒ¼ */
   BITMAPINFO BitmapInfo;
   ZeroMemory(&BitmapInfo, sizeof(BitmapInfo) );
   memcpy(&BitmapInfo.bmiHeader, &(pVideoHeader->bmiHeader), sizeof(BITMAPINFOHEADER));
@@ -266,21 +266,21 @@ RTC::ReturnCode_t DirectShowCam::onActivated(RTC::UniqueId ec_id)
   buffersize = BitmapInfo.bmiHeader.biSizeImage;
   pBuffer = new char[buffersize];
 
-  //ƒR[ƒ‹ƒoƒbƒNClass‚ÉBuffer‚ğ“n‚·
+  /* ãƒ¼ãƒ«ãƒãƒƒã‚¯Classã«Bufferã‚’æ¸¡ã™ */
   if(pBuffer !=NULL)
   {
-	  m_cb.SetBufferPtr(pBuffer);
+    m_cb.SetBufferPtr(pBuffer);
   }
 
-  //ƒCƒ[ƒW‚ğæ“¾‚µ‚½ŒãŒÄ‚Î‚ê‚éƒR[ƒ‹ƒoƒbƒN
+  /* ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚’å–å¾—ã—ãŸå¾Œå‘¼ã°ã‚Œã‚‹ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ */
   if(pGrab->SetCallback(&m_cb,1)!=S_OK)
   {
-	  std::cout<<"SetCallback error!\n";
-	  return RTC::RTC_ERROR;
+    std::cout<<"SetCallback error!\n";
+    return RTC::RTC_ERROR;
   }
 
   FreeMediaType(mt);
-  //ƒCƒ[ƒWæ“¾‚·‚é
+  /* ã‚¤ãƒ¡ãƒ¼ã‚¸å–å¾—ã™ã‚‹ */
   pMediaControl->Run();
 
   return RTC::RTC_OK;
@@ -292,21 +292,21 @@ RTC::ReturnCode_t DirectShowCam::onDeactivated(RTC::UniqueId ec_id)
 
   if(bFound)
   {
-	  pMediaControl->Stop();
-	  pMediaControl->Release();
-	  pF->Release();
-	  
-	  pSrc->Release();
-	  pGrab->Release();
-	  pBuilder->Release();
-	  pGraph->Release();
-	  
-	  m_cb.DetachBuffer();
-	  delete [] pBuffer;
+    pMediaControl->Stop();
+    pMediaControl->Release();
+    pF->Release();
+    
+    pSrc->Release();
+    pGrab->Release();
+    pBuilder->Release();
+    pGraph->Release();
+    
+    m_cb.DetachBuffer();
+    delete [] pBuffer;
   }
   
   if(pSrc!=NULL)
-	  pSrc->Release();
+    pSrc->Release();
 
   CoUninitialize();
   CloseHandle(m_cb.hEvent);
@@ -320,21 +320,21 @@ RTC::ReturnCode_t DirectShowCam::onExecute(RTC::UniqueId ec_id)
   static coil::TimeValue tm_pre;
   static int count = 0;
 
-  //ƒCƒ[ƒWæ“¾‚·‚é‚Ü‚Å‘Ò‚Â
+  /* ã‚¤ãƒ¡ãƒ¼ã‚¸å–å¾—ã™ã‚‹ã¾ã§å¾…ã¤ */
   int ret = WaitForSingleObject(m_cb.hEvent, INFINITE);
 
   if(ret==WAIT_FAILED || ret==WAIT_ABANDONED || ret==WAIT_TIMEOUT)
   {
-	  std::cout<<"WatiForSingleObjec Error!"<<std::endl;
-	  return RTC::RTC_ERROR;
+    std::cout<<"WatiForSingleObjec Error!"<<std::endl;
+    return RTC::RTC_ERROR;
   }
 
-  //ã‰º•ÏŠ·
+  /* ä¸Šä¸‹å¤‰æ› */
   //  m_flip(pBuffer, v_Width, abs(v_Height), v_Channel);
 
   int len = v_Channel * v_Width * abs(v_Height);
 
-  //o—ÍƒAƒEƒgƒ|[ƒgİ’è
+  /* å‡ºåŠ›ã‚¢ã‚¦ãƒˆãƒãƒ¼ãƒˆè¨­å®š */
   m_FIN_OUTPORT.pixels.length(len);
   m_FIN_OUTPORT.width = v_Width;
   m_FIN_OUTPORT.height = abs(v_Height);
@@ -345,18 +345,18 @@ RTC::ReturnCode_t DirectShowCam::onExecute(RTC::UniqueId ec_id)
 
   if (count > 100)
   {
-	  count = 0;
-	  coil::TimeValue tm;
-	  tm = coil::gettimeofday();
-	  
-	  double sec(tm - tm_pre);
-		
-	  if (sec > 1.0 && sec < 1000.0)
-	  {
-		  std::cout << 100/sec << " [FPS]" << std::endl;
-	  }
+    count = 0;
+    coil::TimeValue tm;
+    tm = coil::gettimeofday();
+    
+    double sec(tm - tm_pre);
+	
+    if (sec > 1.0 && sec < 1000.0)
+    {
+      std::cout << 100/sec << " [FPS]" << std::endl;
+    }
 
-	  tm_pre = tm;
+    tm_pre = tm;
   }
   ++count;
 

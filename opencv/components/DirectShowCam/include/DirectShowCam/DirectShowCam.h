@@ -50,52 +50,54 @@ using namespace RTC;
 #define RGB_CHANNELBIT 8
 #define RGB_CHANNEL 3
 
-//ƒR[ƒ‹ƒoƒbƒNƒNƒ‰ƒX
-//ƒJƒƒ‰‚©‚ç‰f‘œ‚ðŽæ“¾‚µ‚½ŒãAŒÄ‚Î‚ê‚éƒNƒ‰ƒXA‰f‘œ‚ÍBufferCBƒƒ\ƒbƒh‚ÉƒRƒs[
-//ƒ\[ƒX‚ÍDirextShowƒGƒOƒUƒ“ƒvƒ‹(SampleGrabCB)ŽQl
+/*
+* ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ã‚¯ãƒ©ã‚¹
+* ã‚«ãƒ¡ãƒ©ã‹ã‚‰æ˜ åƒã‚’å–å¾—ã—ãŸå¾Œã€å‘¼ã°ã‚Œã‚‹ã‚¯ãƒ©ã‚¹ã€æ˜ åƒã¯BufferCBãƒ¡ã‚½ãƒƒãƒ‰ã«ã‚³ãƒ”ãƒ¼
+* ã‚½ãƒ¼ã‚¹ã¯DirextShowã‚¨ã‚°ã‚¶ãƒ³ãƒ—ãƒ«(SampleGrabCB)å‚è€ƒ
+*/
 class CGrabCB: public ISampleGrabberCB
 {
 public:
-	HANDLE hEvent;
+  HANDLE hEvent;
     char *m_pImagePtr;
     void SetBufferPtr(char *pBuffer) { m_pImagePtr = pBuffer;}
-	void DetachBuffer(void)
-	{
-		if(m_pImagePtr!=NULL){
-			m_pImagePtr = NULL;
-		}
-	}
+  void DetachBuffer(void)
+  {
+    if(m_pImagePtr!=NULL){
+      m_pImagePtr = NULL;
+    }
+  }
 
-    // fake out any COM ref counting
-    STDMETHODIMP_(ULONG) AddRef() { return 2; }
-    STDMETHODIMP_(ULONG) Release() { return 1; }
+  // fake out any COM ref counting
+  STDMETHODIMP_(ULONG) AddRef() { return 2; }
+  STDMETHODIMP_(ULONG) Release() { return 1; }
 
-    // fake out any COM QI'ing
-    STDMETHODIMP QueryInterface(REFIID riid, void ** ppv)
+  // fake out any COM QI'ing
+  STDMETHODIMP QueryInterface(REFIID riid, void ** ppv)
+  {
+    if( riid == IID_ISampleGrabberCB || riid == IID_IUnknown ) 
     {
-        if( riid == IID_ISampleGrabberCB || riid == IID_IUnknown ) 
-        {
-            *ppv = (void *) static_cast<ISampleGrabberCB*> ( this );
-            return NOERROR;
-        }    
-        return E_NOINTERFACE;
-    }
-    // ISampleGrabberCB methods
-    STDMETHODIMP SampleCB(double SampleTime, IMediaSample *pSample) 
-    {
-        return E_NOTIMPL;
-    }
-    STDMETHODIMP BufferCB(double SampleTime, BYTE *pSrcBuffer, long BufferLen) 
-    {
-        memcpy(m_pImagePtr, pSrcBuffer, BufferLen);
-		SetEvent(hEvent);
-        return S_OK;
-    }
-    // Constructor
-    CGrabCB( )
-    {
-        m_pImagePtr = NULL;
-    }
+      *ppv = (void *) static_cast<ISampleGrabberCB*> ( this );
+      return NOERROR;
+    }    
+    return E_NOINTERFACE;
+  }
+  // ISampleGrabberCB methods
+  STDMETHODIMP SampleCB(double SampleTime, IMediaSample *pSample) 
+  {
+    return E_NOTIMPL;
+  }
+  STDMETHODIMP BufferCB(double SampleTime, BYTE *pSrcBuffer, long BufferLen) 
+  {
+    memcpy(m_pImagePtr, pSrcBuffer, BufferLen);
+    SetEvent(hEvent);
+    return S_OK;
+  }
+  // Constructor
+  CGrabCB( )
+  {
+    m_pImagePtr = NULL;
+  }
 };
 
 /*!
