@@ -35,7 +35,7 @@
 
 using namespace RTC;
 
-// –‘OéŒ¾
+/* äº‹å‰å®£è¨€ */
 void onMouse(int nEvent, int x, int y, int nFlags, void* param);
 
 /*!
@@ -301,17 +301,17 @@ class CameraViewer
   // </rtc-template>
 
 private:
-    int dummy;
-    IplImage* m_orig_img;
-  
-    int m_nOldHeight;     // CFGXVƒ`ƒFƒbƒN—p
-    int m_nOldWidth;
+  int dummy;
+  IplImage* m_orig_img;
 
-    int m_in_height;      // “ü—ÍƒCƒ[ƒW‚ÌHeight
-    int m_in_width;       // “ü—ÍƒCƒ[ƒW‚ÌWidth
-    
-    bool isCFGChanged();
-    //void onMouse(int nEvent, int x, int y, int nFlags, void* param);
+  int m_nOldHeight;     /* CFGæ›´æ–°ãƒã‚§ãƒƒã‚¯ç”¨ */
+  int m_nOldWidth;
+
+  int m_in_height;      /* å…¥åŠ›ã‚¤ãƒ¡ãƒ¼ã‚¸ã®Height */
+  int m_in_width;       /* å…¥åŠ›ã‚¤ãƒ¡ãƒ¼ã‚¸ã®Width */
+  
+  bool isCFGChanged();
+  //void onMouse(int nEvent, int x, int y, int nFlags, void* param);
 
 // 
 public:

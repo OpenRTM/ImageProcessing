@@ -16,9 +16,9 @@ static const char* cameraviewer_spec[] =
     "implementation_id", "CameraViewer",
     "type_name",         "CameraViewer",
     "description",       "USB Camera Monitor component",
-    "version",           "1.0.0",
+    "version",           "1.1.0",
     "vendor",            "AIST",
-    "category",          "example",
+    "category",          "Category",
     "activity_type",     "PERIODIC",
     "kind",              "DataFlowComponent",
     "max_instance",      "1",
@@ -120,13 +120,12 @@ RTC::ReturnCode_t CameraViewer::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t CameraViewer::onActivated(RTC::UniqueId ec_id)
 { 
+  m_orig_img  = NULL;
 
-    m_orig_img  = NULL;
+  m_in_height = 0;
+  m_in_width  = 0;
 
-    m_in_height = 0;
-    m_in_width  = 0;
-
-  //‰æ‘œ•\Ž¦—pƒEƒBƒ“ƒhƒE‚Ìì¬
+  /* ç”»åƒè¡¨ç¤ºç”¨ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ä½œæˆ */
   cvNamedWindow("CaptureImage", CV_WINDOW_AUTOSIZE);
   cvSetMouseCallback("CaptureImage", onMouse, (void*)this);
   
@@ -136,85 +135,85 @@ RTC::ReturnCode_t CameraViewer::onActivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t CameraViewer::onDeactivated(RTC::UniqueId ec_id)
 {
-    if(m_orig_img != NULL)
-        cvReleaseImage(&m_orig_img);
+  if(m_orig_img != NULL)
+      cvReleaseImage(&m_orig_img);
 
-    //•\Ž¦ƒEƒBƒ“ƒhƒE‚ÌÁ‹Ž    
-    cvDestroyWindow("CaptureImage");
-    return RTC::RTC_OK;
+  /* è¡¨ç¤ºã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®æ¶ˆåŽ» */    
+  cvDestroyWindow("CaptureImage");
+  return RTC::RTC_OK;
 }
 
 
 RTC::ReturnCode_t CameraViewer::onExecute(RTC::UniqueId ec_id)
 {
-    static coil::TimeValue tm_pre;
-    static int count = 0;
-	
-    int nLength;
+  static coil::TimeValue tm_pre;
+  static int count = 0;
 
-    m_lKey.data = cvWaitKey(1);
-    if(m_lKey.data >= 0)
-    {
-        printf("[onExecute] Key number %d is down\n", m_lKey.data);
-        m_lKeyOut.write();
-    }
+  int nLength;
 
-    // Check input image is new
-    if (!m_inIn.isNew())
-    {	
-		return RTC::RTC_OK;
-    }
-    m_inIn.read();    
+  m_lKey.data = cvWaitKey(1);
+  if(m_lKey.data >= 0)
+  {
+    printf("[onExecute] Key number %ld is down\n", m_lKey.data);
+    m_lKeyOut.write();
+  }
 
-    nLength = m_in.pixels.length();
+  // Check input image is new
+  if (!m_inIn.isNew())
+  {	
+	  return RTC::RTC_OK;
+  }
+  m_inIn.read();    
 
-    if (!(nLength > 0))
-    {
-        return RTC::RTC_OK;
-    }
+  nLength = m_in.pixels.length();
 
-    // ƒTƒCƒY‚ª•Ï‚í‚Á‚½‚Æ‚«‚¾‚¯Ä¶¬‚·‚é
-    if(m_in_height != (int)m_in.height || m_in_width != (int)m_in.width)
-    {
-        printf("[onExecute] Size of input image is not match!\n");
-        
-        if(m_orig_img != NULL)
-            cvReleaseImage(&m_orig_img);
-
-        m_in_height = m_in.height;
-        m_in_width  = m_in.width;
-
-        // ƒTƒCƒY•ÏŠ·‚Ì‚½‚ßTempƒƒ‚ƒŠ[‚ð‚æ‚¢‚·‚é
-        m_orig_img = cvCreateImage(cvSize(m_in.width, m_in.height), IPL_DEPTH_8U, 3);
-    }
-
-    // ƒf[ƒ^ƒRƒs[
-    memcpy(m_orig_img->imageData,(void *)&(m_in.pixels[0]), m_in.pixels.length());
-
-
-    //‰æ‘œ•\Ž¦
-	#if (!defined WIN32) || (!defined WIN64)
-    cvStartWindowThread();
-	#endif
-    cvShowImage("CaptureImage", m_orig_img);
-
-    if (count > 100)
-    {
-        count = 0;
-        coil::TimeValue tm;
-        tm = coil::gettimeofday();
-        double sec(tm - tm_pre);
-        
-        if (sec > 1.0 && sec < 1000.0)
-        {
-            std::cout << 100.0/sec << " [FPS]" << std::endl;
-        }
-        tm_pre = tm;
-    }
-
-    ++count;
-
+  if (!(nLength > 0))
+  {
     return RTC::RTC_OK;
+  }
+
+  /* ã‚µã‚¤ã‚ºãŒå¤‰ã‚ã£ãŸã¨ãã ã‘å†ç”Ÿæˆã™ã‚‹ */
+  if(m_in_height != (int)m_in.height || m_in_width != (int)m_in.width)
+  {
+    printf("[onExecute] Size of input image is not match!\n");
+
+    if(m_orig_img != NULL)
+      cvReleaseImage(&m_orig_img);
+
+    m_in_height = m_in.height;
+    m_in_width  = m_in.width;
+
+    /* ã‚µã‚¤ã‚ºå¤‰æ›ã®ãŸã‚Tempãƒ¡ãƒ¢ãƒªãƒ¼ã‚’ç”¨æ„ã™ã‚‹ */
+    m_orig_img = cvCreateImage(cvSize(m_in.width, m_in.height), IPL_DEPTH_8U, 3);
+  }
+
+  /* ãƒ‡ãƒ¼ã‚¿ã‚³ãƒ”ãƒ¼ */
+  memcpy(m_orig_img->imageData,(void *)&(m_in.pixels[0]), m_in.pixels.length());
+
+
+  /* ç”»åƒè¡¨ç¤º */
+#if (!defined WIN32) || (!defined WIN64)
+  cvStartWindowThread();
+#endif
+  cvShowImage("CaptureImage", m_orig_img);
+
+  if (count > 100)
+  {
+    count = 0;
+    coil::TimeValue tm;
+    tm = coil::gettimeofday();
+    double sec(tm - tm_pre);
+
+    if (sec > 1.0 && sec < 1000.0)
+    {
+      std::cout << 100.0/sec << " [FPS]" << std::endl;
+    }
+    tm_pre = tm;
+  }
+
+  ++count;
+
+  return RTC::RTC_OK;
 }
 
 /*
@@ -254,26 +253,26 @@ RTC::ReturnCode_t CameraViewer::onRateChanged(RTC::UniqueId ec_id)
 
 bool CameraViewer::isCFGChanged()
 {
-    if(m_img_height != m_nOldHeight || m_img_width != m_nOldWidth)
-        return true;
+  if(m_img_height != m_nOldHeight || m_img_width != m_nOldWidth)
+    return true;
 
-    return false;
+  return false;
 }
 
 void onMouse(int nEvent, int x, int y, int nFlags, void *param)
 {
-    //printf("[onExecute] Mouse event [%d] is occured on (%d, %d)\n", 
-    //                    nEvent, x, y);
+  //printf("[onExecute] Mouse event [%d] is occured on (%d, %d)\n", 
+  //                    nEvent, x, y);
 
-    CameraViewer *rtmParam = (CameraViewer *)param;
+  CameraViewer *rtmParam = (CameraViewer *)param;
 
-    rtmParam->m_lMouseEv.data = nEvent;
-    rtmParam->m_lMouseX.data  = x;
-    rtmParam->m_lMouseY.data  = y;
+  rtmParam->m_lMouseEv.data = nEvent;
+  rtmParam->m_lMouseX.data  = x;
+  rtmParam->m_lMouseY.data  = y;
 
-    rtmParam->m_lMouseEvOut.write();
-    rtmParam->m_lMouseXOut.write();
-    rtmParam->m_lMouseYOut.write();
+  rtmParam->m_lMouseEvOut.write();
+  rtmParam->m_lMouseXOut.write();
+  rtmParam->m_lMouseYOut.write();
 }
 
 extern "C"
