@@ -106,6 +106,9 @@ The available configuration parameters are described below:
 ================ ================== ================ ======
 Parameter        Data type          Default Value    Effect
 ================ ================== ================ ======
+sobel_x_size     int                3                
+sobel_y_size     int                3                
+laplacian_size   int                3                
 ================ ================== ================ ======
 
 Ports

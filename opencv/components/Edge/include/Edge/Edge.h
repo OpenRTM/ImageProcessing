@@ -25,8 +25,8 @@
 #include <highgui.h>
 
 //	cvConvertScaleAbs用定数
-#define SCALE	1					//	ScaleAbs係数
-#define	SHIFT	0					//	スケーリングした入力配列の要素に加える値
+#define SCALE   1   /* ScaleAbs係数 */
+#define SHIFT   0   /* スケーリングした入力配列の要素に加える値 */
 
 // Service implementation headers
 // <rtc-template block="service_impl_h">
@@ -250,6 +250,7 @@ class Edge
    * - DefaultValue: 3
    */
   int m_laplacian_size;
+
   // </rtc-template>
 
   // DataInPort declaration
@@ -302,7 +303,7 @@ class Edge
   // <rtc-template block="private_operation">
   
   // </rtc-template>
-  IplImage* imageBuff;					// カメライメージ
+  IplImage* imageBuff;
   IplImage* grayImage;
   IplImage* destinationImage_x;
   IplImage* destinationImage_y;
