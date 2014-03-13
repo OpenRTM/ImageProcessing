@@ -19,7 +19,7 @@
 #include <rtm/idl/ExtendedDataTypesSkel.h>
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
-//OpenCV用インクルードファイルのインクルード
+/* OpenCV逕ｨ */
 #include<cv.h>
 #include<cxcore.h>
 #include<highgui.h>
@@ -314,25 +314,25 @@ class Chromakey
   
   // </rtc-template>
     // Configuration fileds
-    int m_in_height;                 // 入力イメージのHeight
-    int m_in_width;                  // 入力イメージのWidth
+  int m_in_height;                // 蜈･蜉帙う繝｡繝ｼ繧ｸ縺ｮHeight
+  int m_in_width;                 // 蜈･蜉帙う繝｡繝ｼ繧ｸ縺ｮWidth
 
-    int m_in2_height;                // Background入力イメージのHeight
-    int m_in2_width;                 // Background入力イメージのWidth
+  int m_in2_height;               // Background蜈･蜉帙う繝｡繝ｼ繧ｸ縺ｮHeight
+  int m_in2_width;                // Background蜈･蜉帙う繝｡繝ｼ繧ｸ縺ｮWidth
 
-    IplImage* m_image_buff;			 // Original Image
-    
-    IplImage* m_image_extracted;     // Extracted Image
+  IplImage* m_image_buff;         // Original Image
+  
+  IplImage* m_image_extracted;    // Extracted Image
 
-    IplImage* m_image_mask;			 // Mask Image
-    IplImage* m_image_inverseMask;   // Inverse Mask Image
-    
-    IplImage* m_image_BG_in;         // Background Input image
-    IplImage* m_image_BG;            // Background Converted Image(Resized to Camera Image)
-    IplImage* m_image_extractedBG;   // Extracted Background Image
+  IplImage* m_image_mask;         // Mask Image
+  IplImage* m_image_inverseMask;  // Inverse Mask Image
+  
+  IplImage* m_image_BG_in;         // Background Input image
+  IplImage* m_image_BG;            // Background Converted Image(Resized to Camera Image)
+  IplImage* m_image_extractedBG;   // Extracted Background Image
 
-    IplImage* m_image_destination;	 // 結果出力用IplImage
-    
+  IplImage* m_image_destination;	 // 邨先棡蜃ｺ蜉帷畑IplImage
+  
 };
 
 

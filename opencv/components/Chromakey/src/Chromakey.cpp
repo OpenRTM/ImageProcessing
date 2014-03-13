@@ -16,7 +16,7 @@ static const char* chromakey_spec[] =
     "implementation_id", "Chromakey",
     "type_name",         "Chromakey",
     "description",       "Chromakey image component",
-    "version",           "1.0.0",
+    "version",           "1.1.0",
     "vendor",            "AIST",
     "category",          "Category",
     "activity_type",     "PERIODIC",
@@ -129,23 +129,23 @@ RTC::ReturnCode_t Chromakey::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Chromakey::onActivated(RTC::UniqueId ec_id)
 {
-    m_image_buff        = NULL;
-    
-    m_image_extracted   = NULL;
+  m_image_buff        = NULL;
 
-    m_image_mask        = NULL;
-    m_image_inverseMask = NULL;
-    
-    m_image_BG_in       = NULL;
-    m_image_BG          = NULL;
-    m_image_extractedBG = NULL;
+  m_image_extracted   = NULL;
 
-    m_image_destination = NULL;
+  m_image_mask        = NULL;
+  m_image_inverseMask = NULL;
 
-    m_in_height         = 0;
-    m_in_width          = 0;
-    m_in2_height        = 0;
-    m_in2_width         = 0;
+  m_image_BG_in       = NULL;
+  m_image_BG          = NULL;
+  m_image_extractedBG = NULL;
+
+  m_image_destination = NULL;
+
+  m_in_height         = 0;
+  m_in_width          = 0;
+  m_in2_height        = 0;
+  m_in2_width         = 0;
 
   return RTC::RTC_OK;
 }
@@ -153,147 +153,132 @@ RTC::ReturnCode_t Chromakey::onActivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Chromakey::onDeactivated(RTC::UniqueId ec_id)
 {
-    // ƒCƒ[ƒW—pƒƒ‚ƒŠ‚Ì‰ğ•ú
-    if(m_image_buff        != NULL)
-        cvReleaseImage(&m_image_buff);
-    if(m_image_extracted   != NULL)
-        cvReleaseImage(&m_image_extracted);
-    if(m_image_mask        != NULL)
-        cvReleaseImage(&m_image_mask);
-    if(m_image_inverseMask != NULL)
-        cvReleaseImage(&m_image_inverseMask);
-    if(m_image_BG_in       != NULL)
-        cvReleaseImage(&m_image_BG_in);
-    if(m_image_BG          != NULL)
-        cvReleaseImage(&m_image_BG);
-    if(m_image_extractedBG != NULL)
-        cvReleaseImage(&m_image_extractedBG);
-    if(m_image_destination != NULL)
-        cvReleaseImage(&m_image_destination);
+  /* ã‚¤ãƒ¡ãƒ¼ã‚¸ç”¨ãƒ¡ãƒ¢ãƒªã®è§£æ”¾ */
+  if(m_image_buff        != NULL)
+    cvReleaseImage(&m_image_buff);
+  if(m_image_extracted   != NULL)
+    cvReleaseImage(&m_image_extracted);
+  if(m_image_mask        != NULL)
+    cvReleaseImage(&m_image_mask);
+  if(m_image_inverseMask != NULL)
+    cvReleaseImage(&m_image_inverseMask);
+  if(m_image_BG_in       != NULL)
+    cvReleaseImage(&m_image_BG_in);
+  if(m_image_BG          != NULL)
+    cvReleaseImage(&m_image_BG);
+  if(m_image_extractedBG != NULL)
+    cvReleaseImage(&m_image_extractedBG);
+  if(m_image_destination != NULL)
+    cvReleaseImage(&m_image_destination);
 
-    return RTC::RTC_OK;
+  return RTC::RTC_OK;
 }
 
 
 RTC::ReturnCode_t Chromakey::onExecute(RTC::UniqueId ec_id)
 {
-    // Common CV actions
-    // Port for Background image
-    if (m_image_backIn.isNew()) 
+  // Common CV actions
+  // Port for Background image
+  if (m_image_backIn.isNew()) 
+  {
+    /* InPortãƒ‡ãƒ¼ã‚¿ã®èª­ã¿è¾¼ã¿ */
+    m_image_backIn.read();
+
+    /* ã‚µã‚¤ã‚ºãŒå¤‰ã‚ã£ãŸã¨ãã ã‘å†ç”Ÿæˆã™ã‚‹ */
+    if(m_in2_height != m_image_back.height || m_in2_width != m_image_back.width)
     {
-                // InPortƒf[ƒ^‚Ì“Ç‚İ‚İ
-        m_image_backIn.read();
+      printf("[onExecute] Size of background image is not match!\n");
 
-        // ƒTƒCƒY‚ª•Ï‚í‚Á‚½‚Æ‚«‚¾‚¯Ä¶¬‚·‚é
-        if(m_in2_height != m_image_back.height || m_in2_width != m_image_back.width)
-        {
-            printf("[onExecute] Size of background image is not match!\n");
+      m_in2_height = m_image_back.height;
+      m_in2_width  = m_image_back.width;
 
-            m_in2_height = m_image_back.height;
-            m_in2_width  = m_image_back.width;
-            
-            if(m_image_BG_in != NULL)
-                cvReleaseImage(&m_image_BG_in);
+      if(m_image_BG_in != NULL)
+        cvReleaseImage(&m_image_BG_in);
 
-            // ƒTƒCƒY•ÏŠ·‚Ì‚½‚ßTempƒƒ‚ƒŠ[‚ğ‚æ‚¢‚·‚é
-	        m_image_BG_in = cvCreateImage(cvSize(m_in2_width, m_in2_height), IPL_DEPTH_8U, 3);
-        }
-
-        // InPort‚Ì‰æ‘œƒf[ƒ^‚ğIplImage‚ÌimageData‚ÉƒRƒs[
-        memcpy(m_image_BG_in->imageData,(void *)&(m_image_back.pixels[0]), m_image_back.pixels.length());
+      /* ã‚µã‚¤ã‚ºå¤‰æ›ã®ãŸã‚Tempãƒ¡ãƒ¢ãƒªãƒ¼ã‚’ç”¨æ„ã™ã‚‹ */
+      m_image_BG_in = cvCreateImage(cvSize(m_in2_width, m_in2_height), IPL_DEPTH_8U, 3);
     }
 
-    // V‚µ‚¢ƒf[ƒ^‚Ìƒ`ƒFƒbƒN
-    if (m_image_originalIn.isNew()) 
+    /* InPortã®ç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’IplImageã®imageDataã«ã‚³ãƒ”ãƒ¼ */
+    memcpy(m_image_BG_in->imageData,(void *)&(m_image_back.pixels[0]), m_image_back.pixels.length());
+  }
+
+  /* æ–°ã—ã„ãƒ‡ãƒ¼ã‚¿ã®ãƒã‚§ãƒƒã‚¯ */
+  if (m_image_originalIn.isNew()) 
+  {
+    m_image_originalIn.read();
+
+    /* ã‚µã‚¤ã‚ºãŒå¤‰ã‚ã£ãŸã¨ãã ã‘å†ç”Ÿæˆã™ã‚‹ */
+    if(m_in_height != m_image_original.height || m_in_width != m_image_original.width)
     {
-        // InPortƒf[ƒ^‚Ì“Ç‚İ‚İ
-        m_image_originalIn.read();
+      printf("[onExecute] Size of input image is not match!\n");
 
-        // ƒTƒCƒY‚ª•Ï‚í‚Á‚½‚Æ‚«‚¾‚¯Ä¶¬‚·‚é
-        if(m_in_height != m_image_original.height || m_in_width != m_image_original.width)
-        {
-            printf("[onExecute] Size of input image is not match!\n");
+      m_in_height = m_image_original.height;
+      m_in_width  = m_image_original.width;
 
-            m_in_height = m_image_original.height;
-            m_in_width  = m_image_original.width;
-            
-            if(m_image_buff        != NULL)
-                cvReleaseImage(&m_image_buff);
-            if(m_image_extracted   != NULL)
-                cvReleaseImage(&m_image_extracted);
-            if(m_image_mask        != NULL)
-                cvReleaseImage(&m_image_mask);
-            if(m_image_inverseMask != NULL)
-                cvReleaseImage(&m_image_inverseMask);
-            if(m_image_BG          != NULL)
-                cvReleaseImage(&m_image_BG);
-            if(m_image_extractedBG != NULL)
-                cvReleaseImage(&m_image_extractedBG);
-            if(m_image_destination != NULL)
-                cvReleaseImage(&m_image_destination);
+      if(m_image_buff        != NULL)
+          cvReleaseImage(&m_image_buff);
+      if(m_image_extracted   != NULL)
+          cvReleaseImage(&m_image_extracted);
+      if(m_image_mask        != NULL)
+          cvReleaseImage(&m_image_mask);
+      if(m_image_inverseMask != NULL)
+          cvReleaseImage(&m_image_inverseMask);
+      if(m_image_BG          != NULL)
+          cvReleaseImage(&m_image_BG);
+      if(m_image_extractedBG != NULL)
+          cvReleaseImage(&m_image_extractedBG);
+      if(m_image_destination != NULL)
+          cvReleaseImage(&m_image_destination);
 
+      m_image_buff        = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3 );
+      m_image_extracted   = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3 );
+      m_image_mask        = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 1 );
+      m_image_inverseMask = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 1 );
+      m_image_BG          = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3 );
+      m_image_extractedBG = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3 );
+      m_image_destination = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3 );
+    }
 
-            // ƒTƒCƒY•ÏŠ·‚Ì‚½‚ßTempƒƒ‚ƒŠ[‚ğ‚æ‚¢‚·‚é
-	        m_image_buff        = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3 );
-    
-            m_image_extracted   = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3 );
+    // Resize background image to fit Camera image
+    if(m_image_BG_in != NULL)
+      cvResize(m_image_BG_in, m_image_BG, CV_INTER_LINEAR);
 
-            m_image_mask        = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 1 );
-            m_image_inverseMask = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 1 );
-            
-            m_image_BG          = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3 );
-            m_image_extractedBG = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3 );
+    memcpy(m_image_buff->imageData,(void *)&(m_image_original.pixels[0]),m_image_original.pixels.length());
 
-            m_image_destination = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3 );
-        }
+    // Anternative actions
+    CvScalar lowerValue = cvScalar( m_nLowerBlue,     m_nLowerYellow,     m_nLowerRed );
+    CvScalar upperValue = cvScalar( m_nUpperBlue + 1, m_nUpperYellow + 1, m_nUpperRed + 1 );
 
-        // Resize background image to fit Camera image
-        if(m_image_BG_in != NULL)
-            cvResize(m_image_BG_in, m_image_BG, CV_INTER_LINEAR);
+    /* RGBå„ãƒãƒ£ãƒ³ãƒãƒ«ã”ã¨ã«ç¯„å›²å†…ã®å€¤ä»¥å¤–ã®ç”»ç´ ã‚’ãƒã‚¹ã‚¯ã«è¨­å®šã™ã‚‹ */
+    cvInRangeS( m_image_buff, lowerValue, upperValue, m_image_mask );
 
-        // InPort‚Ì‰æ‘œƒf[ƒ^‚ğIplImage‚ÌimageData‚ÉƒRƒs[
-        memcpy(m_image_buff->imageData,(void *)&(m_image_original.pixels[0]),m_image_original.pixels.length());
+    /* èƒŒæ™¯ç”»åƒã®ã†ã¡åˆæˆã™ã‚‹ç‰©ä½“éƒ¨åˆ†ã®ç”»ç´ å€¤ã‚’0ã«ã™ã‚‹ */
+    cvSetZero( m_image_extractedBG );
+    cvCopy( m_image_BG, m_image_extractedBG, m_image_mask );
 
-        // Anternative actions
+    /* ãƒã‚¹ã‚¯ç”»åƒã®0ã¨1ã‚’åè»¢ã™ã‚‹ */
+    cvNot( m_image_mask, m_image_inverseMask );
 
-        CvScalar lowerValue = cvScalar( m_nLowerBlue,     m_nLowerYellow,     m_nLowerRed );
-		CvScalar upperValue = cvScalar( m_nUpperBlue + 1, m_nUpperYellow + 1, m_nUpperRed + 1 );
+    /* ãƒˆãƒ©ãƒƒã‚¯ãƒãƒ¼ã®æ¡ä»¶ã‚’æº€ãŸã™åˆæˆç‰©ä½“ãŒæŠ½å‡ºã•ã‚ŒãŸç”»åƒã‚’ä½œæˆ */ 
+    cvSetZero( m_image_extracted );
+    cvCopy( m_image_buff, m_image_extracted, m_image_inverseMask );
 
-		//	RGBŠeƒ`ƒƒƒ“ƒlƒ‹‚²‚Æ‚É”ÍˆÍ“à‚Ì’lˆÈŠO‚Ì‰æ‘f‚ğƒ}ƒXƒN‚Éİ’è‚·‚é
-		cvInRangeS( m_image_buff, lowerValue, upperValue, m_image_mask );
-
-		//	”wŒi‰æ‘œ‚Ì‚¤‚¿‡¬‚·‚é•¨‘Ì•”•ª‚Ì‰æ‘f’l‚ğ0‚É‚·‚é
-		cvSetZero( m_image_extractedBG );
-		cvCopy( m_image_BG, m_image_extractedBG, m_image_mask );
-
-		//	ƒ}ƒXƒN‰æ‘œ‚Ì0‚Æ1‚ğ”½“]‚·‚é
-		cvNot( m_image_mask, m_image_inverseMask );
-
-		//	ƒgƒ‰ƒbƒNƒo[‚ÌğŒ‚ğ–‚½‚·‡¬•¨‘Ì‚ª’Šo‚³‚ê‚½‰æ‘œ‚ğì¬ 
-		cvSetZero( m_image_extracted );
-		cvCopy( m_image_buff, m_image_extracted, m_image_inverseMask );
-
-		//	”wŒi‰æ‘œ‚Æ‡¬•¨‘Ì‰æ‘œ‚Ì‡¬
-		cvAdd( m_image_extractedBG, m_image_extracted, m_image_destination, NULL);
-
+    /* èƒŒæ™¯ç”»åƒã¨åˆæˆç‰©ä½“ç”»åƒã®åˆæˆ */
+    cvAdd( m_image_extractedBG, m_image_extracted, m_image_destination, NULL);
        
-        // Prepare to out data
-        // ‰æ‘œƒf[ƒ^‚ÌƒTƒCƒYæ“¾
-        int len = m_image_destination->nChannels * m_image_destination->width * m_image_destination->height;
-                
-        // ‰æ–Ê‚ÌƒTƒCƒYî•ñ‚ğ“ü‚ê‚é
-        m_image_output.pixels.length(len);        
-        m_image_output.width  = m_image_destination->width;
-        m_image_output.height = m_image_destination->height;
+    // Prepare to out data
+    int len = m_image_destination->nChannels * m_image_destination->width * m_image_destination->height;
+            
+    m_image_output.pixels.length(len);        
+    m_image_output.width  = m_image_destination->width;
+    m_image_output.height = m_image_destination->height;
+    memcpy((void *)&(m_image_output.pixels[0]), m_image_destination->imageData,len);
 
-        // ”½“]‚µ‚½‰æ‘œƒf[ƒ^‚ğOutPort‚ÉƒRƒs[
-        memcpy((void *)&(m_image_output.pixels[0]), m_image_destination->imageData,len);
+    m_image_outputOut.write();
+  }
 
-        // ”½“]‚µ‚½‰æ‘œƒf[ƒ^‚ğOutPort‚©‚ço—Í‚·‚éB
-        m_image_outputOut.write();
-    }
-
-    return RTC::RTC_OK;
+  return RTC::RTC_OK;
 }
 
 /*
