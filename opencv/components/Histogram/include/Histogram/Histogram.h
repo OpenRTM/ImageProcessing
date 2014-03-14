@@ -24,15 +24,15 @@
 #include <cxcore.h>
 #include <highgui.h>
 
-#define DIMENSIONS	1     //	ヒストグラムの次元数
-#define UNIFORM	1         //	一様性に関するフラグ
-#define ACCUMULATE	0     //	計算フラグ
-#define TRACKBAR_MAX_VALUE	200 //	トラックバーの最大値
+#define DIMENSIONS  1     /* ヒストグラムの次元数 */
+#define UNIFORM     1     /* 一様性に関するフラグ */
+#define ACCUMULATE  0     /* 計算フラグ */
+#define TRACKBAR_MAX_VALUE  200 /* トラックバーの最大値 */
 
-#define SCALE_SHIFT	0     //	スケーリングした入力配列の要素に加える値
-#define LINE_THICKNESS	-1  //	線の太さ
-#define LINE_TYPE	1     //	線の種類
-#define SHIFT	0         //	座標の小数点以下の桁を表すビット数
+#define SCALE_SHIFT     0   /* スケーリングした入力配列の要素に加える値 */
+#define LINE_THICKNESS  -1  /* 線の太さ */
+#define LINE_TYPE       1   /* 線の種類 */
+#define SHIFT           0   /* 座標の小数点以下の桁を表すビット数 */
 
 // Service implementation headers
 // <rtc-template block="service_impl_h">
@@ -299,14 +299,14 @@ class Histogram
   // <rtc-template block="private_operation">
   
   // </rtc-template>
-  IplImage* imageBuff;				// カメラのイメージ
+  IplImage* imageBuff;        /* カメラのイメージ */
   IplImage* grayImage;				
   IplImage* destinationImage;
   IplImage* histogramImage;
   IplImage* histogramBarImage;
 
   CvHistogram *histogram;
-  CvMat* lookUpTableMatrix;			//	濃度対応行列
+  CvMat* lookUpTableMatrix;   /* 濃度対応行列 */
 
   int histogramSize;
   int bin_w;
