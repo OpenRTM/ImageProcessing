@@ -18,7 +18,7 @@ static const char* flip_spec[] =
     "implementation_id", "Flip",
     "type_name",         "Flip",
     "description",       "Flip image component",
-    "version",           "1.0.0",
+    "version",           "1.1.0",
     "vendor",            "AIST",
     "category",          "Category",
     "activity_type",     "PERIODIC",
@@ -109,11 +109,11 @@ RTC::ReturnCode_t Flip::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Flip::onActivated(RTC::UniqueId ec_id)
 {
-  // ƒCƒ[ƒW—pƒƒ‚ƒŠ‚Ì‰Šú‰»
+  /* ã‚¤ãƒ¡ãƒ¼ã‚¸ç”¨ãƒ¡ãƒ¢ãƒªã®åˆæœŸåŒ– */
   m_image_buff = NULL;
   m_flip_image_buff = NULL;
 
-  // OutPort‚Ì‰æ–ÊƒTƒCƒY‚Ì‰Šú‰»
+  /* OutPortã®ç”»é¢ã‚µã‚¤ã‚ºã®åˆæœŸåŒ– */
   m_image_flip.width = 0;
   m_image_flip.height = 0;
 
@@ -125,7 +125,7 @@ RTC::ReturnCode_t Flip::onDeactivated(RTC::UniqueId ec_id)
 {
   if(m_image_buff != NULL)
   {
-    // ƒCƒ[ƒW—pƒƒ‚ƒŠ‚Ì‰ğ•ú
+    /* ã‚¤ãƒ¡ãƒ¼ã‚¸ç”¨ãƒ¡ãƒ¢ãƒªã®è§£æ”¾ */
     cvReleaseImage(&m_image_buff);
     cvReleaseImage(&m_flip_image_buff);
   }
@@ -136,43 +136,43 @@ RTC::ReturnCode_t Flip::onDeactivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Flip::onExecute(RTC::UniqueId ec_id)
 {
-	// V‚µ‚¢ƒf[ƒ^‚Ìƒ`ƒFƒbƒN
+  /* æ–°ã—ã„ãƒ‡ãƒ¼ã‚¿ã®ãƒã‚§ãƒƒã‚¯ */
   if (m_image_origIn.isNew()) {
-    // InPortƒf[ƒ^‚Ì“Ç‚İ‚İ
+    /* InPortãƒ‡ãƒ¼ã‚¿ã®èª­ã¿è¾¼ã¿ */
     m_image_origIn.read();
 
-	// InPort‚ÆOutPort‚Ì‰æ–ÊƒTƒCƒYˆ—‚¨‚æ‚ÑƒCƒ[ƒW—pƒƒ‚ƒŠ‚ÌŠm•Û
-	if( m_image_orig.width != m_image_flip.width || m_image_orig.height != m_image_flip.height)
-	{
-		m_image_flip.width = m_image_orig.width;
-		m_image_flip.height = m_image_orig.height;
+  /* InPortã¨OutPortã®ç”»é¢ã‚µã‚¤ã‚ºå‡¦ç†ãŠã‚ˆã³ã‚¤ãƒ¡ãƒ¼ã‚¸ç”¨ãƒ¡ãƒ¢ãƒªã®ç¢ºä¿ */
+  if( m_image_orig.width != m_image_flip.width || m_image_orig.height != m_image_flip.height)
+  {
+    m_image_flip.width = m_image_orig.width;
+    m_image_flip.height = m_image_orig.height;
 
-		// InPort‚ÌƒCƒ[ƒWƒTƒCƒY‚ª•ÏX‚³‚ê‚½ê‡
-		if(m_image_buff != NULL)
-		{
-			cvReleaseImage(&m_image_buff);
-			cvReleaseImage(&m_flip_image_buff);
-		}
+    /* InPortã®ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚µã‚¤ã‚ºãŒå¤‰æ›´ã•ã‚ŒãŸå ´åˆ */
+    if(m_image_buff != NULL)
+    {
+      cvReleaseImage(&m_image_buff);
+      cvReleaseImage(&m_flip_image_buff);
+    }
 
-		// ƒCƒ[ƒW—pƒƒ‚ƒŠ‚ÌŠm•Û
-		m_image_buff = cvCreateImage(cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_8U, 3);
-		m_flip_image_buff = cvCreateImage(cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_8U, 3);
-	}
+    /* ã‚¤ãƒ¡ãƒ¼ã‚¸ç”¨ãƒ¡ãƒ¢ãƒªã®ç¢ºä¿ */
+    m_image_buff = cvCreateImage(cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_8U, 3);
+    m_flip_image_buff = cvCreateImage(cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_8U, 3);
+  }
 
-    // InPort‚Ì‰æ‘œƒf[ƒ^‚ğIplImage‚ÌimageData‚ÉƒRƒs[
+    /* InPortã®ç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’IplImageã®imageDataã«ã‚³ãƒ”ãƒ¼ */
     memcpy(m_image_buff->imageData,(void *)&(m_image_orig.pixels[0]),m_image_orig.pixels.length());
 
-    // InPort‚©‚ç‚Ì‰æ‘œƒf[ƒ^‚ğ”½“]‚·‚éB m_flip_mode 0: X²ü‚è, 1: Y²ü‚è, -1: —¼•û‚Ì²ü‚è
+    /* InPortã‹ã‚‰ã®ç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’åè»¢ã™ã‚‹ã€‚ m_flip_mode 0: Xè»¸å‘¨ã‚Š, 1: Yè»¸å‘¨ã‚Š, -1: ä¸¡æ–¹ã®è»¸å‘¨ã‚Š */
     cvFlip(m_image_buff, m_flip_image_buff, m_flip_mode);
 
-    // ‰æ‘œƒf[ƒ^‚ÌƒTƒCƒYæ“¾
+    /* ç”»åƒãƒ‡ãƒ¼ã‚¿ã®ã‚µã‚¤ã‚ºå–å¾— */
     int len = m_flip_image_buff->nChannels * m_flip_image_buff->width * m_flip_image_buff->height;
     m_image_flip.pixels.length(len);
 
-    // ”½“]‚µ‚½‰æ‘œƒf[ƒ^‚ğOutPort‚ÉƒRƒs[
+    /* åè»¢ã—ãŸç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’OutPortã«ã‚³ãƒ”ãƒ¼ */
     memcpy((void *)&(m_image_flip.pixels[0]),m_flip_image_buff->imageData,len);
 
-    // ”½“]‚µ‚½‰æ‘œƒf[ƒ^‚ğOutPort‚©‚ço—Í‚·‚éB
+    /* åè»¢ã—ãŸç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’OutPortã‹ã‚‰å‡ºåŠ›ã™ã‚‹ã€‚ */
     m_image_flipOut.write();
   }
 

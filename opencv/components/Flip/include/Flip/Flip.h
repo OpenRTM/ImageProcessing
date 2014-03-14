@@ -20,7 +20,7 @@
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
 
-//OpenCV—pƒCƒ“ƒNƒ‹[ƒhƒtƒ@ƒCƒ‹‚ÌƒCƒ“ƒNƒ‹[ƒh
+/* OpenCVç”¨ã‚¤ãƒ³ã‚¯ãƒ«ãƒ¼ãƒ‰ãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚¤ãƒ³ã‚¯ãƒ«ãƒ¼ãƒ‰ */
 #include <cv.h>
 #include <cxcore.h>
 #include <highgui.h>
