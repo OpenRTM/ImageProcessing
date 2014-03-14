@@ -68,9 +68,9 @@ IF (WIN32)
     #
     #
     #
-    set(CPACK_NSIS_MUI_ICON "@PROJECT_SOURCE_DIR@/cmake\\rt_middleware_logo.ico")
-    set(CPACK_NSIS_MUI_UNIICON "@PROJECT_SOURCE_DIR@/cmake\\rt_middleware_logo.ico")
-    set(CPACK_PACKAGE_ICON "@PROJECT_SOURCE_DIR@/cmake\\rt_middleware_logo.bmp")
+#    set(CPACK_NSIS_MUI_ICON "@PROJECT_SOURCE_DIR@/cmake\\rt_middleware_logo.ico")
+#    set(CPACK_NSIS_MUI_UNIICON "@PROJECT_SOURCE_DIR@/cmake\\rt_middleware_logo.ico")
+#    set(CPACK_PACKAGE_ICON "@PROJECT_SOURCE_DIR@/cmake\\rt_middleware_logo.bmp")
     set(CPACK_NSIS_HELP_LINK "http://www.openrtm.org")
     set(CPACK_NSIS_URL_INFO_ABOUT "http://www.openrtm.org")
     set(CPACK_NSIS_MODIFY_PATH ON)
@@ -90,5 +90,9 @@ IF (WIN32)
     set(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS
         "  Delete \"$INSTDIR\\@PROJECT_NAME_LOWER@-config.cmake\"
   Delete \"$INSTDIR\\@PROJECT_NAME_LOWER@-config-version.cmake\"")
+
+ELSE(WIN32)
+  set(CPACK_GENERATOR @LINUX_PACKAGE_GENERATOR@)
+  set(CPACK_PACKAGE_CONTACT @PROJECT_MAINTAINER@) 
 ENDIF (WIN32)
 

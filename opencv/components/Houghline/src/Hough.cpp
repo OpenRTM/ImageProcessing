@@ -16,7 +16,7 @@ static const char* hough_spec[] =
     "implementation_id", "Hough",
     "type_name",         "Hough",
     "description",       "Hough line component",
-    "version",           "1.0.0",
+    "version",           "1.1.0",
     "vendor",            "AIST",
     "category",          "Category",
     "activity_type",     "PERIODIC",
@@ -141,7 +141,7 @@ RTC::ReturnCode_t Hough::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Hough::onActivated(RTC::UniqueId ec_id)
 {
-  //  イメージ用メモリの初期化
+  /* イメージ用メモリの初期化 */
   imageBuff = NULL;
   grayImage = NULL;
   edgeImage = NULL;
@@ -164,7 +164,7 @@ RTC::ReturnCode_t Hough::onDeactivated(RTC::UniqueId ec_id)
 {
   if(imageBuff != NULL)
   {
-    // イメージ用メモリの解放
+    /* イメージ用メモリの解放 */
     cvReleaseImage(&imageBuff);
     cvReleaseImage(&grayImage);
     cvReleaseImage(&edgeImage);
@@ -178,19 +178,19 @@ RTC::ReturnCode_t Hough::onDeactivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Hough::onExecute(RTC::UniqueId ec_id)
 {
-  //  新しいデータのチェック
+  /* 新しいデータのチェック */
   if(m_image_origIn.isNew())
   {
-    //  InPortデータの読み込み
+    /* InPortデータの読み込み */
     m_image_origIn.read();
 
-    //  サイズが変わったときだけ再生成する
+    /* サイズが変わったときだけ再生成する */
     if(m_image_orig.width != m_in_width || m_image_orig.height != m_in_height)
     {
       m_in_width = m_image_orig.width;
       m_in_height = m_image_orig.height;
 
-      //  InPortのイメージサイズが変更された場合
+      /* InPortのイメージサイズが変更された場合 */
       if(imageBuff != NULL)
       {
         cvReleaseImage(&imageBuff);
@@ -200,7 +200,7 @@ RTC::ReturnCode_t Hough::onExecute(RTC::UniqueId ec_id)
         cvReleaseImage(&houghImage);
       }
 
-      //  イメージ用メモリの確保
+      /* イメージ用メモリの確保 */
       imageBuff = cvCreateImage( cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3 );
       grayImage = cvCreateImage( cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 1 );
       edgeImage = cvCreateImage( cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 1 );
@@ -208,36 +208,36 @@ RTC::ReturnCode_t Hough::onExecute(RTC::UniqueId ec_id)
       houghImage = cvCreateImage( cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3 );
     }
 
-    // InPortの画面データをコピー
+    /* InPortの画面データをコピー */
     memcpy( imageBuff->imageData, (void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length() );
 
-    //  RGBからグレースケールに変換
+    /* RGBからグレースケールに変換 */
     cvCvtColor( imageBuff, grayImage, CV_RGB2GRAY );
 
-    //  ハフ変換に必要なメモリ領域
+    /* ハフ変換に必要なメモリ領域 */
     CvMemStorage *storage = cvCreateMemStorage( 0 );
 
-    //エッジ抽出を行う
+    /* エッジ抽出を行う */
     cvCanny( grayImage, edgeImage, m_canny_threshold1, m_canny_threshold2, APERTURE_SIZE );
 
-    //グレースケールからRGBに変換する
+    /* グレースケールからRGBに変換する */
     cvCvtColor( edgeImage, houghImage, CV_GRAY2RGB );
 
-    //ハフ変換により直線の抽出を行う
+    /* ハフ変換により直線の抽出を行う */
     int hough_method;
     if ( m_hough_method == "PROBABILISTIC" )
     {
-      //確率的ハフ変換
+      /* 確率的ハフ変換 */
       hough_method = CV_HOUGH_PROBABILISTIC;
     }
     else if ( m_hough_method == "STANDARD" )
     {
-      //標準的ハフ変換
+      /* 標準的ハフ変換 */
       hough_method = CV_HOUGH_STANDARD;
     }
     else
     {
-      //マルチスケール型の古典的ハフ変換
+      /* マルチスケール型の古典的ハフ変換 */
       hough_method = CV_HOUGH_MULTI_SCALE;
     }
     if ( hough_method != debug_method )
@@ -247,7 +247,7 @@ RTC::ReturnCode_t Hough::onExecute(RTC::UniqueId ec_id)
     }
     lines = cvHoughLines2( edgeImage, storage, hough_method, RHO, THETA, m_hough_threshold, m_hough_param1, m_hough_param2 );
 
-    //抽出された直線を描く
+    /* 抽出された直線を描く */
     int line_type;
     if ( m_line_type == "CV_AA" )
     {
@@ -267,19 +267,19 @@ RTC::ReturnCode_t Hough::onExecute(RTC::UniqueId ec_id)
       cvLine( houghImage, line[0], line[1], CV_RGB( m_line_color_R, m_line_color_G, m_line_color_B ), m_line_thickness, line_type, SHIFT );
     }
 
-    //  画像データのサイズ取得
+    /* 画像データのサイズ取得 */
     len = houghImage->nChannels * houghImage->width * houghImage->height;
     m_image_hough.pixels.length(len);
     m_image_hough.width  = houghImage->width;
     m_image_hough.height = houghImage->height;
 
-    //  反転した画像データをOutPortにコピー
+    /* 反転した画像データをOutPortにコピー */
     memcpy( (void *)&(m_image_hough.pixels[0]), houghImage->imageData, len );
 
-    //  反転した画像データをOutPortから出力
+    /* 反転した画像データをOutPortから出力 */
     m_image_houghOut.write();
 
-    //  ハフ変換に使用したメモリ解放
+    /* ハフ変換に使用したメモリ解放 */
     cvReleaseMemStorage(&storage);
   }
 

@@ -25,15 +25,15 @@
 #include <cxcore.h>
 #include <highgui.h>
 
-//	cvCanny用定数
-#define	APERTURE_SIZE		3	//	Sobelオペレータのサイズ (リファレンス参照)
+/* cvCanny用定数 */
+#define	APERTURE_SIZE   3   /* Sobelオペレータのサイズ (リファレンス参照) */
 
-//	cvHoughLines2用定数
-#define RHO					1						//	パラメータ空間におけるρ軸の分解能(ピクセル単位)
-#define THETA				( CV_PI / 180 )			//	パラメータ空間におけるθ軸の分解能(ラジアン単位)
+/* cvHoughLines2用定数 */
+#define RHO             1         /* パラメータ空間におけるρ軸の分解能(ピクセル単位) */
+#define THETA   ( CV_PI / 180 )   /* パラメータ空間におけるθ軸の分解能(ラジアン単位) */
 
-//	cvLine用定数
-#define SHIFT			0	//	座標の小数点以下の桁を表すビット数
+/* cvLine用定数 */
+#define SHIFT     0   /* 座標の小数点以下の桁を表すビット数 */
 
 // Service implementation headers
 // <rtc-template block="service_impl_h">
@@ -98,14 +98,14 @@ class Hough
   // virtual RTC::ReturnCode_t onFinalize();
 
   /***
-   *m_image_hough
+   *
    * The startup action when ExecutionContext startup
    * former rtc_starting_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
    * @return RTC::ReturnCode_t
-   * #include <fstream>
+   * 
    * 
    */
   // virtual RTC::ReturnCode_t onStartup(RTC::UniqueId ec_id);
@@ -178,7 +178,7 @@ class Hough
   /***
    *
    * The error action in ERROR state
-   * former rtc_error_do()#include <fstream>
+   * former rtc_error_do()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -358,11 +358,11 @@ class Hough
   int len;
   CvSeq *lines;
   
-  int debug_method;   // configuration切り替え時の確認用
-  int debug_type;     // configuration切り替え時の確認用
+  int debug_method;   /* configuration切り替え時の確認用 */
+  int debug_type;     /* configuration切り替え時の確認用 */
   
-  int m_in_height;    // 入力イメージのHeight
-  int m_in_width;     // 入力イメージのWidth
+  int m_in_height;    /* 入力イメージのHeight */
+  int m_in_width;     /* 入力イメージのWidth */
   
 };
 
