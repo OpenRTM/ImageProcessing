@@ -98,9 +98,9 @@ ImageCalibrationは ``ImageCalibrationComp`` を実行（ ``${prefix}/components
 ================ ================== ================ ====
 パラメータ       データ型           デフォルト値     意味
 ================ ================== ================ ====
-board_w          int                11               
-board_h          int                8                
-camera_Height    float              -20              
+checker_w        int                13               
+checker_h        int                9                
+image_num        int                5                
 ================ ================== ================ ====
 
 ポート
@@ -111,13 +111,9 @@ camera_Height    float              -20
 =============== =========== ============================== ====
 ポート名        ポート型    データ型                       意味
 =============== =========== ============================== ====
-inputImage      InPort      RTC::CameraImage               
-key             InPort      RTC::TimedLong                 
-orignalImage    OutPort     RTC::CameraImage               
-birdImage       OutPort     RTC::CameraImage               
-internalParameter OutPort     RTC::TimedString               
-externalParameter OutPort     RTC::TimedString               
-renseParameter  OutPort     RTC::TimedString               
+original_image  InPort      RTC::CameraImage               
+checker_image   OutPort     RTC::CameraImage               
+CalibrationService ServicePort ImageCalibService::CalibrationService 
 =============== =========== ============================== ====
 
 例

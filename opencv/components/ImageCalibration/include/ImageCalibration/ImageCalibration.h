@@ -1,7 +1,7 @@
 // -*- C++ -*-
 /*!
  * @file  ImageCalibration.h
- * @brief ImageCalibration component
+ * @brief Image Calibration
  * @date  $Date$
  *
  * $Id$
@@ -19,37 +19,9 @@
 #include <rtm/idl/ExtendedDataTypesSkel.h>
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
-#include <cv.h>
-#include <highgui.h>
-#include <cxcore.h>
-
-#define	NUM_OF_BACKGROUND_FRAMES	5	//	chessboardを生成するのに使用する画像の枚数
-//#define CORNER_WIDTH 11
-//#define CORNER_HEIGHT 8
-//#define CORNER_NUMBER (CORNER_WIDTH * CORNER_HEIGHT) 
-#define UNIT 5
-
-//	cvFindChessboardCornersのフラグ用定数
-#define ADAPTIVE_THRESH	1	//	CV_CALIB_CB_ADAPTIVE_THRESHを設定するかどうか
-#define NORMALIZE_IMAGE	1	//	CV_CALIB_CB_NORMALIZE_IMAGEを設定するかどうか
-#define FILTER_QUADS	1	//	CV_CALIB_CB_FILTER_QUADSを設定するかどうか
-
-//	cvTermCriteria用定数
-#define MAX_ITERATIONS	20		//	反復数の最大値
-#define EPSILON			0.001	//	目標精度
-
-//	cvFindCornerSubPix用定数
-#define SEARCH_WINDOW_HALF_WIDTH	5	//	検索ウィンドウの横幅の半分のサイズ
-#define SEARCH_WINDOW_HALF_HEIGHT	5	//	検索ウィンドウの縦幅の半分のサイズ
-#define DEAD_REGION_HALF_WIDTH		-1	//	総和対象外領域の横幅の半分のサイズ
-#define DEAD_REGION_HALF_HEIGHT	-1	//	総和対象外領域の縦幅の半分のサイズ
-
-#define	THRESHOLD_COEFFICIENT	5.0	//	閾値の値を引く際の使用する閾値にかける数
-
-#define CALIBRATE_CAMERA_FLAG 0
-
 // Service implementation headers
 // <rtc-template block="service_impl_h">
+#include "CalibrationServiceSVC_impl.h"
 
 // </rtc-template>
 
@@ -62,7 +34,7 @@ using namespace RTC;
 
 /*!
  * @class ImageCalibration
- * @brief ImageCalibration component
+ * @brief Image Calibration
  *
  */
 class ImageCalibration
@@ -239,13 +211,8 @@ class ImageCalibration
    * 
    */
   // virtual RTC::ReturnCode_t onRateChanged(RTC::UniqueId ec_id);
-   /*!
-   * 
-   * - Name:  board_w
-   * - DefaultValue: 13
-   */
-   CvPoint2D32f* corners;
-  
+
+
  protected:
   // <rtc-template block="protected_attribute">
   
@@ -259,71 +226,57 @@ class ImageCalibration
   // <rtc-template block="config_declare">
   /*!
    * 
-   * - Name:  m_board_w
-   * - DefaultValue: 11
+   * - Name:  checker_w
+   * - DefaultValue: 13
    */
-//  int m_board_w;
+  int m_checker_w;
   /*!
    * 
-   * - Name:  board_h
-   * - DefaultValue: 8
+   * - Name:  checker_h
+   * - DefaultValue: 9
    */
-//  int m_board_h;
+  int m_checker_h;
   /*!
    * 
-   * - Name:  camera_Height
-   * - DefaultValue: -20
+   * - Name:  image_num
+   * - DefaultValue: 5
    */
-  float m_camera_Height;
+  int m_image_num;
 
   // </rtc-template>
 
   // DataInPort declaration
   // <rtc-template block="inport_declare">
-  RTC::CameraImage m_inputImage;
+  RTC::CameraImage m_img_orig;
   /*!
    */
-  InPort<RTC::CameraImage> m_inputImageIn;
-  RTC::TimedLong m_key;
-  /*!
-   */
-  InPort<RTC::TimedLong> m_keyIn;
+  InPort<RTC::CameraImage> m_img_origIn;
   
   // </rtc-template>
 
 
   // DataOutPort declaration
   // <rtc-template block="outport_declare">
-  RTC::CameraImage m_origImage;
+  RTC::CameraImage m_img_check;
   /*!
    */
-  OutPort<RTC::CameraImage> m_origImageOut;
-  RTC::CameraImage m_birdImage;
-  /*!
-   */
-  OutPort<RTC::CameraImage> m_birdImageOut;
-  RTC::TimedString m_internalParameter;
-  /*!
-   */
-  OutPort<RTC::TimedString> m_internalParameterOut;
-  RTC::TimedString m_externalParameter;
-  /*!
-   */
-  OutPort<RTC::TimedString> m_externalParameterOut;
-  RTC::TimedString m_renseParameter;
-  /*!
-   */
-  OutPort<RTC::TimedString> m_renseParameterOut;
+  OutPort<RTC::CameraImage> m_img_checkOut;
   
   // </rtc-template>
 
   // CORBA Port declaration
   // <rtc-template block="corbaport_declare">
+  /*!
+   */
+  RTC::CorbaPort m_CameraCalibrationServicePort;
   
   // </rtc-template>
 
   // Service declaration
   // <rtc-template block="service_declare">
+  /*!
+   */
+  CalibrationServiceSVC_impl m_CalibrationService;
   
   // </rtc-template>
 
@@ -340,26 +293,9 @@ class ImageCalibration
   // <rtc-template block="private_operation">
   
   // </rtc-template>
-	
-	 CvMat *intrinsicMatrix;
-	 CvMat *distortionCoefficient;
-
-	 IplImage* mapx;
-	 IplImage* mapy;
-	 IplImage* undistortionImage;
-	 IplImage* birds_image;
-	 IplImage* tempImage_buff;
-	 IplImage* inputImage_buff;
-	 IplImage* outputImage_buff;
-	 
-	 int key;
-	 int captureCount;
-	 int findFlag;
-
-	 int InParameter;
-	 int outParameter;
-
-	 int dummy;
+  void checkImageNum(void);
+  
+  int m_current_image_num;  /* 繝√ぉ繧ｹ繝懊�ｼ繝画聴蠖ｱ譫壽焚 */
 
 };
 

@@ -1,7 +1,7 @@
 // -*- C++ -*-
 /*!
  * @file  ImageCalibration.cpp
- * @brief ImageCalibration component
+ * @brief Image Calibration
  * @date $Date$
  *
  * $Id$
@@ -15,8 +15,8 @@ static const char* imagecalibration_spec[] =
   {
     "implementation_id", "ImageCalibration",
     "type_name",         "ImageCalibration",
-    "description",       "ImageCalibration component",
-    "version",           "1.0.0",
+    "description",       "Image Calibration",
+    "version",           "1.1.0",
     "vendor",            "AIST",
     "category",          "Category",
     "activity_type",     "PERIODIC",
@@ -25,36 +25,17 @@ static const char* imagecalibration_spec[] =
     "language",          "C++",
     "lang_type",         "compile",
     // Configuration variables
-    "conf.default.board_w", "11",
-    "conf.default.board_h", "8",
-    "conf.default.camera_Height", "-20",
+    "conf.default.checker_w", "13",
+    "conf.default.checker_h", "9",
+    "conf.default.image_num", "5",
     // Widget
-    "conf.__widget__.board_w", "text",
-    "conf.__widget__.board_h", "text",
-    "conf.__widget__.camera_Height", "text",
+    "conf.__widget__.checker_w", "text",
+    "conf.__widget__.checker_h", "text",
+    "conf.__widget__.image_num", "text",
     // Constraints
     ""
   };
 // </rtc-template>
-
-//IplImage *inputImage_buff;
-//IplImage *outputImage_buff;
-//IplImage *tempImage_buff;
-
-int m_board_w;
-int m_board_h;
-int g_temp_w = 0;
-int g_temp_h = 0;
-
-//CvPoint2D32f* corners = new CvPoint2D32f[11 * 8];
-CvPoint2D32f objPts[4], imgPts[4];
-
-CvSize board_sz;
-
-char* renseParameters = new char[200];
-char* internalParameter = new char[200];
-char* externalParameter = new char[200];
-
 
 /*!
  * @brief constructor
@@ -63,16 +44,11 @@ char* externalParameter = new char[200];
 ImageCalibration::ImageCalibration(RTC::Manager* manager)
     // <rtc-template block="initializer">
   : RTC::DataFlowComponentBase(manager),
-    m_inputImageIn("inputImage", m_inputImage),
-    m_keyIn("key", m_key),
-    m_origImageOut("orignalImage", m_origImage),
-    m_birdImageOut("birdImage", m_birdImage),
-    m_internalParameterOut("internalParameter", m_internalParameter),
-    m_externalParameterOut("externalParameter", m_externalParameter),
-    m_renseParameterOut("renseParameter", m_renseParameter),
+    m_img_origIn("original_image", m_img_orig),
+    m_img_checkOut("checker_image", m_img_check),
+    m_CameraCalibrationServicePort("CameraCalibrationService")
 
     // </rtc-template>
-	dummy(0)
 {
 }
 
@@ -83,207 +59,36 @@ ImageCalibration::~ImageCalibration()
 {
 }
 
-void saveRenseMatrix(CvMat *matrixRense){
-	sprintf(renseParameters, "%lf\n%lf\n%lf\n%lf\n",
-		cvmGet(matrixRense,0,0), 
-		cvmGet(matrixRense,1,0), 
-		cvmGet(matrixRense,2,0),
-		cvmGet(matrixRense,3,0)
-	);
-	
-}
 
-void saveInternalParameterMatrix(CvMat *matrix){
-	sprintf(internalParameter, 
-		"%lf %lf %lf\n%lf %lf %lf\n%lf %lf %lf\n",
-		cvmGet(matrix,0,0), 
-		cvmGet(matrix,0,1), 
-		cvmGet(matrix,0,2),
-		cvmGet(matrix,1,0), 
-		cvmGet(matrix,1,1), 
-		cvmGet(matrix,1,2),
-		cvmGet(matrix,2,0), 
-		cvmGet(matrix,2,1), 
-		cvmGet(matrix,2,2)
-		
-	);
-}
-
-void saveExternalParameterMatrix(CvMat *Matrix, CvMat *Vector){
-	sprintf(externalParameter, 
-		"%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",
-		cvmGet( Matrix, 0, 0),
-		cvmGet( Matrix, 0, 1),
-		cvmGet( Matrix, 0, 2),
-		cvmGet( Vector, 0, 0),
-		cvmGet( Matrix, 1, 0 ),
-		cvmGet( Matrix, 1, 1 ),
-		cvmGet( Matrix, 1, 2 ),
-		cvmGet( Vector, 0, 1 ),
-		cvmGet( Matrix, 2, 0 ),
-		cvmGet( Matrix, 2, 1 ),
-		cvmGet( Matrix, 2, 2 ),
-		cvmGet( Vector, 0, 2 )
-	);
-}
-
-//
-//	s—ñ‚ğ‰æ–Ê‚É•\¦‚·‚é
-//
-//	ˆø”:
-//		disp   : •\¦‚·‚é”’l‚Ì‘®
-//		matrix : •\¦‚·‚és—ñ
-//
-void printMatrix( char *disp, CvMat *matrix ) {
-    for ( int y=0; y < matrix->height; y++ ) {
-        for ( int x=0; x < matrix->width; x++ ) {
-            printf( disp, cvmGet( matrix, y, x ) ); 
-        }
-        printf( "\n" );
-    }
-    printf( "\n" );
-
-}
-//
-//	ŠO•”ƒpƒ‰ƒ[ƒ^s—ñ‚ğ‰æ–Ê‚É•\¦‚·‚é
-//
-//	ˆø”:
-//		rotationMatrix    :  ‰ñ“]s—ñ
-//		translationVector :@•ÀiƒxƒNƒgƒ‹
-//
-void printExtrinsicMatrix( CvMat *rotationMatrix, CvMat *translationVector ) {
-	for ( int i = 0; i<3; i++ ) {
-		printf(
-			"%lf %lf %lf %lf\n",
-			cvmGet( rotationMatrix, i, 0 ),
-			cvmGet( rotationMatrix, i, 1 ),
-			cvmGet( rotationMatrix, i, 2 ),
-			cvmGet( translationVector, 0, i )
-		);
-
-	}
-
-	
-}
-
-//
-//	cvFindChessboardCorners—p‚Ìƒtƒ‰ƒO‚ğ¶¬‚·‚é
-//
-int createFindChessboardCornersFlag() {
-	int flag = 0;
-
-	if ( ADAPTIVE_THRESH != 0 ) {
-		flag = flag | CV_CALIB_CB_ADAPTIVE_THRESH;
-	}
-	if ( NORMALIZE_IMAGE != 0 ) {
-		flag = flag | CV_CALIB_CB_NORMALIZE_IMAGE;
-	}
-	if ( FILTER_QUADS != 0 ) {
-		flag = flag | CV_CALIB_CB_FILTER_QUADS;
-	}
-
-	return flag;
-}
-
-//
-//	ƒR[ƒi[‚ğŒŸo‚·‚é
-//
-//	ˆø”:
-//      frameImage : ƒLƒƒƒvƒ`ƒƒ‰æ‘œ—pIplImage
-//      grayImage  : ƒOƒŒ[ƒXƒP[ƒ‹‰æ‘œ—pIplImage
-//      corners    : ƒR[ƒi[‚ÌˆÊ’u‚ğŠi”[‚·‚é•Ï”
-//
-//	–ß‚è’l:
-//		0   : ƒR[ƒi[‚ª‚·‚×‚ÄŒŸo‚Å‚«‚È‚©‚Á‚½ê‡
-//		”ñ0 : ƒR[ƒi[‚ª‚·‚×‚ÄŒŸo‚³‚ê‚½ê‡
-//
-int findCorners( IplImage *frameImage, IplImage *grayImage, CvPoint2D32f *corners ) {
-	int cornerCount;				//	ŒŸo‚µ‚½ƒR[ƒi[‚Ì”
-	int findChessboardCornersFlag;	//	cvFindChessboardCorners—pƒtƒ‰ƒO
-	int findFlag;					//	ƒR[ƒi[‚ª‚·‚×‚ÄŒŸo‚Å‚«‚½‚©‚Ìƒtƒ‰ƒO
-	
-	IplImage* m_image_binary;
-	IplImage* m_set_image;
-	
-	m_image_binary     = cvCreateImage(cvSize(frameImage->width, frameImage->height), IPL_DEPTH_8U, 1);
-	m_set_image     = cvCreateImage(cvSize(frameImage->width, frameImage->height), IPL_DEPTH_8U, 3);
-
-	//	cvChessboardCorners—pƒtƒ‰ƒO‚ğ¶¬‚·‚é
-	findChessboardCornersFlag = createFindChessboardCornersFlag();
-	
-	//@‰æ‘œ‚ğBinaryImage‚Æ‚µ‚Ä•ÏŠ·‚·‚éB
-	//	ƒR[ƒi[‚ğŒŸo‚·‚é
-	cvCvtColor( frameImage, grayImage, CV_BGR2GRAY );
-
-    //	ƒOƒŒ[ƒXƒP[ƒ‹‚©‚ç2’l‚É•ÏŠ·‚·‚é
-    cvThreshold( grayImage, m_image_binary, 128, 255, CV_THRESH_BINARY );
-
-    // Convert to 3channel image
-    cvMerge(m_image_binary, m_image_binary, m_image_binary, NULL, m_set_image);
-
-	findFlag=cvFindChessboardCorners(
-		m_set_image,
-		//m_set_image,
-		//cvSize( CORNER_WIDTH, CORNER_HEIGHT ),
-		board_sz,
-		corners,
-		&cornerCount,
-		findChessboardCornersFlag
-	);
-	
-	if( findFlag != 0 ) {
-		//	ƒR[ƒi[‚ª‚·‚×‚ÄŒŸo‚³‚ê‚½ê‡
-		//	ŒŸo‚³‚ê‚½ƒR[ƒi[‚ÌˆÊ’u‚ğƒTƒuƒsƒNƒZƒ‹’PˆÊ‚É‚·‚é
-
-		CvTermCriteria criteria={ CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, MAX_ITERATIONS, EPSILON };
-		cvFindCornerSubPix(
-			grayImage,
-			corners,
-			cornerCount,
-			cvSize( SEARCH_WINDOW_HALF_WIDTH, SEARCH_WINDOW_HALF_HEIGHT ),
-			cvSize( DEAD_REGION_HALF_WIDTH, DEAD_REGION_HALF_HEIGHT ), 
-			cvTermCriteria( CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, MAX_ITERATIONS, EPSILON )
-		);
-	}
-		
-	//	ƒR[ƒi[‚ÌˆÊ’u‚ğ•`‚­
-	cvDrawChessboardCorners( frameImage, board_sz, corners, cornerCount, findFlag );
-	
-	cvReleaseImage(&m_set_image);
-	cvReleaseImage(&m_image_binary);
-	
-	return findFlag;
-}
 
 RTC::ReturnCode_t ImageCalibration::onInitialize()
 {
   // Registration: InPort/OutPort/Service
   // <rtc-template block="registration">
   // Set InPort buffers
-  addInPort("inputImage", m_inputImageIn);
-  addInPort("key", m_keyIn);
+  addInPort("original_image", m_img_origIn);
   
   // Set OutPort buffer
-  addOutPort("orignalImage", m_origImageOut);
-  addOutPort("birdImage", m_birdImageOut);
-  addOutPort("internalParameter", m_internalParameterOut);
-  addOutPort("externalParameter", m_externalParameterOut);
-  addOutPort("renseParameter", m_renseParameterOut);
+  addOutPort("checker_image", m_img_checkOut);
   
   // Set service provider to Ports
+  m_CameraCalibrationServicePort.registerProvider("CalibrationService", "ImageCalibService::CalibrationService", m_CalibrationService);
   
   // Set service consumers to Ports
   
   // Set CORBA Service Ports
+  addPort(m_CameraCalibrationServicePort);
   
   // </rtc-template>
 
   // <rtc-template block="bind_config">
   // Bind variables and configuration variable
-  bindParameter("board_w", m_board_w, "11");
-  bindParameter("board_h", m_board_h, "8");
-  bindParameter("camera_Height", m_camera_Height, "-20");
+  bindParameter("checker_w", m_checker_w, "13");
+  bindParameter("checker_h", m_checker_h, "9");
+  bindParameter("image_num", m_image_num, "5");
   // </rtc-template>
+  
+  m_CalibrationService.setCheckerSize(m_checker_w, m_checker_h);
   
   return RTC::RTC_OK;
 }
@@ -312,6 +117,10 @@ RTC::ReturnCode_t ImageCalibration::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t ImageCalibration::onActivated(RTC::UniqueId ec_id)
 {
+  /* ãƒã‚§ã‚¹ãƒœãƒ¼ãƒ‰æ’®å½±æšæ•°ã‚»ãƒƒãƒˆ */
+  m_current_image_num = m_image_num;
+  m_CalibrationService.setImageNumber(m_current_image_num);
+
   return RTC::RTC_OK;
 }
 
@@ -324,348 +133,60 @@ RTC::ReturnCode_t ImageCalibration::onDeactivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t ImageCalibration::onExecute(RTC::UniqueId ec_id)
 {
-	
-	board_sz = cvSize(m_board_w, m_board_h);
-	
-	//Calibrationƒpƒ^[ƒ“‚ğŒvZ‚·‚éB
-	if (m_inputImageIn.isNew()) {
+  cv::Mat image, gray;
+  cv::vector<cv::Point2f>	imagePoints;  /* ãƒã‚§ãƒƒã‚«ãƒ¼äº¤ç‚¹åº§æ¨™ã‚’æ ¼ç´ã™ã‚‹è¡Œåˆ— */
+  
+  /* ã‚³ãƒ¼ãƒŠãƒ¼ä½ç½®é«˜ç²¾åº¦åŒ–ã®ãŸã‚ã®ç¹°ã‚Šè¿”ã—å‡¦ç†ã®åœæ­¢åŸºæº–
+   * ã€Œåå¾©å›æ•°ãŒ20å›ã«é”ã™ã‚‹ã€ã¾ãŸã¯ã€Œã‚¤ãƒ—ã‚·ãƒ­ãƒ³ãŒ0.001ã«é”ã™ã‚‹ã€ã©ã¡ã‚‰ã‹ã®æ¡ä»¶ã‚’æº€ãŸã—ãŸæ™‚ã«çµ‚äº†ã™ã‚‹ 
+   */
+  cv::TermCriteria	criteria( CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, 20, 0.001 );
+ 
+  if(m_img_origIn.isNew())
+  {
+    /* ãƒã‚§ã‚¹ãƒœãƒ¼ãƒ‰æ’®å½±æšæ•°ç¢ºèª */
+    checkImageNum();
+    
+    /* ãƒ‡ãƒ¼ã‚¿ã®èª­ã¿è¾¼ã¿ */
+    m_img_origIn.read();
+    
+    /* ã‚¤ãƒ¡ãƒ¼ã‚¸ç”¨ãƒ¡ãƒ¢ãƒªã®ç¢ºä¿ */
+    image.create(m_img_orig.height, m_img_orig.width, CV_8UC3);
+    gray.create(m_img_orig.height, m_img_orig.width, CV_8UC1);
 
-		m_inputImageIn.read();
+    /* InPortã®æ˜ åƒãƒ‡ãƒ¼ã‚¿ */
+    memcpy(image.data,(void *)&(m_img_orig.pixels[0]), m_img_orig.pixels.length());
+    
+    /* ã‚°ãƒ¬ãƒ¼ã‚¹ã‚±ãƒ¼ãƒ«ã«å¤‰æ› */
+    cv::cvtColor(image, gray, CV_BGR2GRAY);
+    
+    /* ãƒ—ãƒ­ãƒã‚¤ãƒ€ã‚¯ãƒ©ã‚¹ã¸ãƒ‡ãƒ¼ã‚¿ã‚’æ¸¡ã™ */
+    RTC::CameraImage currentImg;
+    int len = gray.channels() * gray.cols * gray.rows;   
+    currentImg.pixels.length(len);
+    currentImg.width = gray.cols;
+    currentImg.height = gray.rows;
+    memcpy((void *)&(currentImg.pixels[0]), gray.data, len);
+    m_CalibrationService.setCurrentImage(&currentImg);
+    
+    /* ãƒã‚§ãƒƒã‚«ãƒ¼ãƒ‘ã‚¿ãƒ¼ãƒ³ã®äº¤ç‚¹æ¤œå‡º */
+    if(cv::findChessboardCorners(gray, cv::Size(m_checker_w, m_checker_h), imagePoints))
+    {
+      /* æ¤œå‡ºç‚¹ã‚’æç”» */  
+      cv::cornerSubPix(gray, imagePoints, cv::Size(11,11), cv::Size(-1,-1), criteria );
+      cv::drawChessboardCorners(image, cv::Size(m_checker_w, m_checker_h), (cv::Mat)imagePoints, true );
+    }
+    
+    /* ç”»åƒãƒ‡ãƒ¼ã‚¿ã®ã‚µã‚¤ã‚ºå–å¾— */
+    len = image.channels() * image.cols * image.rows;
+    m_img_check.pixels.length(len);
+    m_img_check.width = image.cols;
+    m_img_check.height = image.rows;        
 
-		if(m_keyIn.isNew()){
-			m_keyIn.read();
-			key = (int)m_key.data;
-		}
-		
-		if(g_temp_w != m_inputImage.width || g_temp_h != m_inputImage.height){
-		
-			inputImage_buff = cvCreateImage(cvSize(m_inputImage.width, m_inputImage.height), 8, 3);
-			outputImage_buff = cvCreateImage(cvSize(m_inputImage.width, m_inputImage.height), 8, 3);
-			tempImage_buff = cvCreateImage(cvSize(m_inputImage.width, m_inputImage.height), 8, 3);
-			undistortionImage = cvCreateImage(cvSize(m_inputImage.width, m_inputImage.height), 8, 3);
-			birds_image = cvCreateImage(cvSize(m_inputImage.width, m_inputImage.height), 8, 3);
-			
-			intrinsicMatrix = cvCreateMat(3,3,CV_64FC1);
-			distortionCoefficient = cvCreateMat(4,1,CV_64FC1);
-			
-			captureCount = 0;
-			findFlag = 0;
-
-			mapx = cvCreateImage( cvSize(m_inputImage.width, m_inputImage.height), IPL_DEPTH_32F, 1);
-			mapy = cvCreateImage( cvSize(m_inputImage.width, m_inputImage.height), IPL_DEPTH_32F, 1);
-
-			corners = new CvPoint2D32f[m_board_w * m_board_h];
-			
-			g_temp_w = m_inputImage.width;
-			g_temp_h = m_inputImage.height;
-		
-		}
-
-		//CaptureŠJn‚·‚éB
-		memcpy(inputImage_buff->imageData,(void *)&(m_inputImage.pixels[0]), m_inputImage.pixels.length());
-
-//		tempImage_buff = cvCloneImage(inputImage_buff);
-		//OutPort‚Éo—Í‚·‚éB
-		int len = inputImage_buff->nChannels * inputImage_buff->width * inputImage_buff->height;
-		m_origImage.pixels.length(len);
-		
-		memcpy((void *)&(m_origImage.pixels[0]), inputImage_buff->imageData, len);
-		m_origImage.width = inputImage_buff->width;
-		m_origImage.height = inputImage_buff->height;
-
-		m_origImageOut.write();
-		
-		//CaptureŠm”F—p‚ÌWindow‚Ì¶¬
-		//cvShowImage("Capture", inputImage_buff);
-		cvWaitKey(1);
-		
-		//SpaceBar‚ğ‰Ÿ‚·‚ÆƒTƒ“ƒvƒ‹‰f‘œ5–‡‚ğB‚é
-		if (key == ' ') {
-			
-			tempImage_buff = cvCloneImage(inputImage_buff);
-			//‰f‘œ‚ğ¶¬‚·‚é
-			IplImage *grayImage = cvCreateImage(cvGetSize(tempImage_buff), 8, 1);
-
-			//s—ñ‚Ì¶¬
-			CvMat *worldCoordinates = cvCreateMat((m_board_w * m_board_h) * NUM_OF_BACKGROUND_FRAMES, 3, CV_64FC1); //¢ŠEÀ•W—ps—ñ
-			CvMat *imageCoordinates = cvCreateMat((m_board_w * m_board_h) * NUM_OF_BACKGROUND_FRAMES ,2, CV_64FC1); //‰æ‘œÀ•W—ps—ñ
-			CvMat *pointCounts = cvCreateMat(NUM_OF_BACKGROUND_FRAMES, 1, CV_32SC1); //ƒR[ƒi[”‚Ìs—ñ
-			CvMat *rotationVectors = cvCreateMat(NUM_OF_BACKGROUND_FRAMES, 3, CV_64FC1); //‰ñ“]ƒxƒNƒgƒ‹
-			CvMat *translationVectors = cvCreateMat(NUM_OF_BACKGROUND_FRAMES, 3, CV_64FC1); 
-
-			//¢ŠEÀ•W‚ğİ’è‚·‚é
-			for (int i = 0; i < NUM_OF_BACKGROUND_FRAMES; i++){
-				for ( int j = 0; j < (m_board_w * m_board_h); j++) {
-					cvSetReal2D(worldCoordinates, i * (m_board_w * m_board_h) + j, 0, (j % m_board_w) * UNIT);
-					cvSetReal2D(worldCoordinates, i * (m_board_w * m_board_h) + j, 1, (j / m_board_w) * UNIT);
-					cvSetReal2D(worldCoordinates, i * (m_board_w * m_board_h) + j, 2, 0.0);
-				}
-			}
-
-			//ƒR[ƒi[”‚ğİ’è
-			for(int i = 0; i < NUM_OF_BACKGROUND_FRAMES; i++){
-				cvSetReal2D(pointCounts, i, 0, (m_board_w * m_board_h));
-			}
-			
-			//ƒR[ƒi[‚ğŒŸo‚·‚éB
-			findFlag = findCorners(tempImage_buff, grayImage, corners);
-
-			if (findFlag != 0) {
-			
-				//ƒR[ƒi[‚ğ‚·‚×‚ÄŒŸo‚µ‚½ê‡
-				//‰f‘œÀ•W‚ğİ’è‚·‚éB
-				for (;;){
-					for (int i = 0; i < (m_board_w * m_board_h); i++){
- 						cvSetReal2D(imageCoordinates, captureCount * (m_board_w * m_board_h) + i, 0, corners[i].x);
-						cvSetReal2D(imageCoordinates, captureCount * (m_board_w * m_board_h) + i, 1, corners[i].y);
-					}
-				
-					captureCount++;    
-
-					printf("%d–‡–ÚƒLƒƒƒvƒ`ƒƒ‚µ‚Ü‚µ‚½\n", captureCount);
-
-					if (captureCount == NUM_OF_BACKGROUND_FRAMES) {
-						//İ’è‚µ‚½‰ñ”ƒ`ƒFƒbƒNƒpƒ^[ƒ“‚ğB‚Á‚½ê‡
-						//ƒJƒƒ‰ƒpƒ‰ƒ[ƒ^‚ğ„’è‚·‚éB
-						cvCalibrateCamera2(
-							worldCoordinates,
-							imageCoordinates,
-							pointCounts,
-							cvGetSize(inputImage_buff),
-							intrinsicMatrix,
-							distortionCoefficient,
-							rotationVectors,
-							translationVectors,
-							CALIBRATE_CAMERA_FLAG
-						);
-						
-						//î•ñ‚ğText‚Æ‚µ‚Äo—Í
-						printf("\nƒŒƒ“ƒY˜c‚İŒW”\n");
-						saveRenseMatrix(distortionCoefficient);
-						printMatrix("%lf", distortionCoefficient);
-						
-						//m_renseParameter.data = renseParameters;
-												
-						printf("\n“à•”ƒpƒ‰ƒ[ƒ^\n");
-						saveInternalParameterMatrix(intrinsicMatrix);
-						printMatrix("%lf ", intrinsicMatrix);
-
-						//m_internalParameter.data = internalParameter;
-						
-						captureCount = 0;
-						break;
-						
-					}
-				}
-			}
-
-			if (findFlag != 0){
-				InParameter = 1;
-			}else if (findFlag == 0) {
-				InParameter = 0;
-			}
-			
-			//ƒƒ‚ƒŠ‰ğœ
-			cvReleaseMat(&worldCoordinates);
-			cvReleaseMat(&imageCoordinates);
-			cvReleaseMat(&pointCounts);
-			cvReleaseMat(&rotationVectors);
-			cvReleaseMat(&translationVectors);
-			cvReleaseImage(&grayImage);
-
-		}
-		g_temp_w = m_inputImage.width;
-		g_temp_h = m_inputImage.height;
-
-	}
-	//ŠO•”ƒpƒ^[ƒ“‚ğæ“¾
-	if (key == ' ' && m_inputImageIn.isNew() && InParameter == 1) {
-
-		//s—ñ‚Ì¶¬
-		CvMat *worldCoordinates = cvCreateMat((m_board_w * m_board_h), 3, CV_64FC1); //¢ŠEÀ•W—ps—ñ
-		CvMat *imageCoordinates = cvCreateMat((m_board_w * m_board_h), 2, CV_64FC1); //‰æ‘œÀ•W—ps—ñ
-		CvMat *rotationVectors = cvCreateMat(1, 3, CV_64FC1); //‰ñ“]ƒxƒNƒgƒ‹
-		CvMat *rotationMatrix = cvCreateMat(3, 3, CV_64FC1); //‰ñ“]s—ñ
-		CvMat *translationVectors = cvCreateMat(1, 3, CV_64FC1); 
-
-		//¢ŠEÀ•W‚ğİ’è‚·‚é
-		for (int i = 0; i < (m_board_w * m_board_h); i++){
-			cvSetReal2D(worldCoordinates, i, 0, (i % m_board_w) * UNIT);
-			cvSetReal2D(worldCoordinates, i, 1, (i / m_board_w) * UNIT);
-			cvSetReal2D(worldCoordinates, i, 2, 0.0);
-		}
-	
-		cvWaitKey( 1 );
-	
-		//	ƒXƒy[ƒXƒL[‚ª‰Ÿ‚³‚ê‚½‚ç
-		if ( findFlag != 0 ) {
-			//	ƒR[ƒi[‚ª‚·‚×‚ÄŒŸo‚³‚ê‚½ê‡
-			//	‰æ‘œÀ•W‚ğİ’è‚·‚é
-			for ( int i = 0; i < (m_board_w * m_board_h); i++ ){
-				cvSetReal2D( imageCoordinates, i, 0, corners[i].x);
-				cvSetReal2D( imageCoordinates, i, 1, corners[i].y);
-			}
-
-			//	ŠO•”ƒpƒ‰ƒ[ƒ^‚ğ„’è‚·‚é
-			cvFindExtrinsicCameraParams2(
-				worldCoordinates,
-				imageCoordinates,
-				intrinsicMatrix,
-				distortionCoefficient,
-				rotationVectors,
-				translationVectors
-			);
-
-			//	‰ñ“]ƒxƒNƒgƒ‹‚ğ‰ñ“]s—ñ‚É•ÏŠ·‚·‚é
-			cvRodrigues2( rotationVectors, rotationMatrix, NULL );
-
-			printf( "\nŠO•”ƒpƒ‰ƒ[ƒ^\n" );
-			printExtrinsicMatrix( rotationMatrix, translationVectors );
-			saveExternalParameterMatrix(rotationMatrix, translationVectors);
-
-			m_externalParameter.data = CORBA::string_dup(externalParameter);
-			m_renseParameter.data = CORBA::string_dup(renseParameters);
-			m_internalParameter.data = CORBA::string_dup(internalParameter);
-						
-		}
-		//ƒƒ‚ƒŠ‚ğ‰ğ•ú
-		cvReleaseMat( &worldCoordinates );
-		cvReleaseMat( &imageCoordinates );
-		cvReleaseMat( &rotationVectors );
-		cvReleaseMat( &rotationMatrix );
-		cvReleaseMat( &translationVectors );
-		
-		//X,Y‰Šú‰»
-		cvInitUndistortMap(
-			intrinsicMatrix,
-			distortionCoefficient,
-			mapx,
-			mapy
-		);
-		//ŠO•”ƒpƒ‰ƒ[ƒ^Šm”Fƒtƒ‰ƒO
-		outParameter = 1;
-		key = 0;
-				
-	 }
-	
-	//“à•”ŠO•”ƒpƒ‰ƒ[ƒ^‚Ìo—Í‚É¬Œ÷‚µ‚½‚ç
-	if (InParameter == 1 && outParameter == 1) {
-
-		//	ƒŒƒ“ƒY˜c‚İ‚ğ•â³‚µ‚½‰æ‘œ‚ğ¶¬‚·‚é
-		cvUndistort2(
-			inputImage_buff,
-			undistortionImage,
-			intrinsicMatrix,
-			distortionCoefficient
-		);
-
-		//cvShowImage("˜c‚İ•â³", undistortionImage);
-
-		//OutPort‚É•â³‰f‘œ‚ğo—Í‚·‚éB
-		//int len = undistortionImage->nChannels * undistortionImage->width * undistortionImage->height;
-		//m_calbImage.pixels.length(len);
-		
-		//˜c‚İ•â³‰f‘œ‚ğOutPort‚Æ‚µ‚Äƒƒ‚ƒŠƒRƒs[‚·‚éB
-		//memcpy((void *)&(m_calbImage.pixels[0]), undistortionImage->imageData, len);
-		//m_calbImageOut.write();
-		
-		//’¹áÕ}‚ÌÀ•Wİ’è
-		objPts[0].x = 0;					objPts[0].y = 0;
-		objPts[1].x = m_board_w-1;			objPts[1].y = 0;
-		objPts[2].x = 0;					objPts[2].y = m_board_h-1;
-		objPts[3].x = m_board_w-1;			objPts[3].y = m_board_h-1;
-		
-		//æ“¾‚·‚éCorner‚ğİ’è
-		imgPts[0] = corners[0];
-		imgPts[1] = corners[m_board_w - 1];
-		imgPts[2] = corners[(m_board_h - 1) * m_board_w];
-		imgPts[3] = corners[(m_board_h - 1) * m_board_w + m_board_w - 1];
-		
-		//w’è‚µ‚½Corner‚É›‚ğì¬‚·‚é
-		cvCircle(tempImage_buff, cvPointFrom32f(imgPts[0]), 9, CV_RGB(0,0,255), 3);
-		cvCircle(tempImage_buff, cvPointFrom32f(imgPts[1]), 9, CV_RGB(0,255,0), 3);
-		cvCircle(tempImage_buff, cvPointFrom32f(imgPts[2]), 9, CV_RGB(255,0,0), 3);
-		cvCircle(tempImage_buff, cvPointFrom32f(imgPts[3]), 9, CV_RGB(255,255,0), 3);
-
-		CvMat *H = cvCreateMat(3, 3, CV_32F);
-		cvGetPerspectiveTransform(objPts, imgPts, H);
-		
-		//‚‚³‚ğİ’è‚·‚éB
-		CV_MAT_ELEM(*H, float, 2, 2) = m_camera_Height;
-		
-		//Warpping‚ğÀs
-		cvWarpPerspective(inputImage_buff, birds_image, H, CV_INTER_LINEAR | CV_WARP_INVERSE_MAP | CV_WARP_FILL_OUTLIERS);
-		
-		//’¹áÕ}‚ğOutPort‚Éo—Í‚·‚éB
-		int len = birds_image->nChannels * birds_image->width * birds_image->height;
-		m_birdImage.pixels.length(len);
-		memcpy((void *)&(m_birdImage.pixels[0]), birds_image->imageData, len);
-
-		m_birdImage.width = inputImage_buff->width;
-		m_birdImage.height = inputImage_buff->height;
-
-		m_birdImageOut.write();
-
-		cvWaitKey(10);
-
-		//cvShowImage("Bird_Eye", birds_image);
-		cvReleaseMat(&H);
-
-		g_temp_w = m_inputImage.width;
-		g_temp_h = m_inputImage.height;
-
-		key = 0;
-
-	}
-
-	//cvShowImage("Capture", inputImage_buff);
-	
-	if (InParameter == 1 && outParameter == 1) {	
-
-		m_renseParameterOut.write();
-		m_internalParameterOut.write();
-		m_externalParameterOut.write();
-	}
-
-	if (g_temp_w != m_inputImage.width || g_temp_h != m_inputImage.height){
-		
-		if(intrinsicMatrix==NULL){
-			cvReleaseMat(&intrinsicMatrix);
-		}
-		if(distortionCoefficient==NULL){
-			cvReleaseMat(&distortionCoefficient);
-		}
-		
-		if(mapx==NULL){
-			cvReleaseImage(&mapx);
-		}
-		if(mapy==NULL){
-			cvReleaseImage(&mapy);
-		}
-		if(inputImage_buff==NULL){
-			cvReleaseImage(&inputImage_buff);
-		}
-		if(outputImage_buff==NULL){
-			cvReleaseImage(&outputImage_buff);
-		}
-		if(tempImage_buff==NULL){
-			cvReleaseImage(&tempImage_buff);
-		}
-		if(birds_image==NULL){
-			cvReleaseImage(&birds_image);
-		}
-		if(undistortionImage==NULL){
-			cvReleaseImage(&undistortionImage);
-		}
-
-		//g_temp_w = m_inputImage.width;
-		//g_temp_h = m_inputImage.height;
-		InParameter = 0;
-		InParameter = 0;
-
-		key = 0;
-	}
-
+    /* ç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’OutPortã«ã‚³ãƒ”ãƒ¼ */
+    memcpy((void *)&(m_img_check.pixels[0]), image.data, len); 
+  
+    m_img_checkOut.write();
+  }
   return RTC::RTC_OK;
 }
 
@@ -704,7 +225,16 @@ RTC::ReturnCode_t ImageCalibration::onRateChanged(RTC::UniqueId ec_id)
 }
 */
 
-
+/* ãƒã‚§ã‚¹ãƒœãƒ¼ãƒ‰æ’®å½±æšæ•°ç¢ºèª
+ * æšæ•°ã‚’å¤‰æ›´ã•ã‚ŒãŸã‚‰GUIã‚’å†æç”»ã—ã€ãã‚Œã¾ã§ã®ä¿å­˜ç”»åƒã‚’å‰Šé™¤ã™ã‚‹
+ */
+void ImageCalibration::checkImageNum(void)
+{
+  if(m_current_image_num == m_image_num) return;
+  m_current_image_num = m_image_num;
+  m_CalibrationService.setImageNumber(m_image_num);
+  return;
+}
 
 extern "C"
 {
