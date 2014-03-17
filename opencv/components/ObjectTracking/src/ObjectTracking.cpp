@@ -16,7 +16,7 @@ static const char* objecttracking_spec[] =
     "implementation_id", "ObjectTracking",
     "type_name",         "ObjectTracking",
     "description",       "Objecttrack component",
-    "version",           "1.0.0",
+    "version",           "1.1.0",
     "vendor",            "AIST",
     "category",          "Category",
     "activity_type",     "PERIODIC",
@@ -24,206 +24,197 @@ static const char* objecttracking_spec[] =
     "max_instance",      "1",
     "language",          "C++",
     "lang_type",         "compile",
-    // Configuration variables
-    "conf.default.image_height", "240",
-    "conf.default.image_width", "320",
-    // Widget
-    "conf.__widget__.image_height", "text",
-    "conf.__widget__.image_width", "text",
-    // Constraints
     ""
   };
 // </rtc-template>
 
-IplImage	*inputImage = NULL;			//“ü—Í‚³‚ê‚½IplImage
-IplImage	*resultImage = NULL;			//	ˆ—Œ‹‰Ê•\¦—pIplImage
-IplImage	*hsvImage = NULL;			//	HSV•\FŒn—pIplImage
-IplImage	*hueImage = NULL;			//	HSV•\FŒn‚ÌHƒ`ƒƒƒ“ƒlƒ‹—pIplImage
-IplImage	*maskImage = NULL;			//	ƒ}ƒXƒN‰æ‘œ—pIplImage
-IplImage	*backprojectImage = NULL;	//	ƒoƒbƒNƒvƒƒWƒFƒNƒVƒ‡ƒ“‰æ‘œ—pIplImage
-IplImage	*histImage = NULL;			//	ƒqƒXƒgƒOƒ‰ƒ€•`‰æ—pIplImage
-IplImage	*grayImage = NULL;			//	ƒOƒŒ[ƒXƒP[ƒ‹‰æ‘œ—pIplImage
+IplImage	*inputImage = NULL;			/* å…¥åŠ›ã•ã‚ŒãŸIplImage */
+IplImage	*resultImage = NULL;			/* å‡¦ç†çµæœè¡¨ç¤ºç”¨IplImage */
+IplImage	*hsvImage = NULL;			/* HSVè¡¨è‰²ç³»ç”¨IplImage */
+IplImage	*hueImage = NULL;			/* HSVè¡¨è‰²ç³»ã®Hãƒãƒ£ãƒ³ãƒãƒ«ç”¨IplImage */
+IplImage	*maskImage = NULL;			/* ãƒã‚¹ã‚¯ç”»åƒç”¨IplImage */
+IplImage	*backprojectImage = NULL;	/* ãƒãƒƒã‚¯ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³ç”»åƒç”¨IplImage */
+IplImage	*histImage = NULL;			/* ãƒ’ã‚¹ãƒˆã‚°ãƒ©ãƒ æç”»ç”¨IplImage */
+IplImage	*grayImage = NULL;			/* ã‚°ãƒ¬ãƒ¼ã‚¹ã‚±ãƒ¼ãƒ«ç”»åƒç”¨IplImage */
 
-CvHistogram	*hist = NULL;				//	ƒqƒXƒgƒOƒ‰ƒ€ˆ——p\‘¢‘Ì
+CvHistogram	*hist = NULL;				/* ãƒ’ã‚¹ãƒˆã‚°ãƒ©ãƒ å‡¦ç†ç”¨æ§‹é€ ä½“ */
 
-IplImage	*frameImage;	//	ƒLƒƒƒvƒ`ƒƒ‰æ‘œ—pIplImage
-CvCapture	*capture;		//	ƒL[“ü—ÍŒ‹‰Ê‚ğŠi”[‚·‚é•Ï”
+IplImage	*frameImage;	/* ã‚­ãƒ£ãƒ—ãƒãƒ£ç”»åƒç”¨IplImage */
+CvCapture	*capture;		/* ã‚­ãƒ¼å…¥åŠ›çµæœã‚’æ ¼ç´ã™ã‚‹å¤‰æ•° */
 int count  = 0;
 int g_temp_w = 0;
 int g_temp_h = 0;
 
-//	ˆ—ƒ‚[ƒh‘I‘ğ—pƒtƒ‰ƒO
+/* å‡¦ç†ãƒ¢ãƒ¼ãƒ‰é¸æŠç”¨ãƒ•ãƒ©ã‚° */
 int	backprojectMode = HIDDEN_BACKPROJECTION;
 int	selectObject = SELECT_OFF;
 int	trackObject = TRACKING_STOP;
 int showHist = SHOW_HISTOGRAM;
 
-//	CamShiftƒgƒ‰ƒbƒLƒ“ƒO—p•Ï”
+/* CamShiftãƒˆãƒ©ãƒƒã‚­ãƒ³ã‚°ç”¨å¤‰æ•° */
 CvPoint			origin;
 CvRect			selection;
 CvRect			trackWindow;
 CvBox2D			trackRegion;
 CvConnectedComp	trackComp;
 
-//	ƒqƒXƒgƒOƒ‰ƒ€—p•Ï”
-int		hdims = H_DIMENSION;		//	ƒqƒXƒgƒOƒ‰ƒ€‚ÌŸŒ³”
-float	hRangesArray[] = {H_RANGE_MIN, H_RANGE_MAX};	//ƒqƒXƒgƒOƒ‰ƒ€‚ÌƒŒƒ“ƒW
+/* ãƒ’ã‚¹ãƒˆã‚°ãƒ©ãƒ ç”¨å¤‰æ•° */
+int		hdims = H_DIMENSION;		/* ãƒ’ã‚¹ãƒˆã‚°ãƒ©ãƒ ã®æ¬¡å…ƒæ•° */
+float	hRangesArray[] = {H_RANGE_MIN, H_RANGE_MAX};	/* ãƒ’ã‚¹ãƒˆã‚°ãƒ©ãƒ ã®ãƒ¬ãƒ³ã‚¸ */
 float	*hRanges = hRangesArray;
 int		vmin = V_MIN;
 int		vmax = V_MAX;
 
-//char	*windowNameObjectTracking = "CaptureImage";
-
 //
-//	ƒ}ƒEƒXƒhƒ‰ƒbƒO‚É‚æ‚Á‚Ä‰Šú’ÇÕ—Ìˆæ‚ğw’è‚·‚é
+//	ãƒã‚¦ã‚¹ãƒ‰ãƒ©ãƒƒã‚°ã«ã‚ˆã£ã¦åˆæœŸè¿½è·¡é ˜åŸŸã‚’æŒ‡å®šã™ã‚‹
 //
-//	ˆø”:
-//		event	: ƒ}ƒEƒX¶ƒ{ƒ^ƒ“‚Ìó‘Ô
-//		x		: ƒ}ƒEƒX‚ªŒ»İƒ|ƒCƒ“ƒg‚µ‚Ä‚¢‚éxÀ•W
-//		y		: ƒ}ƒEƒX‚ªŒ»İƒ|ƒCƒ“ƒg‚µ‚Ä‚¢‚éyÀ•W
-//		flags	: –{ƒvƒƒOƒ‰ƒ€‚Å‚Í–¢g—p
-//		param	: –{ƒvƒƒOƒ‰ƒ€‚Å‚Í–¢g—p
+//	å¼•æ•°:
+//		event	: ãƒã‚¦ã‚¹å·¦ãƒœã‚¿ãƒ³ã®çŠ¶æ…‹
+//		x		: ãƒã‚¦ã‚¹ãŒç¾åœ¨ãƒã‚¤ãƒ³ãƒˆã—ã¦ã„ã‚‹xåº§æ¨™
+//		y		: ãƒã‚¦ã‚¹ãŒç¾åœ¨ãƒã‚¤ãƒ³ãƒˆã—ã¦ã„ã‚‹yåº§æ¨™
+//		flags	: æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã§ã¯æœªä½¿ç”¨
+//		param	: æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã§ã¯æœªä½¿ç”¨
 //
 static void on_mouse( int event, int x, int y, int flags, void* param ){
-	//	‰æ‘œ‚ªæ“¾‚³‚ê‚Ä‚¢‚È‚¯‚ê‚ÎAˆ—‚ğs‚í‚È‚¢
-	if( resultImage == NULL ){
+  /* ç”»åƒãŒå–å¾—ã•ã‚Œã¦ã„ãªã‘ã‚Œã°ã€å‡¦ç†ã‚’è¡Œã‚ãªã„ */
+  if( resultImage == NULL ){
         return;
-	}
+  }
 
-	//	Œ´“_‚ÌˆÊ’u‚É‰‚¶‚Äy‚Ì’l‚ğ”½“]i‰æ‘œ‚Ì”½“]‚Å‚Í‚È‚¢j
-	if( resultImage->origin == 1 ){
+  /* åŸç‚¹ã®ä½ç½®ã«å¿œã˜ã¦yã®å€¤ã‚’åè»¢ï¼ˆç”»åƒã®åè»¢ã§ã¯ãªã„ï¼‰ */
+  if( resultImage->origin == 1 ){
         y = resultImage->height - y;
-	}
-	//	ƒ}ƒEƒX‚Ì¶ƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚Ä‚¢‚ê‚ÎˆÈ‰º‚Ìˆ—‚ğs‚¤
-    if( selectObject == SELECT_ON ){
-        selection.x = MIN( x, origin.x );
-        selection.y = MIN( y, origin.y );
-        selection.width = selection.x + CV_IABS( x - origin.x );
-        selection.height = selection.y + CV_IABS( y - origin.y );
-        
-        selection.x = MAX( selection.x, 0 );
-        selection.y = MAX( selection.y, 0 );
-        selection.width = MIN( selection.width, resultImage->width );
-        selection.height = MIN( selection.height, resultImage->height );
-        selection.width = selection.width - selection.x;
-        selection.height = selection.height - selection.y;
-    }
-	//	ƒ}ƒEƒX‚Ì¶ƒ{ƒ^ƒ“‚Ìó‘Ô‚É‚æ‚Á‚Äˆ—‚ğ•ªŠò
-    switch( event ){
-		case CV_EVENT_LBUTTONDOWN:
-			//	ƒ}ƒEƒX‚Ì¶ƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚½‚Ì‚Å‚ ‚ê‚ÎA
-			//	Œ´“_‚¨‚æ‚Ñ‘I‘ğ‚³‚ê‚½—Ìˆæ‚ğİ’è
-			origin = cvPoint( x, y );
-			selection = cvRect( x, y, 0, 0 );
-			selectObject = SELECT_ON;
-			break;
-		case CV_EVENT_LBUTTONUP:
-			//	ƒ}ƒEƒX‚Ì¶ƒ{ƒ^ƒ“‚ª—£‚³‚ê‚½‚Æ‚«Awidth‚Æheight‚ª‚Ç‚¿‚ç‚à³‚Å‚ ‚ê‚ÎA
-			//	trackObjectƒtƒ‰ƒO‚ğTRACKING_START‚É‚·‚é
-			selectObject = SELECT_OFF;
-			if( selection.width > 0 && selection.height > 0 ){
-				trackObject = TRACKING_START;
-			}
-			break;
-    }
+  }
+  /* ãƒã‚¦ã‚¹ã®å·¦ãƒœã‚¿ãƒ³ãŒæŠ¼ã•ã‚Œã¦ã„ã‚Œã°ä»¥ä¸‹ã®å‡¦ç†ã‚’è¡Œã† */
+  if( selectObject == SELECT_ON ){
+    selection.x = MIN( x, origin.x );
+    selection.y = MIN( y, origin.y );
+    selection.width = selection.x + CV_IABS( x - origin.x );
+    selection.height = selection.y + CV_IABS( y - origin.y );
+
+    selection.x = MAX( selection.x, 0 );
+    selection.y = MAX( selection.y, 0 );
+    selection.width = MIN( selection.width, resultImage->width );
+    selection.height = MIN( selection.height, resultImage->height );
+    selection.width = selection.width - selection.x;
+    selection.height = selection.height - selection.y;
+  }
+  /* ãƒã‚¦ã‚¹ã®å·¦ãƒœã‚¿ãƒ³ã®çŠ¶æ…‹ã«ã‚ˆã£ã¦å‡¦ç†ã‚’åˆ†å² */
+  switch( event ){
+    case CV_EVENT_LBUTTONDOWN:
+      /* ãƒã‚¦ã‚¹ã®å·¦ãƒœã‚¿ãƒ³ãŒæŠ¼ã•ã‚ŒãŸã®ã§ã‚ã‚Œã°ã€åŸç‚¹ãŠã‚ˆã³é¸æŠã•ã‚ŒãŸé ˜åŸŸã‚’è¨­å®š */
+      origin = cvPoint( x, y );
+      selection = cvRect( x, y, 0, 0 );
+      selectObject = SELECT_ON;
+      break;
+    case CV_EVENT_LBUTTONUP:
+      /* ãƒã‚¦ã‚¹ã®å·¦ãƒœã‚¿ãƒ³ãŒé›¢ã•ã‚ŒãŸã¨ãã€widthã¨heightãŒã©ã¡ã‚‰ã‚‚æ­£ã§ã‚ã‚Œã°ã€*/
+      /* trackObjectãƒ•ãƒ©ã‚°ã‚’TRACKING_STARTã«ã™ã‚‹ */
+      selectObject = SELECT_OFF;
+      if( selection.width > 0 && selection.height > 0 ){
+        trackObject = TRACKING_START;
+      }
+      break;
+  }
 }
 
 //
-//	“ü—Í‚³‚ê‚½1‚Â‚ÌF‘Š’l‚ğRGB‚É•ÏŠ·‚·‚é
+//	å…¥åŠ›ã•ã‚ŒãŸ1ã¤ã®è‰²ç›¸å€¤ã‚’RGBã«å¤‰æ›ã™ã‚‹
 //
-//	ˆø”:
-//		hue		: HSV•\FŒn‚É‚¨‚¯‚éF‘Š’lH
-//	–ß‚è’lF
-//		CvScalar: RGB‚ÌFî•ñ‚ªBGR‚Ì‡‚ÅŠi”[‚³‚ê‚½ƒRƒ“ƒeƒi
+//	å¼•æ•°:
+//		hue		: HSVè¡¨è‰²ç³»ã«ãŠã‘ã‚‹è‰²ç›¸å€¤H
+//	æˆ»ã‚Šå€¤ï¼š
+//		CvScalar: RGBã®è‰²æƒ…å ±ãŒBGRã®é †ã§æ ¼ç´ã•ã‚ŒãŸã‚³ãƒ³ãƒ†ãƒŠ
 //
 CvScalar hsv2rgb( float hue ){
-	IplImage *rgbValue, *hsvValue;
-	rgbValue = cvCreateImage( cvSize(1,1), IPL_DEPTH_8U, 3 );
-	hsvValue = cvCreateImage( cvSize(1,1), IPL_DEPTH_8U, 3 );
+  IplImage *rgbValue, *hsvValue;
+  rgbValue = cvCreateImage( cvSize(1,1), IPL_DEPTH_8U, 3 );
+  hsvValue = cvCreateImage( cvSize(1,1), IPL_DEPTH_8U, 3 );
 
-	hsvValue->imageData[0] = hue;	//	F‘Š’lH
-	hsvValue->imageData[1] = 255;	//	Ê“x’lS
-	hsvValue->imageData[2] = 255;	//	–¾“x’lV
-	
-	//	HSV•\FŒn‚ğRGB•\FŒn‚É•ÏŠ·‚·‚é
-	cvCvtColor( hsvValue, rgbValue, CV_HSV2BGR );
+  hsvValue->imageData[0] = hue;	/* è‰²ç›¸å€¤H */
+  hsvValue->imageData[1] = 255;	/* å½©åº¦å€¤S */
+  hsvValue->imageData[2] = 255;	/* æ˜åº¦å€¤V */
 
-	return cvScalar(	(unsigned char)rgbValue->imageData[0], 
-						(unsigned char)rgbValue->imageData[1], 
-						(unsigned char)rgbValue->imageData[2], 
-						0 );
+  /* HSVè¡¨è‰²ç³»ã‚’RGBè¡¨è‰²ç³»ã«å¤‰æ›ã™ã‚‹ */
+  cvCvtColor( hsvValue, rgbValue, CV_HSV2BGR );
 
-	//	ƒƒ‚ƒŠ‚ğ‰ğ•ú‚·‚é
-	cvReleaseImage( &rgbValue );
-	cvReleaseImage( &hsvValue );
+  return cvScalar(	(unsigned char)rgbValue->imageData[0], 
+              (unsigned char)rgbValue->imageData[1], 
+              (unsigned char)rgbValue->imageData[2], 
+              0 );
+
+  /* ãƒ¡ãƒ¢ãƒªã‚’è§£æ”¾ã™ã‚‹ */
+  cvReleaseImage( &rgbValue );
+  cvReleaseImage( &hsvValue );
 }
 
 
 //
-//	ƒ}ƒEƒX‘I‘ğ‚³‚ê‚½‰Šú’ÇÕ—Ìˆæ‚É‚¨‚¯‚éHSV‚ÌH’l‚ÅƒqƒXƒgƒOƒ‰ƒ€‚ğì¬‚µAƒqƒXƒgƒOƒ‰ƒ€‚Ì•`‰æ‚Ü‚Å‚ğs‚¤
+//	ãƒã‚¦ã‚¹é¸æŠã•ã‚ŒãŸåˆæœŸè¿½è·¡é ˜åŸŸã«ãŠã‘ã‚‹HSVã®Hå€¤ã§ãƒ’ã‚¹ãƒˆã‚°ãƒ©ãƒ ã‚’ä½œæˆã—ã€ãƒ’ã‚¹ãƒˆã‚°ãƒ©ãƒ ã®æç”»ã¾ã§ã‚’è¡Œã†
 //
-//	ˆø”:
-//		hist		: main‚ÅéŒ¾‚³‚ê‚½ƒqƒXƒgƒOƒ‰ƒ€—p\‘¢‘Ì
-//		hsvImage	: “ü—Í‰æ‘œ‚ªHSV•\FŒn‚É•ÏŠ·‚³‚ê‚½Œã‚ÌIplImage
-//		maskImage	: ƒ}ƒXƒN‰æ‘œ—pIplImage
-//		selection	: ƒ}ƒEƒX‚Å‘I‘ğ‚³‚ê‚½‹éŒ`—Ìˆæ
+//	å¼•æ•°:
+//		hist		: mainã§å®£è¨€ã•ã‚ŒãŸãƒ’ã‚¹ãƒˆã‚°ãƒ©ãƒ ç”¨æ§‹é€ ä½“
+//		hsvImage	: å…¥åŠ›ç”»åƒãŒHSVè¡¨è‰²ç³»ã«å¤‰æ›ã•ã‚ŒãŸå¾Œã®IplImage
+//		maskImage	: ãƒã‚¹ã‚¯ç”»åƒç”¨IplImage
+//		selection	: ãƒã‚¦ã‚¹ã§é¸æŠã•ã‚ŒãŸçŸ©å½¢é ˜åŸŸ
 //
 void CalculateHist( CvHistogram	*hist, IplImage *hsvImage, IplImage *maskImage, CvRect selection ){
-	int		i;
-	int		binW;	//	ƒqƒXƒgƒOƒ‰ƒ€‚ÌŠeƒrƒ“‚ÌA‰æ‘œã‚Å‚Ì•
-	int		val;	//	ƒqƒXƒgƒOƒ‰ƒ€‚Ì•p“x
-	float	maxVal;	//	ƒqƒXƒgƒOƒ‰ƒ€‚ÌÅ‘å•p“x
+  int		i;
+  int		binW;	/* ãƒ’ã‚¹ãƒˆã‚°ãƒ©ãƒ ã®å„ãƒ“ãƒ³ã®ã€ç”»åƒä¸Šã§ã®å¹… */
+  int		val;	/* ãƒ’ã‚¹ãƒˆã‚°ãƒ©ãƒ ã®é »åº¦ */
+  float	maxVal;	/* ãƒ’ã‚¹ãƒˆã‚°ãƒ©ãƒ ã®æœ€å¤§é »åº¦ */
 
+  /* hsvç”»åƒã®å„ç”»ç´ ãŒå€¤ã®ç¯„å›²å†…ã«å…¥ã£ã¦ã„ã‚‹ã‹ãƒã‚§ãƒƒã‚¯ã—ã€ */
+  /* ãƒã‚¹ã‚¯ç”»åƒmaskImageã‚’ä½œæˆã™ã‚‹ */
+  cvInRangeS( hsvImage, 
+        cvScalar( H_RANGE_MIN, S_MIN, MIN(V_MIN,V_MAX), 0 ),
+        cvScalar( H_RANGE_MAX, S_MAX, MAX(V_MIN,V_MAX), 0 ), 
+        maskImage );
+  /* hsvImageã®ã†ã¡ã€ã¨ãã«å¿…è¦ãªHãƒãƒ£ãƒ³ãƒãƒ«ã‚’hueImageã¨ã—ã¦åˆ†é›¢ã™ã‚‹ */
+  cvSplit( hsvImage, hueImage, 0, 0, 0 );
+  /* trackObjectãŒTRACKING_STARTçŠ¶æ…‹ãªã‚‰ã€ä»¥ä¸‹ã®å‡¦ç†ã‚’è¡Œã† */
+  if( trackObject == TRACKING_START ){
+    /* è¿½è·¡é ˜åŸŸã®ãƒ’ã‚¹ãƒˆã‚°ãƒ©ãƒ è¨ˆç®—ã¨histImageã¸ã®æç”» */
+    maxVal = 0.0;
+    cvSetImageROI( hueImage, selection );
+    cvSetImageROI( maskImage, selection );
 
-	//	hsv‰æ‘œ‚ÌŠe‰æ‘f‚ª’l‚Ì”ÍˆÍ“à‚É“ü‚Á‚Ä‚¢‚é‚©ƒ`ƒFƒbƒN‚µA
-	//	ƒ}ƒXƒN‰æ‘œmaskImage‚ğì¬‚·‚é
-	cvInRangeS( hsvImage, 
-				cvScalar( H_RANGE_MIN, S_MIN, MIN(V_MIN,V_MAX), 0 ),
-				cvScalar( H_RANGE_MAX, S_MAX, MAX(V_MIN,V_MAX), 0 ), 
-				maskImage );
-	//	hsvImage‚Ì‚¤‚¿A‚Æ‚­‚É•K—v‚ÈHƒ`ƒƒƒ“ƒlƒ‹‚ğhueImage‚Æ‚µ‚Ä•ª—£‚·‚é
-	cvSplit( hsvImage, hueImage, 0, 0, 0 );
-	//	trackObject‚ªTRACKING_STARTó‘Ô‚È‚çAˆÈ‰º‚Ìˆ—‚ğs‚¤
-	if( trackObject == TRACKING_START ){
-		//	’ÇÕ—Ìˆæ‚ÌƒqƒXƒgƒOƒ‰ƒ€ŒvZ‚ÆhistImage‚Ö‚Ì•`‰æ
-		maxVal = 0.0;
+    /* ãƒ’ã‚¹ãƒˆã‚°ãƒ©ãƒ ã‚’è¨ˆç®—ã—ã€æœ€å¤§å€¤ã‚’æ±‚ã‚ã‚‹ */
+    cvCalcHist( &hueImage, hist, 0, maskImage );
+    cvGetMinMaxHistValue( hist, 0, &maxVal, 0, 0 );
 
-		cvSetImageROI( hueImage, selection );
-        cvSetImageROI( maskImage, selection );
-        //	ƒqƒXƒgƒOƒ‰ƒ€‚ğŒvZ‚µAÅ‘å’l‚ğ‹‚ß‚é
-		cvCalcHist( &hueImage, hist, 0, maskImage );
-		cvGetMinMaxHistValue( hist, 0, &maxVal, 0, 0 );
-        //	ƒqƒXƒgƒOƒ‰ƒ€‚Ìc²i•p“xj‚ğ0-255‚Ìƒ_ƒCƒiƒ~ƒbƒNƒŒƒ“ƒW‚É³‹K‰»
-		if( maxVal == 0.0 ){
-			cvConvertScale( hist->bins, hist->bins, 0.0, 0 );
-		} else{
-			cvConvertScale( hist->bins, hist->bins, 255.0 / maxVal, 0 );
-		}
-		//	hue,mask‰æ‘œ‚Éİ’è‚³‚ê‚½ROI‚ğƒŠƒZƒbƒg
-		cvResetImageROI( hueImage );
-        cvResetImageROI( maskImage );
+    /* ãƒ’ã‚¹ãƒˆã‚°ãƒ©ãƒ ã®ç¸¦è»¸ï¼ˆé »åº¦ï¼‰ã‚’0-255ã®ãƒ€ã‚¤ãƒŠãƒŸãƒƒã‚¯ãƒ¬ãƒ³ã‚¸ã«æ­£è¦åŒ– */
+    if( maxVal == 0.0 ){
+      cvConvertScale( hist->bins, hist->bins, 0.0, 0 );
+    } else{
+      cvConvertScale( hist->bins, hist->bins, 255.0 / maxVal, 0 );
+    }
 
-        trackWindow = selection;
-        //	trackObject‚ğTRACKING_NOW‚É‚·‚é
-		trackObject = TRACKING_NOW;
+    /* hue,maskç”»åƒã«è¨­å®šã•ã‚ŒãŸROIã‚’ãƒªã‚»ãƒƒãƒˆ */
+    cvResetImageROI( hueImage );
+    cvResetImageROI( maskImage );
+    trackWindow = selection;
 
-		//	ƒqƒXƒgƒOƒ‰ƒ€‰æ‘œ‚ğƒ[ƒƒNƒŠƒA
-        cvSetZero( histImage );
-		//	Šeƒrƒ“‚Ì•‚ğŒˆ‚ß‚é
-        binW = histImage->width / hdims;
-		//	ƒqƒXƒgƒOƒ‰ƒ€‚ğ•`‰æ‚·‚é
-        for( i = 0; i < hdims; i++ ){
-			val = cvRound( cvGetReal1D(hist->bins,i) * histImage->height / 255 );
-            CvScalar color = hsv2rgb( i * 180.0 / hdims );
-            cvRectangle(	histImage, 
-							cvPoint( i * binW, histImage->height ), 
-							cvPoint( (i+1) * binW, histImage->height - val ),
-							color,
-							-1, 
-							8, 
-							0	);
-		}
-	}
+    /* trackObjectã‚’TRACKING_NOWã«ã™ã‚‹ */
+    trackObject = TRACKING_NOW;
+
+    /* ãƒ’ã‚¹ãƒˆã‚°ãƒ©ãƒ ç”»åƒã‚’ã‚¼ãƒ­ã‚¯ãƒªã‚¢ */
+    cvSetZero( histImage );
+    /* å„ãƒ“ãƒ³ã®å¹…ã‚’æ±ºã‚ã‚‹ */
+    binW = histImage->width / hdims;
+    /* ãƒ’ã‚¹ãƒˆã‚°ãƒ©ãƒ ã‚’æç”»ã™ã‚‹ */
+    for( i = 0; i < hdims; i++ ){
+      val = cvRound( cvGetReal1D(hist->bins,i) * histImage->height / 255 );
+      CvScalar color = hsv2rgb( i * 180.0 / hdims );
+      cvRectangle(	histImage, 
+            cvPoint( i * binW, histImage->height ), 
+            cvPoint( (i+1) * binW, histImage->height - val ),
+            color,
+            -1, 
+            8, 
+            0	);
+    }
+  }
 }
 
 /*!
@@ -276,9 +267,6 @@ RTC::ReturnCode_t ObjectTracking::onInitialize()
   // </rtc-template>
 
   // <rtc-template block="bind_config">
-  // Bind variables and configuration variable
-  bindParameter("image_height", m_img_height, "240");
-  bindParameter("image_width", m_img_width, "320");
   // </rtc-template>
   
   return RTC::RTC_OK;
@@ -308,299 +296,291 @@ RTC::ReturnCode_t ObjectTracking::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t ObjectTracking::onActivated(RTC::UniqueId ec_id)
 {	
-	g_temp_w = 0;
-	g_temp_h = 0;
-	
-	//Šeƒƒ‚ƒŠŠm•Û
-	inputImage = NULL;
-	resultImage = NULL;
-	hsvImage = NULL;
-	hueImage = NULL;
-	maskImage = NULL;
-	backprojectImage = NULL;
-	grayImage = NULL;
-	histImage = NULL;
+  g_temp_w = 0;
+  g_temp_h = 0;
 
-	return RTC::RTC_OK;
+  inputImage = NULL;
+  resultImage = NULL;
+  hsvImage = NULL;
+  hueImage = NULL;
+  maskImage = NULL;
+  backprojectImage = NULL;
+  grayImage = NULL;
+  histImage = NULL;
+
+  return RTC::RTC_OK;
 }
 
 
 RTC::ReturnCode_t ObjectTracking::onDeactivated(RTC::UniqueId ec_id)
 {
-	//ƒƒ‚ƒŠ‚©‚ç‰ğ•ú
-	if(inputImage != NULL){
-		cvReleaseImage(&inputImage);
-	}
-	if(resultImage != NULL){
-		cvReleaseImage(&resultImage);
-	}
-	if(hsvImage != NULL){
-		cvReleaseImage(&hsvImage);
-	}
-	if(hueImage != NULL){
-		cvReleaseImage(&hueImage);
-	}
-	if(hueImage != NULL){
-		cvReleaseImage(&maskImage);
-	}
-	if(backprojectImage != NULL){
-		cvReleaseImage(&backprojectImage);
-	}
-	if(grayImage != NULL){
-		cvReleaseImage(&grayImage);
-	}
-	if(histImage != NULL){
-		cvReleaseImage(&histImage);
-	}
+  if(inputImage != NULL){
+    cvReleaseImage(&inputImage);
+  }
+  if(resultImage != NULL){
+    cvReleaseImage(&resultImage);
+  }
+  if(hsvImage != NULL){
+    cvReleaseImage(&hsvImage);
+  }
+  if(hueImage != NULL){
+    cvReleaseImage(&hueImage);
+  }
+  if(hueImage != NULL){
+    cvReleaseImage(&maskImage);
+  }
+  if(backprojectImage != NULL){
+    cvReleaseImage(&backprojectImage);
+  }
+  if(grayImage != NULL){
+    cvReleaseImage(&grayImage);
+  }
+  if(histImage != NULL){
+    cvReleaseImage(&histImage);
+  }
 
-	return RTC::RTC_OK;
+  return RTC::RTC_OK;
 }
 
 
 RTC::ReturnCode_t ObjectTracking::onExecute(RTC::UniqueId ec_id)
 {
-	int		key;	//	ƒL[“ü—ÍŒ‹‰Ê‚ğŠi”[‚·‚é•Ï”
-	int		i;
-	int		j;
+  int		i;
+  int		j;
+
+  int x;
+  int y;
+  int mouse_event;
+
+  /* Snakeç”¨ã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ */	
+  float alpha = 1.0;		/* é€£ç¶šã‚¨ãƒãƒ«ã‚®ãƒ¼ã®é‡ã¿ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ */
+  float beta = 0.5;		/* æ›²ç‡ã®é‡ã¿ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ */
+  float gamma = 1.5;		/* ç”»åƒã‚¨ãƒãƒ«ã‚®ãƒ¼ã®é‡ã¿ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ */
+  CvPoint pt[SEGMENT];	/* åˆ¶å¾¡ç‚¹ã®åº§æ¨™ */
+  CvSize window;			/* æœ€å°å€¤ã‚’æ¢ç´¢ã™ã‚‹è¿‘å‚ã‚µã‚¤ã‚º */
+  window.width = WINDOW_WIDTH;	
+  window.height = WINDOW_HEIGHT;
+  CvTermCriteria crit;
+  crit.type = CV_TERMCRIT_ITER;		/* çµ‚äº†æ¡ä»¶ã®è¨­å®š */
+  crit.max_iter = ITERATION_SNAKE;	/* é–¢æ•°ã®æœ€å¤§åå¾©æ•° */
+
+  if(m_orig_imgIn.isNew()){
+
+    m_orig_imgIn.read();
 	
-	int x;
-	int y;
-	int mouse_event;
+    /* å„ãƒ¡ãƒ¢ãƒªç¢ºä¿ */
+    if(inputImage == NULL){
+      inputImage = cvCreateImage(cvSize(m_orig_img.width, m_orig_img.height), IPL_DEPTH_8U, 3);
+    }
+    if(g_temp_w != m_orig_img.width || g_temp_h != m_orig_img.height){
+      cvReleaseImage(&inputImage);
+      inputImage = cvCreateImage(cvSize(m_orig_img.width, m_orig_img.height), IPL_DEPTH_8U, 3);
+    }
+    if(resultImage == NULL){
+      resultImage = cvCreateImage(cvSize(m_orig_img.width, m_orig_img.height), IPL_DEPTH_8U, 3);
+    }
+    if(g_temp_w != m_orig_img.width || g_temp_h != m_orig_img.height){
+      cvReleaseImage(&resultImage);
+      resultImage = cvCreateImage(cvSize(m_orig_img.width, m_orig_img.height), IPL_DEPTH_8U, 3);
+    }
+    resultImage->origin = inputImage->origin;
+    if(hsvImage == NULL){
+      hsvImage = cvCreateImage(cvSize(m_orig_img.width, m_orig_img.height), IPL_DEPTH_8U, 3);
+    }
+    if(g_temp_w != m_orig_img.width || g_temp_h != m_orig_img.height){
+      cvReleaseImage(&hsvImage);
+      hsvImage = cvCreateImage(cvSize(m_orig_img.width, m_orig_img.height), IPL_DEPTH_8U, 3);
+    }
+    if(hueImage == NULL){
+      hueImage = cvCreateImage(cvSize(m_orig_img.width, m_orig_img.height), IPL_DEPTH_8U, 1);
+    }
+    if(g_temp_w != m_orig_img.width || g_temp_h != m_orig_img.height){
+      cvReleaseImage(&hueImage);
+      hueImage = cvCreateImage(cvSize(m_orig_img.width, m_orig_img.height), IPL_DEPTH_8U, 1);
+    }
+    if(maskImage == NULL){
+      maskImage = cvCreateImage(cvSize(m_orig_img.width, m_orig_img.height), IPL_DEPTH_8U, 1);
+    }
+    if(g_temp_w != m_orig_img.width || g_temp_h != m_orig_img.height){
+      cvReleaseImage(&maskImage);
+      maskImage = cvCreateImage(cvSize(m_orig_img.width, m_orig_img.height), IPL_DEPTH_8U, 1);
+    }
+    if(backprojectImage == NULL){
+      backprojectImage = cvCreateImage(cvSize(m_orig_img.width, m_orig_img.height), IPL_DEPTH_8U, 1);
+    }
+    if(g_temp_w != m_orig_img.width || g_temp_h != m_orig_img.height){
+      cvReleaseImage(&backprojectImage);
+      backprojectImage = cvCreateImage(cvSize(m_orig_img.width, m_orig_img.height), IPL_DEPTH_8U, 1);
+    }
+    if(grayImage == NULL){
+      grayImage = cvCreateImage(cvSize(m_orig_img.width, m_orig_img.height), IPL_DEPTH_8U, 1);
+    }
+    if(g_temp_w != m_orig_img.width || g_temp_h != m_orig_img.height){
+      cvReleaseImage(&grayImage);
+      grayImage = cvCreateImage(cvSize(m_orig_img.width, m_orig_img.height), IPL_DEPTH_8U, 1);
+    }
+    /* ãƒ’ã‚¹ãƒˆã‚°ãƒ©ãƒ æ§‹é€ ä½“ã®ä½¿ç”¨ã‚’å®£è¨€ */
+    if(hist == NULL){
+      hist = cvCreateHist( 1, &hdims, CV_HIST_ARRAY, &hRanges, 1 );
+    }
+    /* ãƒ’ã‚¹ãƒˆã‚°ãƒ©ãƒ ç”¨ã®ç”»åƒã‚’ç¢ºä¿ã—ã€ã‚¼ãƒ­ã‚¯ãƒªã‚¢ */
+    if(histImage == NULL){
+      histImage = cvCreateImage( cvSize(HISTIMAGE_WIDTH, HISTIMAGE_HEIGHT), IPL_DEPTH_8U, 3 );
+    }
+    if(g_temp_w != m_orig_img.width || g_temp_h != m_orig_img.height){
+      cvReleaseImage(&histImage);
+      histImage = cvCreateImage(cvSize(m_orig_img.width, m_orig_img.height), IPL_DEPTH_8U, 3);
+    }
+    cvSetZero( histImage );
 
-	//	Snake—p‚Ìƒpƒ‰ƒ[ƒ^
-	float alpha = 1.0;		//	˜A‘±ƒGƒlƒ‹ƒM[‚Ìd‚İƒpƒ‰ƒ[ƒ^
-	float beta = 0.5;		//	‹È—¦‚Ìd‚İƒpƒ‰ƒ[ƒ^
-	float gamma = 1.5;		//	‰æ‘œƒGƒlƒ‹ƒM[‚Ìd‚İƒpƒ‰ƒ[ƒ^
-	CvPoint pt[SEGMENT];	//	§Œä“_‚ÌÀ•W
-	CvSize window;			//	Å¬’l‚ğ’Tõ‚·‚é‹ß–TƒTƒCƒY
-	window.width = WINDOW_WIDTH;	
-	window.height = WINDOW_HEIGHT;
-	CvTermCriteria crit;
-	crit.type = CV_TERMCRIT_ITER;		//	I—¹ğŒ‚Ìİ’è
-	crit.max_iter = ITERATION_SNAKE;	//	ŠÖ”‚ÌÅ‘å”½•œ”
+    /* InPortã®æ˜ åƒã®å–å¾— */
+    memcpy(inputImage->imageData,(void *)&(m_orig_img.pixels[0]),m_orig_img.pixels.length());
 
-	if(m_orig_imgIn.isNew()){
+    /* ã‚­ãƒ£ãƒ—ãƒãƒ£ã•ã‚ŒãŸç”»åƒã‚’resultImageã«ã‚³ãƒ”ãƒ¼ã—ã€HSVè¡¨è‰²ç³»ã«å¤‰æ›ã—ã¦hsvImageã«æ ¼ç´ */
+    cvCopy( inputImage, resultImage, NULL );
+    cvCvtColor( resultImage, hsvImage, CV_BGR2HSV );
 
-		m_orig_imgIn.read();
-			
-		//Šeƒƒ‚ƒŠŠm•Û
-		if(inputImage == NULL){
-			inputImage = cvCreateImage(cvSize(m_orig_img.width, m_orig_img.height), IPL_DEPTH_8U, 3);
-		}
-		if(g_temp_w != m_orig_img.width || g_temp_h != m_orig_img.height){
-			cvReleaseImage(&inputImage);
-			inputImage = cvCreateImage(cvSize(m_orig_img.width, m_orig_img.height), IPL_DEPTH_8U, 3);
-		}
-		if(resultImage == NULL){
-			resultImage = cvCreateImage(cvSize(m_orig_img.width, m_orig_img.height), IPL_DEPTH_8U, 3);
-		}
-		if(g_temp_w != m_orig_img.width || g_temp_h != m_orig_img.height){
-			cvReleaseImage(&resultImage);
-			resultImage = cvCreateImage(cvSize(m_orig_img.width, m_orig_img.height), IPL_DEPTH_8U, 3);
-		}
-		resultImage->origin = inputImage->origin;
-		if(hsvImage == NULL){
-			hsvImage = cvCreateImage(cvSize(m_orig_img.width, m_orig_img.height), IPL_DEPTH_8U, 3);
-		}
-		if(g_temp_w != m_orig_img.width || g_temp_h != m_orig_img.height){
-			cvReleaseImage(&hsvImage);
-			hsvImage = cvCreateImage(cvSize(m_orig_img.width, m_orig_img.height), IPL_DEPTH_8U, 3);
-		}
-		if(hueImage == NULL){
-			hueImage = cvCreateImage(cvSize(m_orig_img.width, m_orig_img.height), IPL_DEPTH_8U, 1);
-		}
-		if(g_temp_w != m_orig_img.width || g_temp_h != m_orig_img.height){
-			cvReleaseImage(&hueImage);
-			hueImage = cvCreateImage(cvSize(m_orig_img.width, m_orig_img.height), IPL_DEPTH_8U, 1);
-		}
-		if(maskImage == NULL){
-			maskImage = cvCreateImage(cvSize(m_orig_img.width, m_orig_img.height), IPL_DEPTH_8U, 1);
-		}
-		if(g_temp_w != m_orig_img.width || g_temp_h != m_orig_img.height){
-			cvReleaseImage(&maskImage);
-			maskImage = cvCreateImage(cvSize(m_orig_img.width, m_orig_img.height), IPL_DEPTH_8U, 1);
-		}
-		if(backprojectImage == NULL){
-			backprojectImage = cvCreateImage(cvSize(m_orig_img.width, m_orig_img.height), IPL_DEPTH_8U, 1);
-		}
-		if(g_temp_w != m_orig_img.width || g_temp_h != m_orig_img.height){
-			cvReleaseImage(&backprojectImage);
-			backprojectImage = cvCreateImage(cvSize(m_orig_img.width, m_orig_img.height), IPL_DEPTH_8U, 1);
-		}
-		if(grayImage == NULL){
-			grayImage = cvCreateImage(cvSize(m_orig_img.width, m_orig_img.height), IPL_DEPTH_8U, 1);
-		}
-		if(g_temp_w != m_orig_img.width || g_temp_h != m_orig_img.height){
-			cvReleaseImage(&grayImage);
-			grayImage = cvCreateImage(cvSize(m_orig_img.width, m_orig_img.height), IPL_DEPTH_8U, 1);
-		}
-		//	ƒqƒXƒgƒOƒ‰ƒ€\‘¢‘Ì‚Ìg—p‚ğéŒ¾
-		if(hist == NULL){
-			hist = cvCreateHist( 1, &hdims, CV_HIST_ARRAY, &hRanges, 1 );
-		}
-		//	ƒqƒXƒgƒOƒ‰ƒ€—p‚Ì‰æ‘œ‚ğŠm•Û‚µAƒ[ƒƒNƒŠƒA
-		if(histImage == NULL){
-			histImage = cvCreateImage( cvSize(HISTIMAGE_WIDTH, HISTIMAGE_HEIGHT), IPL_DEPTH_8U, 3 );
-		}
-		if(g_temp_w != m_orig_img.width || g_temp_h != m_orig_img.height){
-			cvReleaseImage(&histImage);
-			histImage = cvCreateImage(cvSize(m_orig_img.width, m_orig_img.height), IPL_DEPTH_8U, 3);
-		}
-		cvSetZero( histImage );
+    /* Windowã®Eventæƒ…å ±ã®å–å¾—ã«å¯¾ã™ã‚‹å‡¦ç† */
+    if(m_eventIn.isNew() && m_xIn.isNew() && m_yIn.isNew()){
+      m_xIn.read();
+      m_yIn.read();
+      m_eventIn.read();
 
-		//InPort‚Ì‰f‘œ‚Ìæ“¾
-		memcpy(inputImage->imageData,(void *)&(m_orig_img.pixels[0]),m_orig_img.pixels.length());
+      x = m_x.data;
+      y = m_y.data;
+      mouse_event = m_event.data;
 
-		//	ƒLƒƒƒvƒ`ƒƒ‚³‚ê‚½‰æ‘œ‚ğresultImage‚ÉƒRƒs[‚µAHSV•\FŒn‚É•ÏŠ·‚µ‚ÄhsvImage‚ÉŠi”[
-		cvCopy( inputImage, resultImage, NULL );
-		cvCvtColor( resultImage, hsvImage, CV_BGR2HSV );
+      on_mouse(mouse_event, x, y, 0, 0);
 
-		//Window‚ÌEventî•ñ‚Ìæ“¾‚É‘Î‚·‚éˆ—
-		if(m_eventIn.isNew() && m_xIn.isNew() && m_yIn.isNew()){
-			m_xIn.read();
-			m_yIn.read();
-			m_eventIn.read();
+      x= 0;
+      y= 0;
+      mouse_event = 0;
+    }
 
-			x = m_x.data;
-			y = m_y.data;
-			mouse_event = m_event.data;
+    /* trackObjectãƒ•ãƒ©ã‚°ãŒTRACKING_STOPä»¥å¤–ãªã‚‰ã€ä»¥ä¸‹ã®å‡¦ç†ã‚’è¡Œã† */
+    if( trackObject != TRACKING_STOP ){
 
-			on_mouse(mouse_event, x, y, 0, 0);
+      /* è¿½è·¡é ˜åŸŸã®ãƒ’ã‚¹ãƒˆã‚°ãƒ©ãƒ è¨ˆç®—ã¨æç”» */
+      CalculateHist(	hist, hsvImage, maskImage, selection );
 
-			x= 0;
-			y= 0;
-			mouse_event = 0;
-		}
-		
-		//	trackObjectƒtƒ‰ƒO‚ªTRACKING_STOPˆÈŠO‚È‚çAˆÈ‰º‚Ìˆ—‚ğs‚¤
-        if( trackObject != TRACKING_STOP ){
-			
-			//’ÇÕ—Ìˆæ‚ÌƒqƒXƒgƒOƒ‰ƒ€ŒvZ‚Æ•`‰æ
-			CalculateHist(	hist, hsvImage, maskImage, selection );
+      /* ãƒãƒƒã‚¯ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³ã‚’è¨ˆç®—ã™ã‚‹ */
+      cvCalcBackProject( &hueImage, backprojectImage, hist );
+      /* backProjectionã®ã†ã¡ã€ãƒã‚¹ã‚¯ãŒ1ã§ã‚ã‚‹ã¨ã•ã‚ŒãŸéƒ¨åˆ†ã®ã¿æ®‹ã™ */
+      cvAnd( backprojectImage, maskImage, backprojectImage, 0 );
 
-			//	ƒoƒbƒNƒvƒƒWƒFƒNƒVƒ‡ƒ“‚ğŒvZ‚·‚é
-            cvCalcBackProject( &hueImage, backprojectImage, hist );
-            //	backProjection‚Ì‚¤‚¿Aƒ}ƒXƒN‚ª1‚Å‚ ‚é‚Æ‚³‚ê‚½•”•ª‚Ì‚İc‚·
-			cvAnd( backprojectImage, maskImage, backprojectImage, 0 );
+      /* CamShiftæ³•ã«ã‚ˆã‚‹é ˜åŸŸè¿½è·¡ã‚’å®Ÿè¡Œã™ã‚‹ */
+      cvCamShift( backprojectImage, 
+            trackWindow, 
+            cvTermCriteria( CV_TERMCRIT_EPS | CV_TERMCRIT_ITER, 10, 1 ), 
+            &trackComp, 
+            &trackRegion );
 
-			//	CamShift–@‚É‚æ‚é—Ìˆæ’ÇÕ‚ğÀs‚·‚é
-			cvCamShift( backprojectImage, 
-						trackWindow, 
-						cvTermCriteria( CV_TERMCRIT_EPS | CV_TERMCRIT_ITER, 10, 1 ), 
-						&trackComp, 
-						&trackRegion );
-			
-			trackWindow = trackComp.rect;
+      trackWindow = trackComp.rect;
 
-			//	SnakeImage—p‚ÌƒOƒŒ[ƒXƒP[ƒ‹‰æ‘œ‚ğì¬‚·‚é
-			cvCvtColor( resultImage, grayImage, CV_BGR2GRAY );
+      /* SnakeImageç”¨ã®ã‚°ãƒ¬ãƒ¼ã‚¹ã‚±ãƒ¼ãƒ«ç”»åƒã‚’ä½œæˆã™ã‚‹ */
+      cvCvtColor( resultImage, grayImage, CV_BGR2GRAY );
 
-			if( backprojectMode == SHOW_BACKPROJECTION ){
-                cvCvtColor( backprojectImage, resultImage, CV_GRAY2BGR );
-			}
-			if( resultImage->origin == 1 ){
-                trackRegion.angle = -trackRegion.angle;
-			}
+      if( backprojectMode == SHOW_BACKPROJECTION ){
+        cvCvtColor( backprojectImage, resultImage, CV_GRAY2BGR );
+      }
+      if( resultImage->origin == 1 ){
+        trackRegion.angle = -trackRegion.angle;
+      }
 
-			//	CamShift‚Å‚Ì—Ìˆæ’ÇÕŒ‹‰Ê‚ğSnake‚Ì‰ŠúˆÊ’u‚Éİ’è‚·‚é
-			for( i=0; i<SEGMENT; i++ ){
-				pt[i].x = cvRound(	trackRegion.size.width 
-									* cos(i * 6.28 / SEGMENT + trackRegion.angle) 
-									/ 2.0 + trackRegion.center.x );
-				pt[i].y = cvRound(	trackRegion.size.height 
-									* sin(i * 6.28 / SEGMENT + trackRegion.angle) 
-									/ 2.0 + trackRegion.center.y );
-			}
-			//	Snake‚É‚æ‚é—ÖŠs’Šo‚ğÀs‚·‚é
-			for( i=0; i<ITERATION_SNAKE; i++ ){
-				cvSnakeImage(	grayImage, 
-								pt, 
-								SEGMENT, 
-								&alpha, 
-								&beta, 
-								&gamma, 
-								CV_VALUE, 
-								window, 
-								crit, 
-								1);
-				//	Še—ÖŠs“_‚ÌŠÔ‚Éü‚ğ‚Ğ‚¢‚Ä—ÖŠsü‚ğ•`‰æ‚·‚é
-				for( j=0; j<SEGMENT; j++ ){
-					if( j < SEGMENT-1 ){
-						cvLine( resultImage, pt[j], pt[j+1], 
-						  cvScalar(0,0,255,0), 2, 8, 0 );
-					}
-					else{ 
-						cvLine( resultImage, pt[j], pt[0], 
-						  cvScalar(0,0,255,0),  2, 8, 0 );
-					}
-				}
-			}
+      /* CamShiftã§ã®é ˜åŸŸè¿½è·¡çµæœã‚’Snakeã®åˆæœŸä½ç½®ã«è¨­å®šã™ã‚‹ */
+      for( i=0; i<SEGMENT; i++ ){
+        pt[i].x = cvRound(	trackRegion.size.width 
+                    * cos(i * 6.28 / SEGMENT + trackRegion.angle) 
+                    / 2.0 + trackRegion.center.x );
+        pt[i].y = cvRound(	trackRegion.size.height 
+                    * sin(i * 6.28 / SEGMENT + trackRegion.angle) 
+                    / 2.0 + trackRegion.center.y );
+      }
+      /* Snakeã«ã‚ˆã‚‹è¼ªéƒ­æŠ½å‡ºã‚’å®Ÿè¡Œã™ã‚‹ */
+      for( i=0; i<ITERATION_SNAKE; i++ ){
+        cvSnakeImage(	grayImage, 
+        pt, 
+        SEGMENT, 
+        &alpha, 
+        &beta, 
+        &gamma, 
+        CV_VALUE, 
+        window, 
+        crit, 
+        1);
+        /* å„è¼ªéƒ­ç‚¹ã®é–“ã«ç·šã‚’ã²ã„ã¦è¼ªéƒ­ç·šã‚’æç”»ã™ã‚‹ */
+        for( j=0; j<SEGMENT; j++ ){
+          if( j < SEGMENT-1 ){
+            cvLine( resultImage, pt[j], pt[j+1], 
+            cvScalar(0,0,255,0), 2, 8, 0 );
+          }
+          else{ 
+            cvLine( resultImage, pt[j], pt[0], 
+            cvScalar(0,0,255,0),  2, 8, 0 );
+          }
         }
+      }
+    }
 
-		//	ƒ}ƒEƒX‚Å‘I‘ğ’†‚Ì‰Šú’ÇÕ—Ìˆæ‚ÌF‚ğ”½“]‚³‚¹‚é
-		if( selectObject == SELECT_ON && selection.width > 0 && selection.height > 0 ){
-			
-			cvSetImageROI( resultImage, selection );
-			cvXorS( resultImage, cvScalarAll(255), resultImage, 0 );
-			cvResetImageROI( resultImage );
-		}
-		//	backprojectImage‚ÌÀ•WŒ´“_‚ª¶ã‚Ìê‡Aã‰º‚ğ”½“]‚³‚¹‚é
-		if( backprojectImage->origin == 0 ){
-			cvFlip( backprojectImage, backprojectImage, 0 );
-		}
-				
-		//	‰æ‘œ‚ğ•\¦‚·‚é
-		//cvShowImage( windowNameObjectTracking, resultImage );
-		//key = cvWaitKey(1);
+    /* ãƒã‚¦ã‚¹ã§é¸æŠä¸­ã®åˆæœŸè¿½è·¡é ˜åŸŸã®è‰²ã‚’åè»¢ã•ã›ã‚‹ */
+    if( selectObject == SELECT_ON && selection.width > 0 && selection.height > 0 ){
 
-		// ‰æ‘œƒf[ƒ^‚ÌƒTƒCƒYæ“¾
-		double len = (resultImage->nChannels * resultImage->width * resultImage->height);
-		double leng = (histImage->nChannels * histImage->width * histImage->height);
-		m_out_img.pixels.length(len);
-		m_hist_img.pixels.length(leng);
+      cvSetImageROI( resultImage, selection );
+      cvXorS( resultImage, cvScalarAll(255), resultImage, 0 );
+      cvResetImageROI( resultImage );
+    }
+    /* backprojectImageã®åº§æ¨™åŸç‚¹ãŒå·¦ä¸Šã®å ´åˆã€ä¸Šä¸‹ã‚’åè»¢ã•ã›ã‚‹ */
+    if( backprojectImage->origin == 0 ){
+      cvFlip( backprojectImage, backprojectImage, 0 );
+    }
 
-		// ŠY“–‚ÌƒCƒ[ƒW‚ğMemCopy‚·‚é
-		memcpy((void *)&(m_out_img.pixels[0]), resultImage->imageData, len);
-		memcpy((void *)&(m_hist_img.pixels[0]), histImage->imageData, leng);
+    /* ç”»åƒãƒ‡ãƒ¼ã‚¿ã®ã‚µã‚¤ã‚ºå–å¾— */
+    double len = (resultImage->nChannels * resultImage->width * resultImage->height);
+    double leng = (histImage->nChannels * histImage->width * histImage->height);
+    m_out_img.pixels.length(len);
+    m_hist_img.pixels.length(leng);
 
-		// ”½“]‚µ‚½‰æ‘œƒf[ƒ^‚ğOutPort‚©‚ço—Í‚·‚éB
-		m_out_img.width = inputImage->width;
-		m_out_img.height = inputImage->height;
+    /* è©²å½“ã®ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚’MemCopyã™ã‚‹ */
+    memcpy((void *)&(m_out_img.pixels[0]), resultImage->imageData, len);
+    memcpy((void *)&(m_hist_img.pixels[0]), histImage->imageData, leng);
 
-		m_hist_img.width = inputImage->width;
-		m_hist_img.height = inputImage->height;
+    /* åè»¢ã—ãŸç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’OutPortã‹ã‚‰å‡ºåŠ›ã™ã‚‹ */
+    m_out_img.width = inputImage->width;
+    m_out_img.height = inputImage->height;
 
-		m_out_imgOut.write();
-		m_hist_imgOut.write();
-		
-		if(inputImage != NULL){
-			cvReleaseImage(&inputImage);
-		}
-		if(resultImage != NULL){
-			cvReleaseImage(&resultImage);
-		}
-		if(hsvImage != NULL){
-			cvReleaseImage(&hsvImage);
-		}
-		if(hueImage != NULL){
-			cvReleaseImage(&hueImage);
-		}
-		if(hueImage != NULL){
-			cvReleaseImage(&maskImage);
-		}
-		if(backprojectImage != NULL){
-			cvReleaseImage(&backprojectImage);
-		}
-		if(grayImage != NULL){
-			cvReleaseImage(&grayImage);
-		}
-		if(histImage != NULL){
-			cvReleaseImage(&histImage);
-		}
-	
-	}
+    m_hist_img.width = inputImage->width;
+    m_hist_img.height = inputImage->height;
 
-	return RTC::RTC_OK;
+    m_out_imgOut.write();
+    m_hist_imgOut.write();
+
+    if(inputImage != NULL){
+      cvReleaseImage(&inputImage);
+    }
+    if(resultImage != NULL){
+      cvReleaseImage(&resultImage);
+    }
+    if(hsvImage != NULL){
+      cvReleaseImage(&hsvImage);
+    }
+    if(hueImage != NULL){
+      cvReleaseImage(&hueImage);
+    }
+    if(hueImage != NULL){
+      cvReleaseImage(&maskImage);
+    }
+    if(backprojectImage != NULL){
+      cvReleaseImage(&backprojectImage);
+    }
+    if(grayImage != NULL){
+      cvReleaseImage(&grayImage);
+    }
+    if(histImage != NULL){
+      cvReleaseImage(&histImage);
+    }	
+  }
+
+  return RTC::RTC_OK;
 }
 
 /*

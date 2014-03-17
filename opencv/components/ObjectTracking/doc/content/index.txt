@@ -106,8 +106,6 @@ The available configuration parameters are described below:
 ================ ================== ================ ======
 Parameter        Data type          Default Value    Effect
 ================ ================== ================ ======
-image_height     int                240              
-image_width      int                320              
 ================ ================== ================ ======
 
 Ports

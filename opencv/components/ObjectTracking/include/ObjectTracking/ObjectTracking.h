@@ -23,28 +23,28 @@
 #include <cvaux.h>
 #include <highgui.h>
 
-#define		SEGMENT				150		//	cvSnakeImage�ŗp���鐧��_�̐�
-#define		WINDOW_WIDTH		17		//	cvSnakeImage�ōŏ��l��T������ߖT�̈�̕�
-#define		WINDOW_HEIGHT		17		//	cvSnakeImage�ōŏ��l��T������ߖT�̈�̍���
-#define		HISTIMAGE_WIDTH		320		//	�q�X�g�O�����摜�̕�
-#define		HISTIMAGE_HEIGHT	200		//	�q�X�g�O�����摜�̍���
-#define		H_DIMENSION		16		//	�q�X�g�O�����̎�����
+#define		SEGMENT				150		/* cvSnakeImageで用いる制御点の数 */
+#define		WINDOW_WIDTH		17		/* cvSnakeImageで最小値を探索する近傍領域の幅 */
+#define		WINDOW_HEIGHT		17		/* cvSnakeImageで最小値を探索する近傍領域の高さ */
+#define		HISTIMAGE_WIDTH		320		/* ヒストグラム画像の幅 */
+#define		HISTIMAGE_HEIGHT	200		/* ヒストグラム画像の高さ */
+#define		H_DIMENSION		16		/* ヒストグラムの次元数 */
 #define		H_RANGE_MIN		0
 #define		H_RANGE_MAX		180
-#define		V_MIN	10		//	���x�̍ŏ��l
-#define		V_MAX	256		//	���x�̍ő�l
-#define		S_MIN	30		//	�ʓx�̍ŏ��l
-#define		S_MAX	256		//	�ʓx�̍ŏ��l
-#define		HIDDEN_BACKPROJECTION	0	//	�o�b�N�v���W�F�N�V�����摜��\�������Ȃ��t���O�l
-#define		SHOW_BACKPROJECTION		1	//	�o�b�N�v���W�F�N�V�����摜��\��������t���O�l
-#define		SELECT_OFF				0	//	�����ǐ՗̈悪�ݒ肳��Ă��Ȃ��Ƃ��̃t���O�l
-#define		SELECT_ON				1	//	�����ǐ՗̈悪�ݒ肳��Ă���Ƃ��̃t���O�l
-#define		TRACKING_STOP			0	//	�g���b�L���O���~�߂�t���O�l
-#define		TRACKING_START			-1	//	�g���b�L���O���J�n����t���O�l
-#define		TRACKING_NOW			1	//	�g���b�L���O���������t���O�l
-#define		HIDDEN_HISTOGRAM		0	//	�q�X�g�O������\�������Ȃ��t���O�l
-#define		SHOW_HISTOGRAM			1	//	�q�X�g�O������\��������t���O�l
-#define		ITERATION_SNAKE			10	//	cvSnakeImage�̔�����
+#define		V_MIN	10		/* 明度の最小値 */
+#define		V_MAX	256		/* 明度の最大値 */
+#define		S_MIN	30		/* 彩度の最小値 */
+#define		S_MAX	256		/* 彩度の最小値 */
+#define		HIDDEN_BACKPROJECTION	0 /* バックプロジェクション画像を表示させないフラグ値 */
+#define		SHOW_BACKPROJECTION		1 /* バックプロジェクション画像を表示させるフラグ値 */
+#define		SELECT_OFF        0 /* 初期追跡領域が設定されていないときのフラグ値 */
+#define		SELECT_ON         1 /* 初期追跡領域が設定されているときのフラグ値 */
+#define		TRACKING_STOP     0 /* トラッキングを止めるフラグ値 */
+#define		TRACKING_START   -1 /* トラッキングを開始するフラグ値 */
+#define		TRACKING_NOW      1 /* トラッキング中を示すフラグ値 */
+#define		HIDDEN_HISTOGRAM  0 /* ヒストグラムを表示させないフラグ値 */
+#define		SHOW_HISTOGRAM    1 /* ヒストグラムを表示させるフラグ値 */
+#define		ITERATION_SNAKE  10 /* cvSnakeImageの反復回数 */
 
 // Service implementation headers
 // <rtc-template block="service_impl_h">
@@ -250,18 +250,6 @@ class ObjectTracking
 
   // Configuration variable declaration
   // <rtc-template block="config_declare">
-  /*!
-   * 
-   * - Name:  img_height
-   * - DefaultValue: 240
-   */
-  int m_img_height;
-  /*!
-   * 
-   * - Name:  img_width
-   * - DefaultValue: 320
-   */
-  int m_img_width;
 
   // </rtc-template>
 
