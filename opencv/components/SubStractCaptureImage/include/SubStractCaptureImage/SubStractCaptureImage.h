@@ -23,19 +23,19 @@
 #include <cxcore.h>
 #include <highgui.h>
 
-#define	MASK_THRESHOLD		1	//	backgroundMaskImage‚âstillObjectMaskImage‚ğ¶¬‚·‚é‚½‚ß‚Ìè‡’l
-#define THRESHOLD_MAX_VALUE	255	//	2’l‰»‚ÌÛ‚Ég—p‚·‚éÅ‘å’l
+#define	MASK_THRESHOLD		1       /* backgroundMaskImageã‚„stillObjectMaskImageã‚’ç”Ÿæˆã™ã‚‹ãŸã‚ã®é–¾å€¤ */
+#define THRESHOLD_MAX_VALUE	255   /* 2å€¤åŒ–ã®éš›ã«ä½¿ç”¨ã™ã‚‹æœ€å¤§å€¤ */
 
-#define	BACKGROUND_ALPHA				0.01	//	”wŒiXV‚ÌÛ‚Ì¬‡”ä—¦
-#define	BACKGROUND_INITIAL_THRESHOLD	20		//	”wŒi‚Ì‰Šúè‡’l
+#define	BACKGROUND_ALPHA				0.01      /* èƒŒæ™¯æ›´æ–°ã®éš›ã®æ··åˆæ¯”ç‡ */
+#define	BACKGROUND_INITIAL_THRESHOLD	20  /* èƒŒæ™¯ã®åˆæœŸé–¾å€¤ */
 
-#define	STILL_OBJECT_ALPHA				0.1		//	Ã~•¨‘ÌXV‚ÌÛ‚Ì¬‡”ä—¦
-#define	STILL_OBJECT_INITIAL_THRESHOLD	255		//	Ã~•¨‘Ì‚Ì‰Šúè‡’l
+#define	STILL_OBJECT_ALPHA				0.1     /* é™æ­¢ç‰©ä½“æ›´æ–°ã®éš›ã®æ··åˆæ¯”ç‡ */
+#define	STILL_OBJECT_INITIAL_THRESHOLD	255 /* é™æ­¢ç‰©ä½“ã®åˆæœŸé–¾å€¤ */
 
-#define	THRESHOLD_COEFFICIENT	5.0	//	è‡’l‚Ì’l‚ğˆø‚­Û‚Ìg—p‚·‚éè‡’l‚É‚©‚¯‚é”
+#define	THRESHOLD_COEFFICIENT	5.0   /* é–¾å€¤ã®å€¤ã‚’å¼•ãéš›ã®ä½¿ç”¨ã™ã‚‹é–¾å€¤ã«ã‹ã‘ã‚‹æ•° */
 
-#define	NOT_STILL_DEC_STEP			10	//	“®‚¢‚½ê‡‚ÌƒJƒEƒ“ƒ^Œ¸Z—Ê
-#define	STILL_OBJECT_TO_BACKGROUND	100	//	”wŒi‚Æ‚µ‚ÄÌ—p‚·‚éŠî€
+#define	NOT_STILL_DEC_STEP			10	/* å‹•ã„ãŸå ´åˆã®ã‚«ã‚¦ãƒ³ã‚¿æ¸›ç®—é‡ */
+#define	STILL_OBJECT_TO_BACKGROUND	100 /* èƒŒæ™¯ã¨ã—ã¦æ¡ç”¨ã™ã‚‹åŸºæº– */
 
 
 // Service implementation headers
@@ -242,24 +242,6 @@ class SubStractCaptureImage
 
   // Configuration variable declaration
   // <rtc-template block="config_declare">
-  /*!
-   * 
-   * - Name:  output_mode
-   * - DefaultValue: 0
-   */
-  int m_output_mode;
-  /*!
-   * 
-   * - Name:  img_height
-   * - DefaultValue: 240
-   */
-  int m_img_height;
-  /*!
-   * 
-   * - Name:  img_width
-   * - DefaultValue: 320
-   */
-  int m_img_width;
 
   // </rtc-template>
 
@@ -321,38 +303,37 @@ class SubStractCaptureImage
   // <rtc-template block="private_operation">
   
   // </rtc-template>
-	//	‰æ‘œ‚ğ¶¬‚·‚é
-	IplImage* inputImage;
-	IplImage* backgroundAverageImage;		//	”wŒi‚Ì•½‹Ï’l•Û‘¶—pIplImage
-	IplImage* backgroundThresholdImage;		//	”wŒi‚Ìè‡’l•Û‘¶—pIplImage
-	IplImage* stillObjectAverageImage;		//	Ã~•¨‘Ì‚Ì•½‹Ï’l•Û‘¶—pIplImage
-	IplImage* stillObjectThresholdImage;		//	Ã~•¨‘Ì‚Ìè‡’l•Û‘¶—pIplImage
-	IplImage* stillObjectCounterImage;		//	Ã~•¨‘Ì‚ÌƒJƒEƒ“ƒ^—pIplImage
-	IplImage* backgroundDifferenceImage;		//	”wŒi·•ª‰æ‘œ—pIplImage
-	IplImage* stillObjectDifferenceImage;	//	Ã~•¨‘Ì·•ª‰æ‘œ—pIplIMage
-	IplImage* thresholdImage32;				//	32bit‚Ìè‡’l‰æ‘œ—pIplImage
-	IplImage* thresholdImage;					//	è‡’l‰æ‘œ—pIplImage
-	IplImage* resultImage;					//	Œ‹‰Ê‰æ‘œ—pIplImage
-	IplImage* backgroundMaskImage;			//	”wŒiƒ}ƒXƒN‰æ‘œ—pIplImage
-	IplImage* foregroundMaskImage;			//	‘OŒiƒ}ƒXƒN—pIplImage
-	IplImage* stillObjectMaskImage;			//	Ã~•¨‘Ìƒ}ƒXƒN—pIplImage
-	IplImage* movingObjectMask;				//	“®•¨‘Ìƒ}ƒXƒN—pIplImage
-	IplImage* backgroundCopyMaskImage;		//	”wŒi‚ÉƒRƒs[‚·‚éÛ‚Ég—p‚·‚éƒ}ƒXƒN—pIplImage
-	IplImage* tmpMaskImage;					//	ƒeƒ“ƒ|ƒ‰ƒŠ—pIplImage
-	IplImage* tmp2MaskImage;					//	ƒeƒ“ƒ|ƒ‰ƒŠ—pIplImage(‚»‚Ì2)
-	IplImage* frameImage32;					//	32bit‚ÌƒLƒƒƒvƒ`ƒƒ‚µ‚½‰æ‘œ—pIplImage
-	IplImage* backgroundImage;				//	”wŒi‰æ‘œ—pIplImage
-	IplImage* stillObjectImage;				//	Ã~•¨‘Ì‰æ‘œ—pIplImage
-	IplImage* outputImage;
 
-	IplImage* foreGroundMaskBuff;
-	IplImage* stillObjectMaskBuff;
-	IplImage* backGroundBuff;
-	IplImage* stillObjectImageBuff;
-	IplImage* stillObjectCounterBuff;
+  IplImage* inputImage;
+  IplImage* backgroundAverageImage;     /* èƒŒæ™¯ã®å¹³å‡å€¤ä¿å­˜ç”¨IplImage */
+  IplImage* backgroundThresholdImage;   /* èƒŒæ™¯ã®é–¾å€¤ä¿å­˜ç”¨IplImage */
+  IplImage* stillObjectAverageImage;    /* é™æ­¢ç‰©ä½“ã®å¹³å‡å€¤ä¿å­˜ç”¨IplImage */
+  IplImage* stillObjectThresholdImage;  /* é™æ­¢ç‰©ä½“ã®é–¾å€¤ä¿å­˜ç”¨IplImage */
+  IplImage* stillObjectCounterImage;    /* é™æ­¢ç‰©ä½“ã®ã‚«ã‚¦ãƒ³ã‚¿ç”¨IplImage */
+  IplImage* backgroundDifferenceImage;  /* èƒŒæ™¯å·®åˆ†ç”»åƒç”¨IplImage */
+  IplImage* stillObjectDifferenceImage; /* é™æ­¢ç‰©ä½“å·®åˆ†ç”»åƒç”¨IplIMage */
+  IplImage* thresholdImage32;           /* 32bitã®é–¾å€¤ç”»åƒç”¨IplImage */
+  IplImage* thresholdImage;             /* é–¾å€¤ç”»åƒç”¨IplImage */
+  IplImage* resultImage;                /* çµæœç”»åƒç”¨IplImage */
+  IplImage* backgroundMaskImage;        /* èƒŒæ™¯ãƒã‚¹ã‚¯ç”»åƒç”¨IplImage */
+  IplImage* foregroundMaskImage;        /* å‰æ™¯ãƒã‚¹ã‚¯ç”¨IplImage */
+  IplImage* stillObjectMaskImage;       /* é™æ­¢ç‰©ä½“ãƒã‚¹ã‚¯ç”¨IplImage */
+  IplImage* movingObjectMask;           /* å‹•ç‰©ä½“ãƒã‚¹ã‚¯ç”¨IplImage */
+  IplImage* backgroundCopyMaskImage;    /* èƒŒæ™¯ã«ã‚³ãƒ”ãƒ¼ã™ã‚‹éš›ã«ä½¿ç”¨ã™ã‚‹ãƒã‚¹ã‚¯ç”¨IplImage */
+  IplImage* tmpMaskImage;       /* ãƒ†ãƒ³ãƒãƒ©ãƒªç”¨IplImage */
+  IplImage* tmp2MaskImage;      /* ãƒ†ãƒ³ãƒãƒ©ãƒªç”¨IplImage(ãã®2) */
+  IplImage* frameImage32;       /* 32bitã®ã‚­ãƒ£ãƒ—ãƒãƒ£ã—ãŸç”»åƒç”¨IplImage */
+  IplImage* backgroundImage;    /* èƒŒæ™¯ç”»åƒç”¨IplImage */
+  IplImage* stillObjectImage;   /* é™æ­¢ç‰©ä½“ç”»åƒç”¨IplImage */
+  IplImage* outputImage;
 
-	int key;					//	ƒL[“ü—Í—p‚Ì•Ï”
-	//int count;
+  IplImage* foreGroundMaskBuff;
+  IplImage* stillObjectMaskBuff;
+  IplImage* backGroundBuff;
+  IplImage* stillObjectImageBuff;
+  IplImage* stillObjectCounterBuff;
+
+  int key;    /* ã‚­ãƒ¼å…¥åŠ›ç”¨ã®å¤‰æ•° */
 };
 
 

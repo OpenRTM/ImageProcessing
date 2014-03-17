@@ -16,7 +16,7 @@ static const char* substractcaptureimage_spec[] =
     "implementation_id", "SubStractCaptureImage",
     "type_name",         "SubStractCaptureImage",
     "description",       "SubStractCaptureImage component",
-    "version",           "1.0.0",
+    "version",           "1.1.0",
     "vendor",            "AIST",
     "category",          "Category",
     "activity_type",     "PERIODIC",
@@ -24,27 +24,11 @@ static const char* substractcaptureimage_spec[] =
     "max_instance",      "1",
     "language",          "C++",
     "lang_type",         "compile",
-    // Configuration variables
-    "conf.default.output_mode", "0",
-    "conf.default.image_height", "240",
-    "conf.default.image_width", "320",
-    // Widget
-    "conf.__widget__.output_mode", "text",
-    "conf.__widget__.image_height", "text",
-    "conf.__widget__.image_width", "text",
-    // Constraints
     ""
   };
 // </rtc-template>
 
 CvSize imageSize;
-
-//char *windowNameCapture = "Capture";					//	ƒLƒƒƒvƒ`ƒƒ‚µ‚½‰æ‘œ‚ğ•\¦‚·‚éƒEƒBƒ“ƒhƒE‚Ì–¼‘O
-//char *windowNameForeground  = "Foreground Mask";		//	‘OŒiƒ}ƒXƒN‰æ‘œ‚ğ•\¦‚·‚éƒEƒBƒ“ƒhƒE‚Ì–¼‘O
-//char *windowNameStillObjectMask  = "Still Object Mask";	//	Ã~•¨‘Ìƒ}ƒXƒN‰æ‘œ‚ğ•\¦‚·‚éƒEƒBƒ“ƒhƒE‚Ì–¼‘O
-//char *windowNameBackground = "Background";				//	”wŒi‰æ‘œ‚ğ•\¦‚·‚éƒEƒBƒ“ƒhƒE‚Ì–¼‘O
-//char *windowNameStillObject  = "Still Object";			//	Ã~•¨‘Ì‚ğ•\¦‚·‚éƒEƒBƒ“ƒhƒE‚Ì–¼‘O
-//char *windowNameCounter = "Counter";					//	ƒJƒEƒ“ƒ^‚ğ•\¦‚·‚éƒEƒBƒ“ƒhƒE‚Ì–¼‘O
 
 int g_temp_w = 0;
 int g_temp_h = 0;
@@ -108,10 +92,6 @@ RTC::ReturnCode_t SubStractCaptureImage::onInitialize()
   // </rtc-template>
 
   // <rtc-template block="bind_config">
-  // Bind variables and configuration variable
-  bindParameter("output_mode", m_output_mode, "0");
-  bindParameter("image_height", m_img_height, "240");
-  bindParameter("image_width", m_img_width, "320");
   // </rtc-template>
   
   return RTC::RTC_OK;
@@ -141,40 +121,40 @@ RTC::ReturnCode_t SubStractCaptureImage::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t SubStractCaptureImage::onActivated(RTC::UniqueId ec_id)
 {
-	g_temp_w = 0;
-	g_temp_h = 0;
-	SubStractCaptureImage_count = 0;
-	
-	inputImage = NULL;
-	backgroundAverageImage = NULL;
-	backgroundThresholdImage = NULL;
-	stillObjectAverageImage = NULL;
-	stillObjectThresholdImage = NULL;
-	stillObjectCounterImage = NULL;
-	backgroundDifferenceImage = NULL;
-	stillObjectDifferenceImage = NULL;
-	thresholdImage32 = NULL;
-	thresholdImage = NULL;
-	resultImage = NULL;
-	backgroundMaskImage = NULL;
-	foregroundMaskImage = NULL;
-	stillObjectMaskImage = NULL;
-	movingObjectMask = NULL;
-	backgroundCopyMaskImage = NULL;
-	tmpMaskImage = NULL;
-	tmp2MaskImage = NULL;
-	frameImage32 = NULL;
-	backgroundImage = NULL;
-	stillObjectImage = NULL;
-	outputImage = NULL;
+  g_temp_w = 0;
+  g_temp_h = 0;
+  SubStractCaptureImage_count = 0;
 
-	foreGroundMaskBuff = NULL;
-	stillObjectMaskBuff = NULL;
-	backGroundBuff = NULL;
-	stillObjectImageBuff = NULL;
-	stillObjectCounterBuff = NULL;
+  inputImage = NULL;
+  backgroundAverageImage = NULL;
+  backgroundThresholdImage = NULL;
+  stillObjectAverageImage = NULL;
+  stillObjectThresholdImage = NULL;
+  stillObjectCounterImage = NULL;
+  backgroundDifferenceImage = NULL;
+  stillObjectDifferenceImage = NULL;
+  thresholdImage32 = NULL;
+  thresholdImage = NULL;
+  resultImage = NULL;
+  backgroundMaskImage = NULL;
+  foregroundMaskImage = NULL;
+  stillObjectMaskImage = NULL;
+  movingObjectMask = NULL;
+  backgroundCopyMaskImage = NULL;
+  tmpMaskImage = NULL;
+  tmp2MaskImage = NULL;
+  frameImage32 = NULL;
+  backgroundImage = NULL;
+  stillObjectImage = NULL;
+  outputImage = NULL;
 
-    return RTC::RTC_OK;
+  foreGroundMaskBuff = NULL;
+  stillObjectMaskBuff = NULL;
+  backGroundBuff = NULL;
+  stillObjectImageBuff = NULL;
+  stillObjectCounterBuff = NULL;
+
+  return RTC::RTC_OK;
 }
 
 
@@ -269,280 +249,279 @@ RTC::ReturnCode_t SubStractCaptureImage::onDeactivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t SubStractCaptureImage::onExecute(RTC::UniqueId ec_id)
 {	
-	
-	if(m_image_origIn.isNew() && SubStractCaptureImage_count == 0){
-	
-		m_image_origIn.read();
+  if(m_image_origIn.isNew() && SubStractCaptureImage_count == 0)
+  {
+    m_image_origIn.read();
 
-		if(g_temp_w != m_image_orig.width || g_temp_h != m_image_orig.height){
-			
-			//	‰æ‘œƒTƒCƒY‚ğ•Û‘¶
-			imageSize = cvSize(m_image_orig.width, m_image_orig.height);
+    if(g_temp_w != m_image_orig.width || g_temp_h != m_image_orig.height)
+    {
+      /* ç”»åƒã‚µã‚¤ã‚ºã‚’ä¿å­˜ */
+      imageSize = cvSize(m_image_orig.width, m_image_orig.height);
 
-			//	‰æ‘œ‚ğ¶¬‚·‚é
-			inputImage = cvCreateImage(imageSize, IPL_DEPTH_8U, 3);
-			backgroundAverageImage = cvCreateImage( imageSize, IPL_DEPTH_32F, 3 );		//	”wŒi‚Ì•½‹Ï’l•Û‘¶—pIplImage
-			backgroundThresholdImage = cvCreateImage( imageSize, IPL_DEPTH_32F, 3 );		//	”wŒi‚Ìè‡’l•Û‘¶—pIplImage
-			stillObjectAverageImage = cvCreateImage( imageSize, IPL_DEPTH_32F, 3 );		//	Ã~•¨‘Ì‚Ì•½‹Ï’l•Û‘¶—pIplImage
-			stillObjectThresholdImage = cvCreateImage( imageSize, IPL_DEPTH_32F, 3 );		//	Ã~•¨‘Ì‚Ìè‡’l•Û‘¶—pIplImage
-			stillObjectCounterImage = cvCreateImage( imageSize, IPL_DEPTH_8U, 1 );		//	Ã~•¨‘Ì‚ÌƒJƒEƒ“ƒ^—pIplImage
-			backgroundDifferenceImage = cvCreateImage( imageSize, IPL_DEPTH_32F, 3 );		//	”wŒi·•ª‰æ‘œ—pIplImage
-			stillObjectDifferenceImage = cvCreateImage( imageSize, IPL_DEPTH_32F, 3 );	//	Ã~•¨‘Ì·•ª‰æ‘œ—pIplIMage
-			thresholdImage32 = cvCreateImage( imageSize, IPL_DEPTH_32F, 3 );				//	32bit‚Ìè‡’l‰æ‘œ—pIplImage
-			thresholdImage = cvCreateImage( imageSize, IPL_DEPTH_8U, 3 );					//	è‡’l‰æ‘œ—pIplImage
-			resultImage = cvCreateImage( imageSize, IPL_DEPTH_8U, 1 );					//	Œ‹‰Ê‰æ‘œ—pIplImage
-			backgroundMaskImage = cvCreateImage( imageSize, IPL_DEPTH_8U, 1 );			//	”wŒiƒ}ƒXƒN‰æ‘œ—pIplImage
-			foregroundMaskImage = cvCreateImage( imageSize, IPL_DEPTH_8U, 1 );			//	‘OŒiƒ}ƒXƒN—pIplImage
-			stillObjectMaskImage = cvCreateImage( imageSize, IPL_DEPTH_8U, 1 );			//	Ã~•¨‘Ìƒ}ƒXƒN—pIplImage
-			movingObjectMask = cvCreateImage( imageSize, IPL_DEPTH_8U, 1 );				//	“®•¨‘Ìƒ}ƒXƒN—pIplImage
-			backgroundCopyMaskImage = cvCreateImage( imageSize, IPL_DEPTH_8U, 1 );		//	”wŒi‚ÉƒRƒs[‚·‚éÛ‚Ég—p‚·‚éƒ}ƒXƒN—pIplImage
-			tmpMaskImage = cvCreateImage( imageSize, IPL_DEPTH_8U, 1 );					//	ƒeƒ“ƒ|ƒ‰ƒŠ—pIplImage
-			tmp2MaskImage = cvCreateImage( imageSize, IPL_DEPTH_8U, 1 );					//	ƒeƒ“ƒ|ƒ‰ƒŠ—pIplImage(‚»‚Ì2)
-			frameImage32 = cvCreateImage( imageSize, IPL_DEPTH_32F, 3 );					//	32bit‚ÌƒLƒƒƒvƒ`ƒƒ‚µ‚½‰æ‘œ—pIplImage
-			backgroundImage = cvCreateImage( imageSize, IPL_DEPTH_8U, 3 );				//	”wŒi‰æ‘œ—pIplImage
-			stillObjectImage = cvCreateImage( imageSize, IPL_DEPTH_8U, 3 );
-			outputImage = cvCreateImage(imageSize, IPL_DEPTH_8U, 3);
+      /* ç”»åƒã‚’ç”Ÿæˆã™ã‚‹ */
+      inputImage = cvCreateImage(imageSize, IPL_DEPTH_8U, 3);
+      backgroundAverageImage = cvCreateImage( imageSize, IPL_DEPTH_32F, 3 );     /* èƒŒæ™¯ã®å¹³å‡å€¤ä¿å­˜ç”¨IplImage */
+      backgroundThresholdImage = cvCreateImage( imageSize, IPL_DEPTH_32F, 3 );   /* èƒŒæ™¯ã®é–¾å€¤ä¿å­˜ç”¨IplImage */
+      stillObjectAverageImage = cvCreateImage( imageSize, IPL_DEPTH_32F, 3 );    /* é™æ­¢ç‰©ä½“ã®å¹³å‡å€¤ä¿å­˜ç”¨IplImage */
+      stillObjectThresholdImage = cvCreateImage( imageSize, IPL_DEPTH_32F, 3 );    /* é™æ­¢ç‰©ä½“ã®é–¾å€¤ä¿å­˜ç”¨IplImage */
+      stillObjectCounterImage = cvCreateImage( imageSize, IPL_DEPTH_8U, 1 );    /* é™æ­¢ç‰©ä½“ã®ã‚«ã‚¦ãƒ³ã‚¿ç”¨IplImage */
+      backgroundDifferenceImage = cvCreateImage( imageSize, IPL_DEPTH_32F, 3 );    /* èƒŒæ™¯å·®åˆ†ç”»åƒç”¨IplImage */
+      stillObjectDifferenceImage = cvCreateImage( imageSize, IPL_DEPTH_32F, 3 );    /* é™æ­¢ç‰©ä½“å·®åˆ†ç”»åƒç”¨IplIMage */
+      thresholdImage32 = cvCreateImage( imageSize, IPL_DEPTH_32F, 3 );    /* 32bitã®é–¾å€¤ç”»åƒç”¨IplImage */
+      thresholdImage = cvCreateImage( imageSize, IPL_DEPTH_8U, 3 );    /* é–¾å€¤ç”»åƒç”¨IplImage */
+      resultImage = cvCreateImage( imageSize, IPL_DEPTH_8U, 1 );    /* çµæœç”»åƒç”¨IplImage */
+      backgroundMaskImage = cvCreateImage( imageSize, IPL_DEPTH_8U, 1 );    /* èƒŒæ™¯ãƒã‚¹ã‚¯ç”»åƒç”¨IplImage */
+      foregroundMaskImage = cvCreateImage( imageSize, IPL_DEPTH_8U, 1 );    /* å‰æ™¯ãƒã‚¹ã‚¯ç”¨IplImage */
+      stillObjectMaskImage = cvCreateImage( imageSize, IPL_DEPTH_8U, 1 );    /* é™æ­¢ç‰©ä½“ãƒã‚¹ã‚¯ç”¨IplImage */
+      movingObjectMask = cvCreateImage( imageSize, IPL_DEPTH_8U, 1 );    /* å‹•ç‰©ä½“ãƒã‚¹ã‚¯ç”¨IplImage */
+      backgroundCopyMaskImage = cvCreateImage( imageSize, IPL_DEPTH_8U, 1 );    /* èƒŒæ™¯ã«ã‚³ãƒ”ãƒ¼ã™ã‚‹éš›ã«ä½¿ç”¨ã™ã‚‹ãƒã‚¹ã‚¯ç”¨IplImage */
+      tmpMaskImage = cvCreateImage( imageSize, IPL_DEPTH_8U, 1 );    /* ãƒ†ãƒ³ãƒãƒ©ãƒªç”¨IplImage */
+      tmp2MaskImage = cvCreateImage( imageSize, IPL_DEPTH_8U, 1 );    /* ãƒ†ãƒ³ãƒãƒ©ãƒªç”¨IplImage(ãã®2) */
+      frameImage32 = cvCreateImage( imageSize, IPL_DEPTH_32F, 3 );    /* 32bitã®ã‚­ãƒ£ãƒ—ãƒãƒ£ã—ãŸç”»åƒç”¨IplImage */
+      backgroundImage = cvCreateImage( imageSize, IPL_DEPTH_8U, 3 );    /* èƒŒæ™¯ç”»åƒç”¨IplImage */
+      stillObjectImage = cvCreateImage( imageSize, IPL_DEPTH_8U, 3 );
+      outputImage = cvCreateImage(imageSize, IPL_DEPTH_8U, 3);
 
-			foreGroundMaskBuff = cvCreateImage(imageSize, IPL_DEPTH_8U, 3);
-			stillObjectMaskBuff  = cvCreateImage(imageSize, IPL_DEPTH_8U, 3);
-			backGroundBuff = cvCreateImage(imageSize, IPL_DEPTH_8U, 3);
-			stillObjectImageBuff = cvCreateImage(imageSize, IPL_DEPTH_8U, 3);
-			stillObjectCounterBuff = cvCreateImage(imageSize, IPL_DEPTH_8U, 3);
+      foreGroundMaskBuff = cvCreateImage(imageSize, IPL_DEPTH_8U, 3);
+      stillObjectMaskBuff  = cvCreateImage(imageSize, IPL_DEPTH_8U, 3);
+      backGroundBuff = cvCreateImage(imageSize, IPL_DEPTH_8U, 3);
+      stillObjectImageBuff = cvCreateImage(imageSize, IPL_DEPTH_8U, 3);
+      stillObjectCounterBuff = cvCreateImage(imageSize, IPL_DEPTH_8U, 3);
 
-			memcpy(inputImage->imageData,(void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length());
+      memcpy(inputImage->imageData,(void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length());
 
-			//	‰Šú‰»‚·‚é
-			cvConvert( inputImage, backgroundAverageImage );
-			cvSet( backgroundThresholdImage, cvScalarAll( BACKGROUND_INITIAL_THRESHOLD ) );
-			cvSetZero( stillObjectAverageImage );
-			cvSetZero( stillObjectThresholdImage );
-			cvSetZero( stillObjectCounterImage );
-			
-			g_temp_w = m_image_orig.width;
-			g_temp_h = m_image_orig.height;
+      /* åˆæœŸåŒ–ã™ã‚‹ */
+      cvConvert( inputImage, backgroundAverageImage );
+      cvSet( backgroundThresholdImage, cvScalarAll( BACKGROUND_INITIAL_THRESHOLD ) );
+      cvSetZero( stillObjectAverageImage );
+      cvSetZero( stillObjectThresholdImage );
+      cvSetZero( stillObjectCounterImage );
 
-			SubStractCaptureImage_count = 1;
+      g_temp_w = m_image_orig.width;
+      g_temp_h = m_image_orig.height;
 
-		}
+      SubStractCaptureImage_count = 1;
 
-	}else if(m_image_origIn.isNew() && SubStractCaptureImage_count != 0 ){
-		
-		m_image_origIn.read();
+    }
 
-		if(g_temp_w == m_image_orig.width && g_temp_h == m_image_orig.height){
-			
-			memcpy(inputImage->imageData,(void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length());
-		
-			//	float 32bit‚É•ÏŠ·‚·‚é
-			cvConvert( inputImage, frameImage32 );
+  }else if(m_image_origIn.isNew() && SubStractCaptureImage_count != 0 )
+  {
+    m_image_origIn.read();
 
-			//	”wŒi‚Æ‚Ì· /////////////////////////////////////////////////////////
+    if(g_temp_w == m_image_orig.width && g_temp_h == m_image_orig.height)
+    {
+      memcpy(inputImage->imageData,(void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length());
 
-			//	Œ»İ‚Ì”wŒi‚Æ‚Ì·‚Ìâ‘Î’l‚ğ¬•ª‚²‚Æ‚Éæ‚é
-			cvAbsDiff( frameImage32, backgroundAverageImage, backgroundDifferenceImage );
+      /* float 32bitã«å¤‰æ›ã™ã‚‹ */
+      cvConvert( inputImage, frameImage32 );
 
-			//	è‡’l‚Ì’l‚ğˆø‚­
-			cvAddWeighted( backgroundDifferenceImage, 1.0, backgroundThresholdImage, -THRESHOLD_COEFFICIENT, 0.0, thresholdImage32 );
+      // èƒŒæ™¯ã¨ã®å·® /////////////////////////////////////////////////////////
 
-			// thresholdImage ‚Ì—v‘f‚ª1‚Â‚Å‚à0ˆÈã‚¾‚Á‚½‚ç”wŒi‚Å‚Í‚È‚¢
-			cvConvert( thresholdImage32, thresholdImage );
-			cvCvtColor( thresholdImage, resultImage, CV_BGR2GRAY );
-			cvThreshold( resultImage, backgroundMaskImage, MASK_THRESHOLD, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY_INV );
+      /* ç¾åœ¨ã®èƒŒæ™¯ã¨ã®å·®ã®çµ¶å¯¾å€¤ã‚’æˆåˆ†ã”ã¨ã«å–ã‚‹ */
+      cvAbsDiff( frameImage32, backgroundAverageImage, backgroundDifferenceImage );
 
-			//	”wŒiŒó•â‚Æ‚Ì· /////////////////////////////////////////////////////
+      /* é–¾å€¤ã®å€¤ã‚’å¼•ã */
+      cvAddWeighted( backgroundDifferenceImage, 1.0, backgroundThresholdImage, -THRESHOLD_COEFFICIENT, 0.0, thresholdImage32 );
 
-			//	Œ»İ‚Ì”wŒiŒó•â‚Æ‚Ì·‚Ìâ‘Î’l‚ğ¬•ª‚²‚Æ‚Éæ‚é
-			cvAbsDiff( frameImage32, stillObjectAverageImage, stillObjectDifferenceImage );
+      /* thresholdImage ã®è¦ç´ ãŒ1ã¤ã§ã‚‚0ä»¥ä¸Šã ã£ãŸã‚‰èƒŒæ™¯ã§ã¯ãªã„ */
+      cvConvert( thresholdImage32, thresholdImage );
+      cvCvtColor( thresholdImage, resultImage, CV_BGR2GRAY );
+      cvThreshold( resultImage, backgroundMaskImage, MASK_THRESHOLD, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY_INV );
 
-			//	è‡’l‚Ì’l‚ğˆø‚­
-			cvAddWeighted( stillObjectDifferenceImage, 1.0, stillObjectThresholdImage, -THRESHOLD_COEFFICIENT, 0.0, thresholdImage32 );
+      // èƒŒæ™¯å€™è£œã¨ã®å·® /////////////////////////////////////////////////////
 
-			//	thresholdImage ‚Ì—v‘f‚ª1‚Â‚Å‚à0ˆÈã‚¾‚Á‚½‚ç”wŒiŒó•â‚Å‚Í‚È‚¢
-			cvConvert( thresholdImage32, thresholdImage );
-			cvCvtColor( thresholdImage, resultImage, CV_BGR2GRAY );
-			cvThreshold( resultImage, stillObjectMaskImage, MASK_THRESHOLD, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY_INV );
-			
-			//	‚±‚±‚Ü‚Å‚ÅA
-			//	backgroundDifferenceImage, backgroundMaskImage
-			//	stillObjectDifferenceImage, stillObjectMaskImage
-			//	‚ÉˆÓ–¡‚Ì‚ ‚é’l‚ª“ü‚éB
+      /* ç¾åœ¨ã®èƒŒæ™¯å€™è£œã¨ã®å·®ã®çµ¶å¯¾å€¤ã‚’æˆåˆ†ã”ã¨ã«å–ã‚‹ */
+      cvAbsDiff( frameImage32, stillObjectAverageImage, stillObjectDifferenceImage );
 
-			//	Šeíî•ñ‚ğXV‚·‚é /////////////////////////////////////////////////
+      /* é–¾å€¤ã®å€¤ã‚’å¼•ã */
+      cvAddWeighted( stillObjectDifferenceImage, 1.0, stillObjectThresholdImage, -THRESHOLD_COEFFICIENT, 0.0, thresholdImage32 );
 
-			//	”wŒi‚É“¯‰»‚·‚éê‡ (backgroundMaskImage=1‚Ìê‡)
-			cvRunningAvg( frameImage32, backgroundAverageImage, BACKGROUND_ALPHA, backgroundMaskImage );
-			cvRunningAvg( backgroundDifferenceImage, backgroundThresholdImage, BACKGROUND_ALPHA, backgroundMaskImage );
+      /* thresholdImage ã®è¦ç´ ãŒ1ã¤ã§ã‚‚0ä»¥ä¸Šã ã£ãŸã‚‰èƒŒæ™¯å€™è£œã§ã¯ãªã„ */
+      cvConvert( thresholdImage32, thresholdImage );
+      cvCvtColor( thresholdImage, resultImage, CV_BGR2GRAY );
+      cvThreshold( resultImage, stillObjectMaskImage, MASK_THRESHOLD, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY_INV );
 
-			//	”wŒiŒó•â‚É“¯‰»‚·‚éê‡ (backgroundMaskImage=0 && stillObjectMaskImage=1)
-			cvNot( backgroundMaskImage, foregroundMaskImage );
-			cvAnd( foregroundMaskImage, stillObjectMaskImage, tmpMaskImage );	//	”wŒiŒó•â
-			
-			cvRunningAvg( frameImage32, stillObjectAverageImage, STILL_OBJECT_ALPHA, tmpMaskImage );
-			cvRunningAvg( stillObjectDifferenceImage, stillObjectThresholdImage, STILL_OBJECT_ALPHA, tmpMaskImage );
-						  
-			//	”wŒiŒó•âƒJƒEƒ“ƒ^‚ğ‘‚â‚·
-			cvAddS( stillObjectCounterImage, cvScalar( 1 ), stillObjectCounterImage, tmpMaskImage );
-			
-			//	ƒJƒEƒ“ƒ^‚ªè‡’lˆÈã‚É‚È‚Á‚½‚çA”wŒiŒó•â‚ğ”wŒi‚Æ‚µ‚ÄÌ—p‚·‚é
-			cvThreshold( stillObjectCounterImage, tmp2MaskImage, STILL_OBJECT_TO_BACKGROUND, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY );
-			cvAnd( tmpMaskImage, tmp2MaskImage, backgroundCopyMaskImage );
-			cvCopy( stillObjectAverageImage, backgroundAverageImage, backgroundCopyMaskImage );
-			cvCopy( stillObjectThresholdImage, backgroundThresholdImage, backgroundCopyMaskImage );
+      /* ã“ã“ã¾ã§ã§ã€
+       * backgroundDifferenceImage, backgroundMaskImage
+       * stillObjectDifferenceImage, stillObjectMaskImage
+       * ã«æ„å‘³ã®ã‚ã‚‹å€¤ãŒå…¥ã‚‹ã€‚
+       */
 
-			//	‚±‚Ì backgroundCopyMaskImage ‚ÍAŒã‚Å”wŒiŒó•â‚ğ0‚É‰Šú‰»‚·‚éÛ‚Ég—p
-			cvSet( stillObjectCounterImage, cvScalarAll( 0 ), backgroundCopyMaskImage );
+      // å„ç¨®æƒ…å ±ã‚’æ›´æ–°ã™ã‚‹ /////////////////////////////////////////////////
 
-			//	”wŒiŒó•â‚Å‚à‚È‚­A”wŒi‚Å‚à‚È‚¢ê‡
-			//	(foregroundMaskImage = 1 && stillObjectMaskImage = 0)
-			cvNot( stillObjectMaskImage, movingObjectMask );
-			
-			//	ƒJƒEƒ“ƒ^‚ğŒ¸‚ç‚·(’Z,ŠÔƒmƒCƒY‘Î‰)
-			//	‚±‚ê‚ÍA”wŒi‚É•ª—Ş‚³‚ê‚½ƒsƒNƒZƒ‹‚É‘Î‚µ‚Ä‚às‚¤B‚·‚È‚í‚¿A
-			//	movingObjectMask == 1 || backgroundMaskImage == 1
-			cvOr( backgroundMaskImage, movingObjectMask, tmpMaskImage );
-			cvSubS( stillObjectCounterImage, cvScalarAll( NOT_STILL_DEC_STEP ), stillObjectCounterImage, tmpMaskImage );
-			
-			//	ƒJƒEƒ“ƒ^‚ª0‚É‚È‚Á‚½‚ç”wŒiŒó•â‚ğ‰Šú‰»‚·‚é
-			cvNot( stillObjectCounterImage, tmp2MaskImage );	// tmp2 = 1 ‚È‚ç‰Šú‰»
+      /* èƒŒæ™¯ã«åŒåŒ–ã™ã‚‹å ´åˆ (backgroundMaskImage=1ã®å ´åˆ) */
+      cvRunningAvg( frameImage32, backgroundAverageImage, BACKGROUND_ALPHA, backgroundMaskImage );
+      cvRunningAvg( backgroundDifferenceImage, backgroundThresholdImage, BACKGROUND_ALPHA, backgroundMaskImage );
 
-			//	‰Šú‰»‚·‚é’l‚ÌŒó•â‚Í2í—Ş‚ ‚éB
-			//	(1)Œ»İ‚Ì‰æ‘œ‚Å‰Šú‰» --- ”wŒi‚Å‚à‚È‚­”wŒiŒó•â‚Å‚à‚È‚¢ê‡
-			//	(2)“o˜^‚È‚µó‘Ô‚Å‰Šú‰» --- ”wŒi‚à‚µ‚­‚Í”wŒiŒó•â‚ğƒRƒs[‚µ‚½ê‡
-			//	‚±‚±‚Å‚Í(1)‚Å‰Šú‰»‚µ‚Ä‚¨‚­
-			cvOr( tmpMaskImage, backgroundCopyMaskImage, tmpMaskImage );
-			cvAnd( tmpMaskImage, tmp2MaskImage, tmpMaskImage );
+      /* èƒŒæ™¯å€™è£œã«åŒåŒ–ã™ã‚‹å ´åˆ (backgroundMaskImage=0 && stillObjectMaskImage=1) */
+      cvNot( backgroundMaskImage, foregroundMaskImage );
+      cvAnd( foregroundMaskImage, stillObjectMaskImage, tmpMaskImage ); /*  */
 
-			cvCopy( frameImage32, stillObjectAverageImage, tmpMaskImage );
-			cvSet( stillObjectThresholdImage, cvScalarAll( STILL_OBJECT_INITIAL_THRESHOLD ), tmpMaskImage );
-			
-			//	ƒmƒCƒY‚ğœ‹‚·‚é
-			cvSmooth( foregroundMaskImage, foregroundMaskImage, CV_MEDIAN );
+      cvRunningAvg( frameImage32, stillObjectAverageImage, STILL_OBJECT_ALPHA, tmpMaskImage );
+      cvRunningAvg( stillObjectDifferenceImage, stillObjectThresholdImage, STILL_OBJECT_ALPHA, tmpMaskImage );
 
-			cvConvert( backgroundAverageImage, backgroundImage );
-			cvConvert( stillObjectAverageImage, stillObjectImage );
+      /* èƒŒæ™¯å€™è£œã‚«ã‚¦ãƒ³ã‚¿ã‚’å¢—ã‚„ã™ */
+      cvAddS( stillObjectCounterImage, cvScalar( 1 ), stillObjectCounterImage, tmpMaskImage );
 
-			//	ƒL[“ü—Í”»’è
-			cvWaitKey( 1 );
-			
-			// ‰æ‘œƒf[ƒ^‚ÌƒTƒCƒYæ“¾
-			double len;
+      /* ã‚«ã‚¦ãƒ³ã‚¿ãŒé–¾å€¤ä»¥ä¸Šã«ãªã£ãŸã‚‰ã€èƒŒæ™¯å€™è£œã‚’èƒŒæ™¯ã¨ã—ã¦æ¡ç”¨ã™ã‚‹ */
+      cvThreshold( stillObjectCounterImage, tmp2MaskImage, STILL_OBJECT_TO_BACKGROUND, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY );
+      cvAnd( tmpMaskImage, tmp2MaskImage, backgroundCopyMaskImage );
+      cvCopy( stillObjectAverageImage, backgroundAverageImage, backgroundCopyMaskImage );
+      cvCopy( stillObjectThresholdImage, backgroundThresholdImage, backgroundCopyMaskImage );
 
-			len = (outputImage->nChannels * outputImage->width * outputImage->height);
-			m_image_out.pixels.length(len);
+      /* ã“ã® backgroundCopyMaskImage ã¯ã€å¾Œã§èƒŒæ™¯å€™è£œã‚’0ã«åˆæœŸåŒ–ã™ã‚‹éš›ã«ä½¿ç”¨ */
+      cvSet( stillObjectCounterImage, cvScalarAll( 0 ), backgroundCopyMaskImage );
 
-			memcpy((void *)&(m_image_out.pixels[0]), inputImage->imageData, len);
-			
-			m_image_out.width = m_image_orig.width;
-			m_image_out.height = m_image_orig.height;
+      /* èƒŒæ™¯å€™è£œã§ã‚‚ãªãã€èƒŒæ™¯ã§ã‚‚ãªã„å ´åˆ */
+      /* (foregroundMaskImage = 1 && stillObjectMaskImage = 0) */
+      cvNot( stillObjectMaskImage, movingObjectMask );
 
-			m_image_outOut.write();
+      /* ã‚«ã‚¦ãƒ³ã‚¿ã‚’æ¸›ã‚‰ã™(çŸ­æ™‚,é–“ãƒã‚¤ã‚ºå¯¾å¿œ)
+       * ã“ã‚Œã¯ã€èƒŒæ™¯ã«åˆ†é¡ã•ã‚ŒãŸãƒ”ã‚¯ã‚»ãƒ«ã«å¯¾ã—ã¦ã‚‚è¡Œã†ã€‚ã™ãªã‚ã¡ã€
+       * movingObjectMask == 1 || backgroundMaskImage == 1
+       */
+      cvOr( backgroundMaskImage, movingObjectMask, tmpMaskImage );
+      cvSubS( stillObjectCounterImage, cvScalarAll( NOT_STILL_DEC_STEP ), stillObjectCounterImage, tmpMaskImage );
 
-			cvMerge( foregroundMaskImage, foregroundMaskImage, foregroundMaskImage, NULL, foreGroundMaskBuff);
-			
-			len = (foreGroundMaskBuff->nChannels * foreGroundMaskBuff->width * foreGroundMaskBuff->height);
-			m_foreMaskImg.pixels.length(len);
+      /* ã‚«ã‚¦ãƒ³ã‚¿ãŒ0ã«ãªã£ãŸã‚‰èƒŒæ™¯å€™è£œã‚’åˆæœŸåŒ–ã™ã‚‹ */
+      cvNot( stillObjectCounterImage, tmp2MaskImage );	/* tmp2 = 1 ãªã‚‰åˆæœŸåŒ– */
 
-			memcpy((void *)&(m_foreMaskImg.pixels[0]), foreGroundMaskBuff->imageData, len);
-			
-			m_foreMaskImg.width = m_image_orig.width;
-			m_foreMaskImg.height = m_image_orig.height;
+      /* åˆæœŸåŒ–ã™ã‚‹å€¤ã®å€™è£œã¯2ç¨®é¡ã‚ã‚‹ã€‚
+       * (1)ç¾åœ¨ã®ç”»åƒã§åˆæœŸåŒ– --- èƒŒæ™¯ã§ã‚‚ãªãèƒŒæ™¯å€™è£œã§ã‚‚ãªã„å ´åˆ
+       * (2)ç™»éŒ²ãªã—çŠ¶æ…‹ã§åˆæœŸåŒ– --- èƒŒæ™¯ã‚‚ã—ãã¯èƒŒæ™¯å€™è£œã‚’ã‚³ãƒ”ãƒ¼ã—ãŸå ´åˆ
+       * ã“ã“ã§ã¯(1)ã§åˆæœŸåŒ–ã—ã¦ãŠã
+       */
+      cvOr( tmpMaskImage, backgroundCopyMaskImage, tmpMaskImage );
+      cvAnd( tmpMaskImage, tmp2MaskImage, tmpMaskImage );
 
-			m_foreMaskImgOut.write();
+      cvCopy( frameImage32, stillObjectAverageImage, tmpMaskImage );
+      cvSet( stillObjectThresholdImage, cvScalarAll( STILL_OBJECT_INITIAL_THRESHOLD ), tmpMaskImage );
 
+      /* ãƒã‚¤ã‚ºã‚’é™¤å»ã™ã‚‹ */
+      cvSmooth( foregroundMaskImage, foregroundMaskImage, CV_MEDIAN );
 
-			cvMerge( stillObjectMaskImage, stillObjectMaskImage, stillObjectMaskImage, NULL, stillObjectMaskBuff );
+      cvConvert( backgroundAverageImage, backgroundImage );
+      cvConvert( stillObjectAverageImage, stillObjectImage );
 
-			len = (stillObjectMaskBuff->nChannels * stillObjectMaskBuff->width * stillObjectMaskBuff->height);
-			m_stillMaskImg.pixels.length(len);
+      cvWaitKey( 1 );
 
-			memcpy((void *)&(m_stillMaskImg.pixels[0]), stillObjectMaskBuff->imageData, len);
+      /* ç”»åƒãƒ‡ãƒ¼ã‚¿ã®ã‚µã‚¤ã‚ºå–å¾— */
+      double len;
+      len = (outputImage->nChannels * outputImage->width * outputImage->height);
+      m_image_out.pixels.length(len);
 
-			m_stillMaskImg.width = m_image_orig.width;
-			m_stillMaskImg.height = m_image_orig.height;
+      memcpy((void *)&(m_image_out.pixels[0]), inputImage->imageData, len);
 
-			m_stillMaskImgOut.write();
+      m_image_out.width = m_image_orig.width;
+      m_image_out.height = m_image_orig.height;
 
-			
-			len = (backgroundImage->nChannels * backgroundImage->width * backgroundImage->height);
-			m_backGroundImg.pixels.length(len);
+      m_image_outOut.write();
 
-			memcpy((void *)&(m_backGroundImg.pixels[0]), backgroundImage->imageData, len);
+      cvMerge( foregroundMaskImage, foregroundMaskImage, foregroundMaskImage, NULL, foreGroundMaskBuff);
 
-			m_backGroundImg.width = m_image_orig.width;
-			m_backGroundImg.height = m_image_orig.height;
+      len = (foreGroundMaskBuff->nChannels * foreGroundMaskBuff->width * foreGroundMaskBuff->height);
+      m_foreMaskImg.pixels.length(len);
 
-			m_backGroundImgOut.write();
+      memcpy((void *)&(m_foreMaskImg.pixels[0]), foreGroundMaskBuff->imageData, len);
+
+      m_foreMaskImg.width = m_image_orig.width;
+      m_foreMaskImg.height = m_image_orig.height;
+
+      m_foreMaskImgOut.write();
 
 
-			len = (stillObjectImage->nChannels * stillObjectImage->width * stillObjectImage->height);
-			m_stillImg.pixels.length(len);
+      cvMerge( stillObjectMaskImage, stillObjectMaskImage, stillObjectMaskImage, NULL, stillObjectMaskBuff );
 
-			memcpy((void *)&(m_stillImg.pixels[0]), stillObjectImage->imageData, len);
+      len = (stillObjectMaskBuff->nChannels * stillObjectMaskBuff->width * stillObjectMaskBuff->height);
+      m_stillMaskImg.pixels.length(len);
 
-			m_stillImg.width = m_image_orig.width;
-			m_stillImg.height = m_image_orig.height;
+      memcpy((void *)&(m_stillMaskImg.pixels[0]), stillObjectMaskBuff->imageData, len);
 
-			m_stillImgOut.write();
+      m_stillMaskImg.width = m_image_orig.width;
+      m_stillMaskImg.height = m_image_orig.height;
 
-			/*
-			cvMerge( stillObjectCounterImage, stillObjectCounterImage, stillObjectCounterImage, NULL, stillObjectCounterBuff );
+      m_stillMaskImgOut.write();
 
-			len = (stillObjectCounterBuff->nChannels * stillObjectCounterBuff->width * stillObjectCounterBuff->height);
-			m_stillCounterImg.pixels.length(len);
 
-			memcpy((void *)&(m_stillCounterImg.pixels[0]), stillObjectCounterBuff->imageData, len);
+      len = (backgroundImage->nChannels * backgroundImage->width * backgroundImage->height);
+      m_backGroundImg.pixels.length(len);
 
-			m_stillCounterImg.width = m_image_orig.width;
-			m_stillCounterImg.height = m_image_orig.height;
+      memcpy((void *)&(m_backGroundImg.pixels[0]), backgroundImage->imageData, len);
 
-			m_stillCounterImgOut.write();
-			*/
-			g_temp_w = m_image_orig.width;
-			g_temp_h = m_image_orig.height;
+      m_backGroundImg.width = m_image_orig.width;
+      m_backGroundImg.height = m_image_orig.height;
 
-			key = '0';
-		}
+      m_backGroundImgOut.write();
 
-	}
 
-	if(g_temp_w != m_image_orig.width || g_temp_h != m_image_orig.height){
+      len = (stillObjectImage->nChannels * stillObjectImage->width * stillObjectImage->height);
+      m_stillImg.pixels.length(len);
 
-		cvReleaseImage( &inputImage );
-		cvReleaseImage( &backgroundAverageImage );
-		cvReleaseImage( &backgroundThresholdImage);
-		cvReleaseImage( &stillObjectAverageImage );
-		cvReleaseImage( &stillObjectThresholdImage );
-		cvReleaseImage( &stillObjectCounterImage );
-		cvReleaseImage( &backgroundDifferenceImage );
-		cvReleaseImage( &stillObjectDifferenceImage );
-		cvReleaseImage( &thresholdImage32 );
-		cvReleaseImage( &thresholdImage );
-		cvReleaseImage( &resultImage );
-		cvReleaseImage( &backgroundMaskImage );
-		cvReleaseImage( &foregroundMaskImage );
-		cvReleaseImage( &stillObjectMaskImage );
-		cvReleaseImage( &movingObjectMask );
-		cvReleaseImage( &backgroundCopyMaskImage );
-		cvReleaseImage( &tmpMaskImage );
-		cvReleaseImage( &tmp2MaskImage );
-		cvReleaseImage( &frameImage32 );
-		cvReleaseImage( &backgroundImage );
-		cvReleaseImage( &stillObjectImage );
-		cvReleaseImage( &outputImage );
+      memcpy((void *)&(m_stillImg.pixels[0]), stillObjectImage->imageData, len);
 
-		cvReleaseImage( &foreGroundMaskBuff);
-		cvReleaseImage( &stillObjectMaskBuff);
-		cvReleaseImage( &backGroundBuff);
-		cvReleaseImage( &stillObjectImageBuff);
-		cvReleaseImage( &stillObjectCounterBuff);
-		
-		//g_temp_w = m_image_orig.width;
-		//g_temp_h = m_image_orig.height;
+      m_stillImg.width = m_image_orig.width;
+      m_stillImg.height = m_image_orig.height;
 
-		SubStractCaptureImage_count = 0;
-	}
+      m_stillImgOut.write();
 
-    return RTC::RTC_OK;
+      /*
+      cvMerge( stillObjectCounterImage, stillObjectCounterImage, stillObjectCounterImage, NULL, stillObjectCounterBuff );
+
+      len = (stillObjectCounterBuff->nChannels * stillObjectCounterBuff->width * stillObjectCounterBuff->height);
+      m_stillCounterImg.pixels.length(len);
+
+      memcpy((void *)&(m_stillCounterImg.pixels[0]), stillObjectCounterBuff->imageData, len);
+
+      m_stillCounterImg.width = m_image_orig.width;
+      m_stillCounterImg.height = m_image_orig.height;
+
+      m_stillCounterImgOut.write();
+      */
+      g_temp_w = m_image_orig.width;
+      g_temp_h = m_image_orig.height;
+
+      key = '0';
+    }
+  }
+
+  if(g_temp_w != m_image_orig.width || g_temp_h != m_image_orig.height)
+  {
+    cvReleaseImage( &inputImage );
+    cvReleaseImage( &backgroundAverageImage );
+    cvReleaseImage( &backgroundThresholdImage);
+    cvReleaseImage( &stillObjectAverageImage );
+    cvReleaseImage( &stillObjectThresholdImage );
+    cvReleaseImage( &stillObjectCounterImage );
+    cvReleaseImage( &backgroundDifferenceImage );
+    cvReleaseImage( &stillObjectDifferenceImage );
+    cvReleaseImage( &thresholdImage32 );
+    cvReleaseImage( &thresholdImage );
+    cvReleaseImage( &resultImage );
+    cvReleaseImage( &backgroundMaskImage );
+    cvReleaseImage( &foregroundMaskImage );
+    cvReleaseImage( &stillObjectMaskImage );
+    cvReleaseImage( &movingObjectMask );
+    cvReleaseImage( &backgroundCopyMaskImage );
+    cvReleaseImage( &tmpMaskImage );
+    cvReleaseImage( &tmp2MaskImage );
+    cvReleaseImage( &frameImage32 );
+    cvReleaseImage( &backgroundImage );
+    cvReleaseImage( &stillObjectImage );
+    cvReleaseImage( &outputImage );
+
+    cvReleaseImage( &foreGroundMaskBuff);
+    cvReleaseImage( &stillObjectMaskBuff);
+    cvReleaseImage( &backGroundBuff);
+    cvReleaseImage( &stillObjectImageBuff);
+    cvReleaseImage( &stillObjectCounterBuff);
+
+    //g_temp_w = m_image_orig.width;
+    //g_temp_h = m_image_orig.height;
+
+    SubStractCaptureImage_count = 0;
+  }
+
+  return RTC::RTC_OK;
 }
 
 /*
