@@ -4,12 +4,17 @@ cmake_policy(SET CMP0002 OLD)
 project(Template)
 string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 include("${PROJECT_SOURCE_DIR}/cmake/utils.cmake")
-set(PROJECT_VERSION 1.0.0 CACHE STRING "Template version")
+set(PROJECT_VERSION 1.1.0 CACHE STRING "Template version")
 DISSECT_VERSION()
 set(PROJECT_DESCRIPTION "Template image component")
 set(PROJECT_VENDOR "AIST")
 set(PROJECT_AUTHOR "AIST")
 set(PROJECT_AUTHOR_SHORT "AIST")
+
+set(LINUX_PACKAGE_GENERATOR "DEB")
+#set(LINUX_PACKAGE_GENERATOR "RPM")
+set(PROJECT_MAINTAINER "Noriaki Ando <n-ando@aist.go.jp>")
+set(PROJECT_TYPE "c++/opencv-rtcs")
 
 # Add an "uninstall" target
 CONFIGURE_FILE ("${PROJECT_SOURCE_DIR}/cmake/uninstall_target.cmake.in"
@@ -18,7 +23,7 @@ ADD_CUSTOM_TARGET (${PROJECT_NAME}_uninstall "${CMAKE_COMMAND}" -P
     "${PROJECT_BINARY_DIR}/uninstall_target.cmake")
 
 #option(BUILD_EXAMPLES "Build and install examples" OFF)
-option(BUILD_DOCUMENTATION "Build the documentation" ON)
+option(BUILD_DOCUMENTATION "Build the documentation" OFF)
 #option(BUILD_TESTS "Build the tests" OFF)
 #option(BUILD_TOOLS "Build the tools" OFF)
 option(BUILD_IDL "Build and install idl" ON)
@@ -38,12 +43,19 @@ endif (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 
 # Set up installation directories
-set(BIN_INSTALL_DIR "components/bin")
-set(LIB_INSTALL_DIR "components/lib")
-set(INC_INSTALL_DIR
-    "components/include/${PROJECT_NAME_LOWER}-${PROJECT_VERSION_MAJOR}")
-set(SHARE_INSTALL_DIR
-    "components/share/${PROJECT_NAME_LOWER}-${PROJECT_VERSION_MAJOR}")
+if(WIN32)
+#  set(BIN_INSTALL_DIR "components/bin")
+#  set(LIB_INSTALL_DIR "components/lib")
+  set(INSTALL_PREFIX "components/${PROJECT_TYPE}")
+else(WIN32)
+  set(OPENRTM_SHARE_PREFIX "share/openrtm-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}")
+  set(INSTALL_PREFIX "${OPENRTM_SHARE_PREFIX}/components/${PROJECT_TYPE}")
+endif(WIN32)
+
+#set(INC_INSTALL_DIR
+#    "components/include/${PROJECT_NAME_LOWER}-${PROJECT_VERSION_MAJOR}")
+#set(SHARE_INSTALL_DIR
+#    "components/share/${PROJECT_NAME_LOWER}-${PROJECT_VERSION_MAJOR}")
 
 # Get necessary dependency information
 find_package(OpenRTM)

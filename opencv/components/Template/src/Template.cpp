@@ -18,7 +18,7 @@ static const char* template_spec[] =
     "implementation_id", "Template",
     "type_name",         "Template",
     "description",       "Template image component",
-    "version",           "1.0.0",
+    "version",           "1.1.0",
     "vendor",            "AIST",
     "category",          "Category",
     "activity_type",     "PERIODIC",
@@ -27,7 +27,7 @@ static const char* template_spec[] =
     "language",          "C++",
     "lang_type",         "compile",
     // Configuration variables
-    "conf.default.image_path", "",
+    "conf.default.image_path", "template.bmp",
     // Widget
     "conf.__widget__.image_path", "text",
     // Constraints
@@ -112,7 +112,7 @@ RTC::ReturnCode_t Template::onShutdown(RTC::UniqueId ec_id)
 RTC::ReturnCode_t Template::onActivated(RTC::UniqueId ec_id)
 {
 
-  // ‘ÎÛ‰æ‘œ—pƒƒ‚ƒŠ‚Ì‰Šú‰»
+  /* å¯¾è±¡ç”»åƒç”¨ãƒ¡ãƒ¢ãƒªã®åˆæœŸåŒ– */
   templateID = -1;
   templateWidth = 0;
   templateHeight = 0;
@@ -120,13 +120,13 @@ RTC::ReturnCode_t Template::onActivated(RTC::UniqueId ec_id)
   templateGrayImage = NULL;
   templateBinaryImage = NULL;
 
-  // ƒCƒ[ƒW—pƒƒ‚ƒŠ‚Ì‰Šú‰»
+  /* ã‚¤ãƒ¡ãƒ¼ã‚¸ç”¨ãƒ¡ãƒ¢ãƒªã®åˆæœŸåŒ– */
   imageBuff = NULL;
   sourceGrayImage = NULL;
   sourceBinaryImage = NULL;
   differenceMapImage = NULL;
 
-  // OutPort‚P‚Ì‰æ–ÊƒTƒCƒY‚Ì‰Šú‰»
+  /* OutPortï¼‘ã®ç”»é¢ã‚µã‚¤ã‚ºã®åˆæœŸåŒ– */
   m_image_template.width = 0;
   m_image_template.height = 0;
 
@@ -142,18 +142,18 @@ RTC::ReturnCode_t Template::onDeactivated(RTC::UniqueId ec_id)
 
   if(imageBuff != NULL)
   {
-    // ƒCƒ[ƒW—pƒƒ‚ƒŠ‚Ì‰ğ•ú
-	cvReleaseImage(&imageBuff);
-	cvReleaseImage(&sourceGrayImage);
-	cvReleaseImage(&sourceBinaryImage);
-	cvReleaseImage(&differenceMapImage);
+    /* ã‚¤ãƒ¡ãƒ¼ã‚¸ç”¨ãƒ¡ãƒ¢ãƒªã®è§£æ”¾ */
+    cvReleaseImage(&imageBuff);
+    cvReleaseImage(&sourceGrayImage);
+    cvReleaseImage(&sourceBinaryImage);
+    cvReleaseImage(&differenceMapImage);
   }
 
   if( templateImage != NULL )
   {
-	  cvReleaseImage(&templateImage);
-	  cvReleaseImage(&templateGrayImage);
-      cvReleaseImage(&templateBinaryImage);
+    cvReleaseImage(&templateImage);
+    cvReleaseImage(&templateGrayImage);
+    cvReleaseImage(&templateBinaryImage);
   }
 
   return RTC::RTC_OK;
@@ -162,143 +162,140 @@ RTC::ReturnCode_t Template::onDeactivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Template::onExecute(RTC::UniqueId ec_id)
 {
-  // V‚µ‚¢ƒf[ƒ^‚Ìƒ`ƒFƒbƒN
+  /* æ–°ã—ã„ãƒ‡ãƒ¼ã‚¿ã®ãƒã‚§ãƒƒã‚¯ */
   if(m_image_origIn.isNew())
   {
-	  // InPortƒf[ƒ^‚Ì“Ç‚İ‚İ
-	  m_image_origIn.read();
+    /* InPortãƒ‡ãƒ¼ã‚¿ã®èª­ã¿è¾¼ã¿ */
+    m_image_origIn.read();
 
-	  // ‘ÎÛ‰æ‘œ‚ğ“Ç‚İ‚Ş
-	  templateImage = cvLoadImage( m_img_path, CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_ANYCOLOR );
+    /* å¯¾è±¡ç”»åƒã‚’èª­ã¿è¾¼ã‚€ */
+    templateImage = cvLoadImage( m_img_path, CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_ANYCOLOR );
 
-	  if( templateImage == NULL )
-	  {
-		  templateID = -1 ;
-		  templateWidth = templateHeight = 0;
-	  }
+    if( templateImage == NULL )
+    {
+      templateID = -1 ;
+      templateWidth = templateHeight = 0;
+    }
 
-	  // ‘ÎÛ‰æ‘œƒ`ƒFƒbƒN
-	  // ‘ÎÛ‰æ‘œ‚ÌPath‚Æ‚©–¼‚ª–³‚¢ê‡ƒeƒ“ƒvƒŒ[ƒgƒ}ƒbƒ`ƒ“ƒO‚µ‚È‚­‚Ä“ü—Í‚³‚ê‚½ƒCƒ[ƒW‚ğ‚»‚Ì‚Ü‚Üo—Í
-	  if( templateImage != NULL && templateID != templateImage->ID )
-	  {
-		  // ƒtƒ‰ƒbƒOİ’è(³‚µ‚¢‘ÎÛ‰æ‘œ‚ª“ü—Íj
-		  flag = 1;
-		  templateID = templateImage->ID;
-		  templateWidth = templateImage->width;
-		  templateHeight = templateImage->height;
+    /* å¯¾è±¡ç”»åƒãƒã‚§ãƒƒã‚¯ */
+    /* å¯¾è±¡ç”»åƒã®Pathã¨ã‹åãŒç„¡ã„å ´åˆãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆãƒãƒƒãƒãƒ³ã‚°ã—ãªãã¦å…¥åŠ›ã•ã‚ŒãŸã‚¤ãƒ¡ãƒ¼ã‚¸ã‚’ãã®ã¾ã¾å‡ºåŠ› */
+    if( templateImage != NULL && templateID != templateImage->ID )
+    {
+      /* ãƒ•ãƒ©ãƒƒã‚°è¨­å®š(æ­£ã—ã„å¯¾è±¡ç”»åƒãŒå…¥åŠ›ï¼‰ */
+      flag = 1;
+      templateID = templateImage->ID;
+      templateWidth = templateImage->width;
+      templateHeight = templateImage->height;
 
-		  if(templateGrayImage != NULL)
-		  {
-			  cvReleaseImage(&templateGrayImage);
-			  cvReleaseImage(&templateBinaryImage);
-		  }
+      if(templateGrayImage != NULL)
+      {
+        cvReleaseImage(&templateGrayImage);
+        cvReleaseImage(&templateBinaryImage);
+      }
 
-		  // ‘ÎÛ‰æ‘œ—p‚Ìƒƒ‚ƒŠŠm•Û
-		  templateGrayImage = cvCreateImage( cvGetSize(templateImage), IPL_DEPTH_8U, 1 );
-		  templateBinaryImage = cvCreateImage( cvGetSize(templateImage), IPL_DEPTH_8U, 1 );
+      /* å¯¾è±¡ç”»åƒç”¨ã®ãƒ¡ãƒ¢ãƒªç¢ºä¿ */
+      templateGrayImage = cvCreateImage( cvGetSize(templateImage), IPL_DEPTH_8U, 1 );
+      templateBinaryImage = cvCreateImage( cvGetSize(templateImage), IPL_DEPTH_8U, 1 );
 
-		  // ‘ÎÛ‰æ‘œIDAƒTƒCƒYo—Í
-		  cout << "templateID : "<<templateID<<endl;
-		  cout << "template - width :"<<templateWidth<<endl;
-		  cout << "template - height :"<<templateHeight<<endl;
+      cout << "templateID : "<<templateID<<endl;
+      cout << "template - width :"<<templateWidth<<endl;
+      cout << "template - height :"<<templateHeight<<endl;
 
-		  //  RGB‚©‚çƒOƒŒ[ƒXƒP[ƒ‹‚É•ÏŠ·‚·‚é
-		  cvCvtColor( templateImage, templateGrayImage, CV_RGB2GRAY );
+      /* RGBã‹ã‚‰ã‚°ãƒ¬ãƒ¼ã‚¹ã‚±ãƒ¼ãƒ«ã«å¤‰æ›ã™ã‚‹ */
+      cvCvtColor( templateImage, templateGrayImage, CV_RGB2GRAY );
 
-		  //  ƒOƒŒ[ƒXƒP[ƒ‹‚©‚ç2’l‚É•ÏŠ·‚·‚é
-		  cvThreshold( templateGrayImage, templateBinaryImage, THRESHOLD, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY );
+      /* ã‚°ãƒ¬ãƒ¼ã‚¹ã‚±ãƒ¼ãƒ«ã‹ã‚‰2å€¤ã«å¤‰æ›ã™ã‚‹ */
+      cvThreshold( templateGrayImage, templateBinaryImage, THRESHOLD, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY );
 
-		  // OutPort‚Q—p‚Ì‰æ–ÊƒTƒCƒY‰Šú‰»
-		  m_image_picture.width = templateImage->width;
-		  m_image_picture.height = templateImage->height;
-	  }
+      /* OutPortï¼’ç”¨ã®ç”»é¢ã‚µã‚¤ã‚ºåˆæœŸåŒ– */
+      m_image_picture.width = templateImage->width;
+      m_image_picture.height = templateImage->height;
+    }
 
-	  // InPort‚ÆOutPort‚Ì‰æ–ÊƒTƒCƒYˆ—‚¨‚æ‚ÑƒCƒ[ƒW—pƒƒ‚ƒŠ‚ÌŠm•Û(³‚µ‚¢‘ÎÛ‰æ‘œ‚ª“ü‚ê‚é‚ÆdifferenceMapImage‚ª•ÏŠ·‚³‚ê‚é-ƒtƒ‰ƒbƒO‚ğŒ©‚Ä”»’fj
-	  if(m_image_orig.width != m_image_template.width || m_image_orig.height != m_image_template.height || flag == 1)
-	  {
-		  flag = 0;
-		  m_image_template.width = m_image_orig.width;
-		  m_image_template.height = m_image_orig.height;
+    /* InPortã¨OutPortã®ç”»é¢ã‚µã‚¤ã‚ºå‡¦ç†ãŠã‚ˆã³ã‚¤ãƒ¡ãƒ¼ã‚¸ç”¨ãƒ¡ãƒ¢ãƒªã®ç¢ºä¿(æ­£ã—ã„å¯¾è±¡ç”»åƒãŒå…¥ã‚Œã‚‹ã¨differenceMapImageãŒå¤‰æ›ã•ã‚Œã‚‹-ãƒ•ãƒ©ãƒƒã‚°ã‚’è¦‹ã¦åˆ¤æ–­ï¼‰ */
+    if(m_image_orig.width != m_image_template.width || m_image_orig.height != m_image_template.height || flag == 1)
+    {
+      flag = 0;
+      m_image_template.width = m_image_orig.width;
+      m_image_template.height = m_image_orig.height;
 
-		  // InPort‚ÌƒCƒ[ƒWƒTƒCƒY‚ª•ÏX‚³‚ê‚½ê‡
-		  if(imageBuff != NULL)
-		  {
-			  cvReleaseImage(&imageBuff);
-			  cvReleaseImage(&sourceGrayImage);
-			  cvReleaseImage(&sourceBinaryImage);
-			  cvReleaseImage(&differenceMapImage);
-		  }
-		  // ƒCƒ[ƒW—pƒƒ‚ƒŠ‚ÌŠm•Û
-		  imageBuff = cvCreateImage( cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_8U, 3 );
-		  sourceGrayImage = cvCreateImage( cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_8U, 1 );
-		  sourceBinaryImage = cvCreateImage( cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_8U, 1 );
-		  differenceMapImage = cvCreateImage( cvSize( m_image_orig.width - templateWidth + 1, m_image_orig.height - templateHeight + 1 ), IPL_DEPTH_32F, 1 );
-	  }
+      /* InPortã®ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚µã‚¤ã‚ºãŒå¤‰æ›´ã•ã‚ŒãŸå ´åˆ */
+      if(imageBuff != NULL)
+      {
+        cvReleaseImage(&imageBuff);
+        cvReleaseImage(&sourceGrayImage);
+        cvReleaseImage(&sourceBinaryImage);
+        cvReleaseImage(&differenceMapImage);
+      }
+      /* ã‚¤ãƒ¡ãƒ¼ã‚¸ç”¨ãƒ¡ãƒ¢ãƒªã®ç¢ºä¿ */
+      imageBuff = cvCreateImage( cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_8U, 3 );
+      sourceGrayImage = cvCreateImage( cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_8U, 1 );
+      sourceBinaryImage = cvCreateImage( cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_8U, 1 );
+      differenceMapImage = cvCreateImage( cvSize( m_image_orig.width - templateWidth + 1, 
+                                m_image_orig.height - templateHeight + 1 ), IPL_DEPTH_32F, 1 );
+    }
 
-	  // InPort‚Ì‰æ‘œƒf[ƒ^‚ğƒRƒs[
-	  memcpy( imageBuff->imageData, (void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length() );
+    /* InPortã®ç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’ã‚³ãƒ”ãƒ¼ */
+    memcpy( imageBuff->imageData, (void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length() );
 
-	  if( templateImage != NULL )
-	  {
-		  //  RGB‚©‚çƒOƒŒ[ƒXƒP[ƒ‹‚É•ÏŠ·‚·‚é
-		  cvCvtColor( imageBuff, sourceGrayImage, CV_RGB2GRAY );
+    if( templateImage != NULL )
+    {
+      /* RGBã‹ã‚‰ã‚°ãƒ¬ãƒ¼ã‚¹ã‚±ãƒ¼ãƒ«ã«å¤‰æ›ã™ã‚‹ */
+      cvCvtColor( imageBuff, sourceGrayImage, CV_RGB2GRAY );
 
-		  //  ƒOƒŒ[ƒXƒP[ƒ‹‚©‚ç2’l‚É•ÏŠ·‚·‚é
-		  cvThreshold( sourceGrayImage, sourceBinaryImage, THRESHOLD, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY );
+      /* ã‚°ãƒ¬ãƒ¼ã‚¹ã‚±ãƒ¼ãƒ«ã‹ã‚‰2å€¤ã«å¤‰æ›ã™ã‚‹ */
+      cvThreshold( sourceGrayImage, sourceBinaryImage, THRESHOLD, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY );
 
-		  //  ƒeƒ“ƒvƒŒ[ƒgƒ}ƒbƒ`ƒ“ƒO‚ğs‚¤
-		  cvMatchTemplate( sourceBinaryImage, templateBinaryImage, differenceMapImage, CV_TM_SQDIFF );
+      /* ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆãƒãƒƒãƒãƒ³ã‚°ã‚’è¡Œã† */
+      cvMatchTemplate( sourceBinaryImage, templateBinaryImage, differenceMapImage, CV_TM_SQDIFF );
 
-		  //  ƒeƒ“ƒvƒŒ[ƒg‚ªŒ³‰æ‘œ‚Ì‚Ç‚Ì•”•ª‚É‚ ‚é‚Ì‚©‚Æ‚¢‚¤î•ñ‚ğ“¾‚é
-		  cvMinMaxLoc( differenceMapImage, NULL, NULL, &minLocation, NULL, NULL );
+      /* ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆãŒå…ƒç”»åƒã®ã©ã®éƒ¨åˆ†ã«ã‚ã‚‹ã®ã‹ã¨ã„ã†æƒ…å ±ã‚’å¾—ã‚‹ */
+      cvMinMaxLoc( differenceMapImage, NULL, NULL, &minLocation, NULL, NULL );
 
-		  //  ˆê’v‚·‚éêŠ‚ğŒ³‰æ‘œ‚ÉlŠp‚Å•`‚­
-		  cvRectangle(
-			  imageBuff,
-			  minLocation,
-			  cvPoint( minLocation.x + templateImage->width, minLocation.y + templateImage->height ),
-			  CV_RGB( 255, 0, 0 ),
-			  LINE_THICKNESS,
-			  LINE_TYPE,
-			  SHIFT
-		  );
+      /* ä¸€è‡´ã™ã‚‹å ´æ‰€ã‚’å…ƒç”»åƒã«å››è§’ã§æã */
+      cvRectangle(
+      imageBuff,
+      minLocation,
+      cvPoint( minLocation.x + templateImage->width, minLocation.y + templateImage->height ),
+                  CV_RGB( 255, 0, 0 ),
+                  LINE_THICKNESS,
+                  LINE_TYPE,
+                  SHIFT
+      );
 
-		  // ‰æ‘œƒf[ƒ^‚ÌƒTƒCƒYæ“¾
-		  len = imageBuff->nChannels * imageBuff->width * imageBuff->height;
-		  m_image_template.pixels.length(len);
+      /* ç”»åƒãƒ‡ãƒ¼ã‚¿ã®ã‚µã‚¤ã‚ºå–å¾— */
+      len = imageBuff->nChannels * imageBuff->width * imageBuff->height;
+      m_image_template.pixels.length(len);
 
-		  //  ”½“]‚µ‚½‰æ‘œƒf[ƒ^‚ğOutPort‚ÉƒRƒs[
-		  memcpy( (void *)&(m_image_template.pixels[0]), imageBuff->imageData, len );
-	  
-		  //  ”½“]‚µ‚½‰æ‘œƒf[ƒ^‚ğOutPort‚©‚ço—Í
-		  m_image_templateOut.write();
+      /* åè»¢ã—ãŸç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’OutPortã«ã‚³ãƒ”ãƒ¼ */
+      memcpy( (void *)&(m_image_template.pixels[0]), imageBuff->imageData, len );
 
-		  //  ‘ÎÛ‰æ‘œƒf[ƒ^‚ÌƒTƒCƒYæ“¾
-		  len = templateImage->nChannels * templateImage->width * templateImage->height;
-		  m_image_picture.pixels.length(len);
+      /* åè»¢ã—ãŸç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’OutPortã‹ã‚‰å‡ºåŠ› */
+      m_image_templateOut.write();
 
-		  //  ”½“]‚µ‚½‘ÎÛ‰æ‘œƒf[ƒ^‚ğOutPort‚ÉƒRƒs[
+      /* å¯¾è±¡ç”»åƒãƒ‡ãƒ¼ã‚¿ã®ã‚µã‚¤ã‚ºå–å¾— */
+      len = templateImage->nChannels * templateImage->width * templateImage->height;
+      m_image_picture.pixels.length(len);
 
-		  memcpy( (void *)&(m_image_picture.pixels[0]), templateImage->imageData, len );
+      /* åè»¢ã—ãŸå¯¾è±¡ç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’OutPortã«ã‚³ãƒ”ãƒ¼ */
+      memcpy( (void *)&(m_image_picture.pixels[0]), templateImage->imageData, len );
 
-		  //  ”½“]‚µ‚½‘ÎÛ‰æ‘œƒf[ƒ^‚ğOutPort‚©‚ço—Í
-		  m_image_pictureOut.write();
+      m_image_pictureOut.write();
 
-	  }else{
+    }else{
 
-		  // ‰æ‘œƒf[ƒ^‚ÌƒTƒCƒYæ“¾
-		  len = imageBuff->nChannels * imageBuff->width * imageBuff->height;
-		  m_image_template.pixels.length(len);
+      /* ç”»åƒãƒ‡ãƒ¼ã‚¿ã®ã‚µã‚¤ã‚ºå–å¾— */
+      len = imageBuff->nChannels * imageBuff->width * imageBuff->height;
+      m_image_template.pixels.length(len);
 
-		  //  ”½“]‚µ‚½‰æ‘œƒf[ƒ^‚ğOutPort‚ÉƒRƒs[
-		  memcpy( (void *)&(m_image_template.pixels[0]), imageBuff->imageData, len );
-	  
-		  //  ”½“]‚µ‚½‰æ‘œƒf[ƒ^‚ğOutPort‚©‚ço—Í
-		  m_image_templateOut.write();
+      /* åè»¢ã—ãŸç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’OutPortã«ã‚³ãƒ”ãƒ¼ */
+      memcpy( (void *)&(m_image_template.pixels[0]), imageBuff->imageData, len );
 
-	  }
+      m_image_templateOut.write();
 
-	  cvReleaseImage(&templateImage);
+    }
+
+    cvReleaseImage(&templateImage);
   }
   return RTC::RTC_OK;
 }

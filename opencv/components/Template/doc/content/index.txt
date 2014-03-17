@@ -106,7 +106,7 @@ The available configuration parameters are described below:
 ================ ================== ================ ======
 Parameter        Data type          Default Value    Effect
 ================ ================== ================ ======
-image_path       char               ""               
+image_path       char               template.bmp     
 ================ ================== ================ ======
 
 Ports

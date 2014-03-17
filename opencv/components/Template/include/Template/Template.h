@@ -24,12 +24,12 @@
 #include <cxcore.h>
 #include <highgui.h>
 
-#define THRESHOLD	50			//	2’l‰»‚МЌЫ‚Ми‡’l
-#define THRESHOLD_MAX_VALUE	255	//	2’l‰»‚МЌЫ‚ЙЋg—p‚·‚йЌЕ‘е’l
+#define THRESHOLD	50            /* 2еЂ¤еЊ–гЃ®йљ›гЃ®й–ѕеЂ¤ */
+#define THRESHOLD_MAX_VALUE	255 /* 2еЂ¤еЊ–гЃ®йљ›гЃ«дЅїз”ЁгЃ™г‚‹жњЂе¤§еЂ¤ */
 
-#define LINE_THICKNESS	1	//	ђь‚М‘ѕ‚і
-#define	LINE_TYPE	8		//	ђь‚МЋн—Ю
-#define SHIFT	0			//	ЌА•W‚МЏ¬ђ”“_€И‰є‚МЊ…‚р•\‚·ѓrѓbѓgђ”
+#define LINE_THICKNESS	1   /* з·љгЃ®е¤ЄгЃ• */
+#define	LINE_TYPE	8         /* з·љгЃ®зЁ®йЎћ */
+#define SHIFT	0             /* еє§жЁ™гЃ®е°Џж•°з‚№д»Ґдё‹гЃ®жЎЃг‚’иЎЁгЃ™гѓ“гѓѓгѓ€ж•° */
 
 // Service implementation headers
 // <rtc-template block="service_impl_h">
@@ -238,7 +238,7 @@ class Template
   /*!
    * 
    * - Name:  img_path
-   * - DefaultValue: ""
+   * - DefaultValue: template.bmp
    */
   char m_img_path[50];
 
