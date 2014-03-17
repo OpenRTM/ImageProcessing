@@ -19,7 +19,7 @@
 #include <rtm/idl/ExtendedDataTypesSkel.h>
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
-//OpenCV—pƒCƒ“ƒNƒ‹[ƒhƒtƒ@ƒCƒ‹‚ÌƒCƒ“ƒNƒ‹[ƒh
+/* OpenCVç”¨ã‚¤ãƒ³ã‚¯ãƒ«ãƒ¼ãƒ‰ãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚¤ãƒ³ã‚¯ãƒ«ãƒ¼ãƒ‰ */
 #include<cv.h>
 #include<cxcore.h>
 #include<highgui.h>
@@ -285,14 +285,14 @@ class Scale
   // <rtc-template block="private_operation">
   
   // </rtc-template>
-    IplImage* m_image_buff;			// Original Image
-    IplImage* m_image_dest;         // Œ‹‰Êo—Í—pIplImage
+  IplImage* m_image_buff;     /* Original Image */
+  IplImage* m_image_dest;     /* çµæœå‡ºåŠ›ç”¨IplImage */
 
-    double m_currentScaleX;         // Œ»İ‚ÌX•ûŒüŠg‘å”ä—¦
-    double m_currentScaleY;         // Œ»İ‚ÌY•ûŒüŠg‘å”ä—¦
+  double m_currentScaleX;     /* ç¾åœ¨ã®Xæ–¹å‘æ‹¡å¤§æ¯”ç‡ */
+  double m_currentScaleY;     /* ç¾åœ¨ã®Yæ–¹å‘æ‹¡å¤§æ¯”ç‡ */
 
-    int m_in_height;      // “ü—ÍƒCƒ[ƒW‚ÌHeight
-    int m_in_width;       // “ü—ÍƒCƒ[ƒW‚ÌWidth
+  int m_in_height;      /* å…¥åŠ›ã‚¤ãƒ¡ãƒ¼ã‚¸ã®Height */
+  int m_in_width;       /* å…¥åŠ›ã‚¤ãƒ¡ãƒ¼ã‚¸ã®Width */
 };
 
 

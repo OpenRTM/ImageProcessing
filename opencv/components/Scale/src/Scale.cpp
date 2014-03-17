@@ -16,7 +16,7 @@ static const char* scale_spec[] =
     "implementation_id", "Scale",
     "type_name",         "Scale",
     "description",       "Scale image component",
-    "version",           "1.0.0",
+    "version",           "1.1.0",
     "vendor",            "AIST",
     "category",          "Category",
     "activity_type",     "PERIODIC",
@@ -111,97 +111,98 @@ RTC::ReturnCode_t Scale::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Scale::onActivated(RTC::UniqueId ec_id)
 {
-    // ƒCƒ[ƒW—pƒƒ‚ƒŠ‚ÌŠm•Û
-    m_image_buff       = NULL;
-    m_image_dest       = NULL;
+  /* ã‚¤ãƒ¡ãƒ¼ã‚¸ç”¨ãƒ¡ãƒ¢ãƒªã®ç¢ºä¿ */
+  m_image_buff       = NULL;
+  m_image_dest       = NULL;
 
-    m_currentScaleX    = m_scale_x;
-    m_currentScaleY    = m_scale_y;
+  m_currentScaleX    = m_scale_x;
+  m_currentScaleY    = m_scale_y;
 
-    m_in_height        = 0;
-    m_in_width         = 0;
-    
-    return RTC::RTC_OK;
+  m_in_height        = 0;
+  m_in_width         = 0;
+  
+  return RTC::RTC_OK;
 }
 
 
 RTC::ReturnCode_t Scale::onDeactivated(RTC::UniqueId ec_id)
 {
-    if(m_image_buff != NULL)
-        cvReleaseImage(&m_image_buff);
-    
-    if(m_image_dest != NULL)
-        cvReleaseImage(&m_image_dest);
-
-    return RTC::RTC_OK;
+  if(m_image_buff != NULL)
+  {
+    cvReleaseImage(&m_image_buff);
+  }
+  if(m_image_dest != NULL)
+  {
+    cvReleaseImage(&m_image_dest);
+  }
+  return RTC::RTC_OK;
 }
 
 
 RTC::ReturnCode_t Scale::onExecute(RTC::UniqueId ec_id)
 {
-    // Common CV actions
-    // V‚µ‚¢ƒf[ƒ^‚Ìƒ`ƒFƒbƒN
-    if (m_image_origIn.isNew()) 
+  /* Common CV actions */
+  /* æ–°ã—ã„ãƒ‡ãƒ¼ã‚¿ã®ãƒã‚§ãƒƒã‚¯ */
+  if (m_image_origIn.isNew()) 
+  {
+    /* InPortãƒ‡ãƒ¼ã‚¿ã®èª­ã¿è¾¼ã¿ */
+    m_image_origIn.read();
+
+    // Anternative actions
+
+    /* ã‚µã‚¤ã‚ºãŒå¤‰ã‚ã£ãŸã¨ãã ã‘å†ç”Ÿæˆã™ã‚‹ */
+    if(m_in_height != m_image_orig.height || m_in_width != m_image_orig.width)
     {
-        // InPortƒf[ƒ^‚Ì“Ç‚Ýž‚Ý
-        m_image_origIn.read();
+      printf("[onExecute] Size of input image is not match!\n");
 
-        // Anternative actions
+      m_in_height = m_image_orig.height;
+      m_in_width  = m_image_orig.width;
 
-        // ƒTƒCƒY‚ª•Ï‚í‚Á‚½‚Æ‚«‚¾‚¯Ä¶¬‚·‚é
-        if(m_in_height != m_image_orig.height || m_in_width != m_image_orig.width)
-        {
-            printf("[onExecute] Size of input image is not match!\n");
-
-            m_in_height = m_image_orig.height;
-            m_in_width  = m_image_orig.width;
-            
-            if(m_image_buff != NULL)
-                cvReleaseImage(&m_image_buff);
-
-            // ƒTƒCƒY•ÏŠ·‚Ì‚½‚ßTempƒƒ‚ƒŠ[‚ð‚æ‚¢‚·‚é
-            m_image_buff = cvCreateImage(cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_8U, 3);
-        }
-
-        // InPort‚Ì‰æ‘œƒf[ƒ^‚ðIplImage‚ÌimageData‚ÉƒRƒs[
-        memcpy(m_image_buff->imageData, (void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length());
-
-	    // Šg‘å”ä—¦‚ªXV‚³‚ê‚½‚ço—ÍƒCƒ[ƒW—pƒƒ‚ƒŠ‚ðÄŠm•Û‚·‚é
-        if(m_image_dest == NULL || m_currentScaleX != m_scale_x || m_currentScaleY != m_scale_y)
-        {
-            m_currentScaleX    = m_scale_x;
-            m_currentScaleY    = m_scale_y;
-
-            printf( "[onExecute] Sacle has been changed to (%f, %f)\n", m_scale_x, m_scale_y);
-            printf( "[onExecute] Realloc memory for output-image by (%d, %d)\n", (int)(m_in_width  * m_currentScaleX), 
-                                                                                 (int)(m_in_height * m_currentScaleY));
-
-            // Šù‘¶‚Ìƒƒ‚ƒŠ‚ð‰ð•ú‚·‚é
-            if(m_image_dest != NULL)
-                cvReleaseImage(&m_image_dest);
-    	    m_image_dest = cvCreateImage(cvSize((int)(m_in_width  * m_currentScaleX), 
-                                                (int)(m_in_height * m_currentScaleY)), IPL_DEPTH_8U, 3);
-        }        
-
-	    // ‰æ‘œ‚Ì‘å‚«‚³‚ð•ÏŠ·‚·‚é
-	    cvResize( m_image_buff, m_image_dest, CV_INTER_LINEAR );
-
-        // ‰æ‘œƒf[ƒ^‚ÌƒTƒCƒYŽæ“¾
-        int len = m_image_dest->nChannels * m_image_dest->width * m_image_dest->height;
-                
-        m_image_output.pixels.length(len);
-        // ‰æ–Ê‚ÌƒTƒCƒYî•ñ‚ð“ü‚ê‚é
-        m_image_output.width  = m_image_dest->width;
-        m_image_output.height = m_image_dest->height;
-
-        // ”½“]‚µ‚½‰æ‘œƒf[ƒ^‚ðOutPort‚ÉƒRƒs[
-        memcpy((void *)&(m_image_output.pixels[0]), m_image_dest->imageData,len);
-
-        // ”½“]‚µ‚½‰æ‘œƒf[ƒ^‚ðOutPort‚©‚ço—Í‚·‚éB
-        m_image_outputOut.write();
+      if(m_image_buff != NULL)
+      {
+        cvReleaseImage(&m_image_buff);
+      }
+      m_image_buff = cvCreateImage(cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_8U, 3);
     }
 
-    return RTC::RTC_OK;
+    /* InPortã®ç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’IplImageã®imageDataã«ã‚³ãƒ”ãƒ¼ */
+    memcpy(m_image_buff->imageData, (void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length());
+
+    /* æ‹¡å¤§æ¯”çŽ‡ãŒæ›´æ–°ã•ã‚ŒãŸã‚‰å‡ºåŠ›ã‚¤ãƒ¡ãƒ¼ã‚¸ç”¨ãƒ¡ãƒ¢ãƒªã‚’å†ç¢ºä¿ã™ã‚‹ */
+    if(m_image_dest == NULL || m_currentScaleX != m_scale_x || m_currentScaleY != m_scale_y)
+    {
+      m_currentScaleX    = m_scale_x;
+      m_currentScaleY    = m_scale_y;
+
+      printf( "[onExecute] Sacle has been changed to (%f, %f)\n", m_scale_x, m_scale_y);
+      printf( "[onExecute] Realloc memory for output-image by (%d, %d)\n", (int)(m_in_width  * m_currentScaleX), 
+                                                                     (int)(m_in_height * m_currentScaleY));
+
+      /* æ—¢å­˜ã®ãƒ¡ãƒ¢ãƒªã‚’è§£æ”¾ã™ã‚‹ */
+      if(m_image_dest != NULL)
+        cvReleaseImage(&m_image_dest);
+      m_image_dest = cvCreateImage(cvSize((int)(m_in_width  * m_currentScaleX), 
+                                    (int)(m_in_height * m_currentScaleY)), IPL_DEPTH_8U, 3);
+    }        
+
+    /* ç”»åƒã®å¤§ãã•ã‚’å¤‰æ›ã™ã‚‹ */
+    cvResize( m_image_buff, m_image_dest, CV_INTER_LINEAR );
+
+    /* ç”»åƒãƒ‡ãƒ¼ã‚¿ã®ã‚µã‚¤ã‚ºå–å¾— */
+    int len = m_image_dest->nChannels * m_image_dest->width * m_image_dest->height;
+          
+    m_image_output.pixels.length(len);
+    /* ç”»é¢ã®ã‚µã‚¤ã‚ºæƒ…å ±ã‚’å…¥ã‚Œã‚‹ */
+    m_image_output.width  = m_image_dest->width;
+    m_image_output.height = m_image_dest->height;
+
+    /* åè»¢ã—ãŸç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’OutPortã«ã‚³ãƒ”ãƒ¼ */
+    memcpy((void *)&(m_image_output.pixels[0]), m_image_dest->imageData,len);
+
+    m_image_outputOut.write();
+  }
+
+  return RTC::RTC_OK;
 }
 
 /*
