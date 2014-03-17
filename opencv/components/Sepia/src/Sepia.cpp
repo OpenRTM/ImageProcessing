@@ -16,7 +16,7 @@ static const char* sepia_spec[] =
     "implementation_id", "Sepia",
     "type_name",         "Sepia",
     "description",       "Sepia component",
-    "version",           "1.0.0",
+    "version",           "1.1.0",
     "vendor",            "AIST",
     "category",          "Category",
     "activity_type",     "PERIODIC",
@@ -109,129 +109,124 @@ RTC::ReturnCode_t Sepia::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Sepia::onActivated(RTC::UniqueId ec_id)
 {
-    // ƒCƒ[ƒW—pƒƒ‚ƒŠ‚ÌŠm•Û
-    m_image_buff       = NULL;
+  /* ã‚¤ãƒ¡ãƒ¼ã‚¸ç”¨ãƒ¡ãƒ¢ãƒªã®ç¢ºä¿ */
+  m_image_buff       = NULL;
 
-	m_hsvImage         = NULL;
+  m_hsvImage         = NULL;
 
-    m_hueImage         = NULL;
-	m_saturationImage  = NULL;
-	m_valueImage       = NULL;
+  m_hueImage         = NULL;
+  m_saturationImage  = NULL;
+  m_valueImage       = NULL;
 
-	m_mergeImage       = NULL;
-	m_destinationImage = NULL;
+  m_mergeImage       = NULL;
+  m_destinationImage = NULL;
 
-    m_in_height        = 0;
-    m_in_width         = 0;
-    
-    return RTC::RTC_OK;
+  m_in_height        = 0;
+  m_in_width         = 0;
+
+  return RTC::RTC_OK;
 }
 
 
 RTC::ReturnCode_t Sepia::onDeactivated(RTC::UniqueId ec_id)
 {
-    // ƒCƒ[ƒW—pƒƒ‚ƒŠ‚Ì‰ð•ú
-    if(m_image_buff       != NULL)
-        cvReleaseImage(&m_image_buff);
-    if(m_hsvImage         != NULL)
-        cvReleaseImage(&m_hsvImage);
-    if(m_hueImage         != NULL)
-        cvReleaseImage(&m_hueImage);
-    if(m_saturationImage  != NULL)
-        cvReleaseImage(&m_saturationImage);
-    if(m_valueImage       != NULL)
-        cvReleaseImage(&m_valueImage);
-    if(m_mergeImage       != NULL)
-        cvReleaseImage(&m_mergeImage);
-    if(m_destinationImage != NULL)
-        cvReleaseImage(&m_destinationImage);
+  /* ã‚¤ãƒ¡ãƒ¼ã‚¸ç”¨ãƒ¡ãƒ¢ãƒªã®è§£æ”¾ */
+  if(m_image_buff       != NULL)
+      cvReleaseImage(&m_image_buff);
+  if(m_hsvImage         != NULL)
+      cvReleaseImage(&m_hsvImage);
+  if(m_hueImage         != NULL)
+      cvReleaseImage(&m_hueImage);
+  if(m_saturationImage  != NULL)
+      cvReleaseImage(&m_saturationImage);
+  if(m_valueImage       != NULL)
+      cvReleaseImage(&m_valueImage);
+  if(m_mergeImage       != NULL)
+      cvReleaseImage(&m_mergeImage);
+  if(m_destinationImage != NULL)
+      cvReleaseImage(&m_destinationImage);
 
-    return RTC::RTC_OK;
+  return RTC::RTC_OK;
 }
 
 
 RTC::ReturnCode_t Sepia::onExecute(RTC::UniqueId ec_id)
 {
-    // Common CV actions
-    // V‚µ‚¢ƒf[ƒ^‚Ìƒ`ƒFƒbƒN
-    if (m_image_origIn.isNew()) 
+  /* Common CV actions */
+  /* æ–°ã—ã„ãƒ‡ãƒ¼ã‚¿ã®ãƒã‚§ãƒƒã‚¯ */
+  if (m_image_origIn.isNew()) 
+  {
+    /* InPortãƒ‡ãƒ¼ã‚¿ã®èª­ã¿è¾¼ã¿ */
+    m_image_origIn.read();
+
+    /* ã‚µã‚¤ã‚ºãŒå¤‰ã‚ã£ãŸã¨ãã ã‘å†ç”Ÿæˆã™ã‚‹ */
+    if(m_in_height != m_image_orig.height || m_in_width != m_image_orig.width)
     {
-        // InPortƒf[ƒ^‚Ì“Ç‚Ýž‚Ý
-        m_image_origIn.read();
+      printf("[onExecute] Size of input image is not match!\n");
 
-        // ƒTƒCƒY‚ª•Ï‚í‚Á‚½‚Æ‚«‚¾‚¯Ä¶¬‚·‚é
-        if(m_in_height != m_image_orig.height || m_in_width != m_image_orig.width)
-        {
-            printf("[onExecute] Size of input image is not match!\n");
+      m_in_height = m_image_orig.height;
+      m_in_width  = m_image_orig.width;
 
-            m_in_height = m_image_orig.height;
-            m_in_width  = m_image_orig.width;
-            
-            if(m_image_buff       != NULL)
-                cvReleaseImage(&m_image_buff);
-            if(m_hsvImage         != NULL)
-                cvReleaseImage(&m_hsvImage);
-            if(m_hueImage         != NULL)
-                cvReleaseImage(&m_hueImage);
-            if(m_saturationImage  != NULL)
-                cvReleaseImage(&m_saturationImage);
-            if(m_valueImage       != NULL)
-                cvReleaseImage(&m_valueImage);
-            if(m_mergeImage       != NULL)
-                cvReleaseImage(&m_mergeImage);
-            if(m_destinationImage != NULL)
-                cvReleaseImage(&m_destinationImage);
+      if(m_image_buff       != NULL)
+        cvReleaseImage(&m_image_buff);
+      if(m_hsvImage         != NULL)
+        cvReleaseImage(&m_hsvImage);
+      if(m_hueImage         != NULL)
+        cvReleaseImage(&m_hueImage);
+      if(m_saturationImage  != NULL)
+        cvReleaseImage(&m_saturationImage);
+      if(m_valueImage       != NULL)
+        cvReleaseImage(&m_valueImage);
+      if(m_mergeImage       != NULL)
+        cvReleaseImage(&m_mergeImage);
+      if(m_destinationImage != NULL)
+        cvReleaseImage(&m_destinationImage);
 
-            // ƒTƒCƒY•ÏŠ·‚Ì‚½‚ßTempƒƒ‚ƒŠ[‚ð‚æ‚¢‚·‚é
-            m_image_buff       = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3);
-
-	        m_hsvImage         = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3);
-
-            m_hueImage         = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 1);
-	        m_saturationImage  = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 1);
-	        m_valueImage       = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 1);
-
-	        m_mergeImage       = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3);
-	        m_destinationImage = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3);
-        }
-
-        // InPort‚Ì‰æ‘œƒf[ƒ^‚ðIplImage‚ÌimageData‚ÉƒRƒs[
-        memcpy(m_image_buff->imageData,(void *)&(m_image_orig.pixels[0]),m_image_orig.pixels.length());
-
-        // Anternative actions
-
-        //	BGR‚©‚çHSV‚É•ÏŠ·‚·‚é
-        cvCvtColor(m_image_buff, m_hsvImage, CV_BGR2HSV);
-
-        //	HSV‰æ‘œ‚ðHASAV‰æ‘œ‚É•ª‚¯‚é
-        cvSplit(m_hsvImage, m_hueImage, m_saturationImage, m_valueImage, NULL); 
-
-        //	H‚ÆS‚Ì’l‚ð•ÏX‚·‚é
-        cvSet(m_hueImage,        cvScalar( m_nHue ),        NULL);
-        cvSet(m_saturationImage, cvScalar( m_nSaturation ), NULL);
-
-        //	3ƒ`ƒƒƒ“ƒlƒ‹‚ðŒ‹‡
-        cvMerge(m_hueImage, m_saturationImage, m_valueImage, NULL, m_mergeImage);
-
-        //	HSV‚©‚çBGR‚É•ÏŠ·‚·‚é
-        cvCvtColor(m_mergeImage, m_destinationImage, CV_HSV2BGR);
-
-        // ‰æ‘œƒf[ƒ^‚ÌƒTƒCƒYŽæ“¾
-        int len = m_destinationImage->nChannels * m_destinationImage->width * m_destinationImage->height;
-                
-        // ‰æ–Ê‚ÌƒTƒCƒYî•ñ‚ð“ü‚ê‚é
-        m_image_sepia.pixels.length(len);        
-        m_image_sepia.width  = m_destinationImage->width;
-        m_image_sepia.height = m_destinationImage->height;
-
-        // ”½“]‚µ‚½‰æ‘œƒf[ƒ^‚ðOutPort‚ÉƒRƒs[
-        memcpy((void *)&(m_image_sepia.pixels[0]), m_destinationImage->imageData,len);
-
-        // ”½“]‚µ‚½‰æ‘œƒf[ƒ^‚ðOutPort‚©‚ço—Í‚·‚éB
-        m_image_sepiaOut.write();
+      m_image_buff       = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3);
+      m_hsvImage         = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3);
+      m_hueImage         = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 1);
+      m_saturationImage  = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 1);
+      m_valueImage       = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 1);
+      m_mergeImage       = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3);
+      m_destinationImage = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3);
     }
 
-    return RTC::RTC_OK;
+    /* InPortã®ç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’IplImageã®imageDataã«ã‚³ãƒ”ãƒ¼ */
+    memcpy(m_image_buff->imageData,(void *)&(m_image_orig.pixels[0]),m_image_orig.pixels.length());
+
+    // Anternative actions
+
+    /* BGRã‹ã‚‰HSVã«å¤‰æ›ã™ã‚‹ */
+    cvCvtColor(m_image_buff, m_hsvImage, CV_BGR2HSV);
+
+    /* HSVç”»åƒã‚’Hã€Sã€Vç”»åƒã«åˆ†ã‘ã‚‹ */
+    cvSplit(m_hsvImage, m_hueImage, m_saturationImage, m_valueImage, NULL); 
+
+    /* Hã¨Sã®å€¤ã‚’å¤‰æ›´ã™ã‚‹ */
+    cvSet(m_hueImage,        cvScalar( m_nHue ),        NULL);
+    cvSet(m_saturationImage, cvScalar( m_nSaturation ), NULL);
+
+    /* 3ãƒãƒ£ãƒ³ãƒãƒ«ã‚’çµåˆ */
+    cvMerge(m_hueImage, m_saturationImage, m_valueImage, NULL, m_mergeImage);
+
+    /* HSVã‹ã‚‰BGRã«å¤‰æ›ã™ã‚‹ */
+    cvCvtColor(m_mergeImage, m_destinationImage, CV_HSV2BGR);
+
+    /* ç”»åƒãƒ‡ãƒ¼ã‚¿ã®ã‚µã‚¤ã‚ºå–å¾— */
+    int len = m_destinationImage->nChannels * m_destinationImage->width * m_destinationImage->height;
+          
+    /* ç”»é¢ã®ã‚µã‚¤ã‚ºæƒ…å ±ã‚’å…¥ã‚Œã‚‹ */
+    m_image_sepia.pixels.length(len);        
+    m_image_sepia.width  = m_destinationImage->width;
+    m_image_sepia.height = m_destinationImage->height;
+
+    /* åè»¢ã—ãŸç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’OutPortã«ã‚³ãƒ”ãƒ¼ */
+    memcpy((void *)&(m_image_sepia.pixels[0]), m_destinationImage->imageData,len);
+
+    m_image_sepiaOut.write();
+  }
+
+  return RTC::RTC_OK;
 }
 
 /*

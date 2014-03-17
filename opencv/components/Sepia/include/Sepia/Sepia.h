@@ -19,7 +19,7 @@
 #include <rtm/idl/ExtendedDataTypesSkel.h>
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
-//OpenCV—pƒCƒ“ƒNƒ‹[ƒhƒtƒ@ƒCƒ‹‚ÌƒCƒ“ƒNƒ‹[ƒh
+/* OpenCVç”¨ã‚¤ãƒ³ã‚¯ãƒ«ãƒ¼ãƒ‰ãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚¤ãƒ³ã‚¯ãƒ«ãƒ¼ãƒ‰ */
 #include<cv.h>
 #include<cxcore.h>
 #include<highgui.h>
@@ -286,18 +286,18 @@ class Sepia
   
   // </rtc-template>
 
-    int m_in_height;                // “ü—ÍƒCƒ[ƒW‚ÌHeight
-    int m_in_width;                 // “ü—ÍƒCƒ[ƒW‚ÌWidth
+  int m_in_height;              /* å…¥åŠ›ã‚¤ãƒ¡ãƒ¼ã‚¸ã®Height */
+  int m_in_width;               /* å…¥åŠ›ã‚¤ãƒ¡ãƒ¼ã‚¸ã®Width */
 
-	IplImage* m_image_buff;			// Original Image
+  IplImage* m_image_buff;       /* Original Image */
 
-	IplImage* m_hsvImage;			// HSV‰æ‘œ—pIplImage
-	IplImage* m_hueImage;			// F‘Š(H)î•ñ—pIplImage
-	IplImage* m_saturationImage;	// Ê“x(S)î•ñ—pIplImage
-	IplImage* m_valueImage;			// –¾“x(V)î•ñ—pIplImage
+  IplImage* m_hsvImage;         /* HSVç”»åƒç”¨IplImage */
+  IplImage* m_hueImage;         /* è‰²ç›¸(H)æƒ…å ±ç”¨IplImage */
+  IplImage* m_saturationImage;  /* å½©åº¦(S)æƒ…å ±ç”¨IplImage */
+  IplImage* m_valueImage;       /* æ˜åº¦(V)æƒ…å ±ç”¨IplImage */
 
-	IplImage* m_mergeImage;			// ƒ}[ƒW—pIplImage
-	IplImage* m_destinationImage;	// Œ‹‰Êo—Í—pIplImage
+  IplImage* m_mergeImage;       /* ãƒãƒ¼ã‚¸ç”¨IplImage */
+  IplImage* m_destinationImage; /* çµæœå‡ºåŠ›ç”¨IplImage */
 };
 
 
