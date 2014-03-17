@@ -19,9 +19,7 @@
 #include <rtm/idl/ExtendedDataTypesSkel.h>
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
-//#include "Camera.h"
 #include "FlyCapture2.h"
-//#include "FlyCapture2GUI.h"
 
 #include <cv.h>
 #include <cxcore.h>
@@ -277,22 +275,19 @@ class PGRCamera
   
   // </rtc-template>
 
-	/** Camera object. */
-	//FlyCapture2::Camera m_camera;
+  // <rtc-template block="private_operation">
+  
+  // </rtc-template>
 
-    /** Camera information for the camera. */
-	FlyCapture2::CameraInfo m_camInfo;
+  /** Camera information for the camera. */
+  FlyCapture2::CameraInfo m_camInfo;
+  FlyCapture2::Camera* m_camera;
+  FlyCapture2::Image convertedImage;
+  FlyCapture2::Image rawImage;
+  FlyCapture2::PGRGuid guid;
 
-	//FlyCapture2::PGRGuid guid[64];
-	//FlyCapture2::Camera** ppCameras = new Camera*;
-	FlyCapture2::Camera* m_camera;
-
-	FlyCapture2::Image convertedImage;
-	FlyCapture2::Image rawImage;
-	FlyCapture2::PGRGuid guid;
-
-	static int s_number;
-	int m_instance_number;	
+  static int s_number;
+  int m_instance_number;	
 		
 };
 

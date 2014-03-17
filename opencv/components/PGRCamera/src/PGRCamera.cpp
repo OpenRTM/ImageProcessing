@@ -18,7 +18,7 @@ static const char* pgrcamera_spec[] =
     "implementation_id", "PGRCamera",
     "type_name",         "PGRCamera",
     "description",       "PGRCamera",
-    "version",           "1.0.0",
+    "version",           "1.1.0",
     "vendor",            "AIST",
     "category",          "Category",
     "activity_type",     "PERIODIC",
@@ -108,139 +108,133 @@ RTC::ReturnCode_t PGRCamera::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t PGRCamera::onActivated(RTC::UniqueId ec_id)
 {	
-	
-	Error error;
-	FlyCapture2::BusManager busMgr;
+  Error error;
+  FlyCapture2::BusManager busMgr;
 
-	m_camera = new Camera();
-	
-	//Index‚©‚çID‚ðŽæ“¾‚·‚é
-	error = busMgr.GetCameraFromIndex(m_index, &guid);
-	if ( error != PGRERROR_OK ){ 
-		cout << "ƒJƒƒ‰‚ª‚ ‚è‚Ü‚¹‚ñB" << endl;
-		return RTC::RTC_ERROR;	
-	}
-	
-	//ID‚©‚çConnect‚·‚é
-	error = m_camera->Connect(&guid);
-	if ( error != PGRERROR_OK ){ 
-		cout << "Connection Ž¸”sB" << endl;
-		return RTC::RTC_ERROR;	
-	}
-	
-	//ƒJƒƒ‰î•ñ‚ðŽæ“¾‚·‚éB
-	error = m_camera->GetCameraInfo(&m_camInfo);
-	if ( error != PGRERROR_OK ){ 
-		cout << "î•ñŽæ“¾@Ž¸”s" << endl;
-		return RTC::RTC_ERROR;	
-	}
-	
-	//‰f‘œ‚ÌCapture‚ðŽn‚ß‚éB
-	error = m_camera->StartCapture();
-	if ( error != PGRERROR_OK ){ 
-		cout << "Capture Ž¸”sB" << endl;
-		return RTC::RTC_ERROR;	
-	}
-	
-	return RTC::RTC_OK;
-	
+  m_camera = new Camera();
+
+  /* Indexã‹ã‚‰IDã‚’å–å¾—ã™ã‚‹ */
+  error = busMgr.GetCameraFromIndex(m_index, &guid);
+  if ( error != PGRERROR_OK ){ 
+    cout << "ã‚«ãƒ¡ãƒ©ãŒã‚ã‚Šã¾ã›ã‚“ã€‚" << endl;
+    return RTC::RTC_ERROR;	
+  }
+
+  /* IDã‹ã‚‰Connectã™ã‚‹ */
+  error = m_camera->Connect(&guid);
+  if ( error != PGRERROR_OK ){ 
+    cout << "Connection å¤±æ•—ã€‚" << endl;
+    return RTC::RTC_ERROR;	
+  }
+
+  /* ã‚«ãƒ¡ãƒ©æƒ…å ±ã‚’å–å¾—ã™ã‚‹ */
+  error = m_camera->GetCameraInfo(&m_camInfo);
+  if ( error != PGRERROR_OK ){ 
+    cout << "æƒ…å ±å–å¾—ã€€å¤±æ•—" << endl;
+    return RTC::RTC_ERROR;	
+  }
+
+  /* æ˜ åƒã®Captureã‚’å§‹ã‚ã‚‹ */
+  error = m_camera->StartCapture();
+  if ( error != PGRERROR_OK ){ 
+    cout << "Capture å¤±æ•—" << endl;
+    return RTC::RTC_ERROR;	
+  }
+
+  return RTC::RTC_OK;
 }
 
 
 RTC::ReturnCode_t PGRCamera::onDeactivated(RTC::UniqueId ec_id)
 {
-	
-	Error error;
-	
-	//‰f‘œŽæ“¾‚ðI—¹‚·‚éB
-	if(m_camera != NULL){
-		error = m_camera->StopCapture();
-		if ( error != PGRERROR_OK ){ 
-			delete m_camera;
-			return RTC::RTC_ERROR;	
-		}
-	}
+  Error error;
 
-	//connection‚ð‰ðœ‚·‚éB
-	if(m_camera != NULL){
-		error = m_camera->Disconnect();
-		if ( error != PGRERROR_OK ){ 
-			delete m_camera;
-			return RTC::RTC_ERROR;	
-		}
-	}
+  /* æ˜ åƒå–å¾—ã‚’çµ‚äº†ã™ã‚‹ */
+  if(m_camera != NULL){
+    error = m_camera->StopCapture();
+    if ( error != PGRERROR_OK ){ 
+      delete m_camera;
+      return RTC::RTC_ERROR;	
+    }
+  }
 
-	delete m_camera;
-	
-	return RTC::RTC_OK;
+  /* connectionã‚’è§£é™¤ã™ã‚‹ */
+  if(m_camera != NULL){
+    error = m_camera->Disconnect();
+    if ( error != PGRERROR_OK ){ 
+      delete m_camera;
+      return RTC::RTC_ERROR;	
+    }
+  }
+
+  delete m_camera;
+
+  return RTC::RTC_OK;
 }
 
 
 RTC::ReturnCode_t PGRCamera::onExecute(RTC::UniqueId ec_id)
 {
-	Error error;
-	static coil::TimeValue tm_pre;
-	static int count = 0;
+  Error error;
+  static coil::TimeValue tm_pre;
+  static int count = 0;
 
-	// ‰f‘œ‚ÌImage
-    error = m_camera->RetrieveBuffer( &rawImage );
-    if (error != PGRERROR_OK)
+  /* æ˜ åƒã®Image */
+  error = m_camera->RetrieveBuffer( &rawImage );
+  if (error != PGRERROR_OK)
+  {
+    cout << "æ˜ åƒã®RawImageã®é ˜åŸŸã®RetrieveãŒã§ãã¾ã›ã‚“" << endl;
+    return RTC::RTC_ERROR;
+  }
+
+  /* RawImageã‚’RGB8Bitã§Convertã™ã‚‹ */
+  error = rawImage.Convert( PIXEL_FORMAT_RGB8, &convertedImage );
+  if (error != PGRERROR_OK)
+  {
+    cout << "RGBFormatã¨ã—ã¦å¤‰æ›ã§ãã¾ã›ã‚“" << endl;
+    return RTC::RTC_ERROR;
+  }
+
+  int len = convertedImage.GetCols() * convertedImage.GetRows() * 3;  /* ãƒ¡ãƒ¢ãƒªã®ç¯„å›²å›ºå®š */
+
+  /* ç”»é¢ã®ã‚µã‚¤ã‚ºæƒ…å ±ã‚’å…¥ã‚Œã‚‹ */
+  m_outputImage.pixels.length(len);
+  m_outputImage.width = convertedImage.GetCols();
+  m_outputImage.height = convertedImage.GetRows();
+
+  /* å–å¾—ã—ãŸConvertImageã‚’MomoryCopyã™ã‚‹ */
+  memcpy((void *)&(m_outputImage.pixels[0]),convertedImage.GetData(), len);
+
+  /* BGRæ˜ åƒã‚’RGBã¨ã—ã¦å¤‰æ›ã™ã‚‹ãŸã‚ã®Imageã®å®£è¨€ */
+  IplImage* frame = cvCreateImage(cvSize(convertedImage.GetRows(), convertedImage.GetCols()), 8, 3);
+
+  /* BGRã‚’RGBã¨ã—ã¦å¤‰æ›ã™ã‚‹ */
+  memcpy(frame->imageData, (void *)&(m_outputImage.pixels[0]), len);
+  cvCvtColor(frame, frame, CV_BGR2RGB);
+
+  /* å¤‰æ›ã—ãŸImageDataã‚’Outportã®ãƒ¡ãƒ¢ãƒªã‚³ãƒ”ãƒ¼ã™ã‚‹ */
+  memcpy((void *)&(m_outputImage.pixels[0]), frame->imageData, len);
+  cvReleaseImage(&frame);
+
+  m_outputImageOut.write();
+
+  if (count > 100)
+  {
+    count = 0;
+    coil::TimeValue tm;
+    tm = coil::gettimeofday();
+
+    double sec(tm - tm_pre);
+
+    if (sec > 1.0 && sec < 1000.0)
     {
-		cout << "‰f‘œ‚ÌRawImage‚Ì—Ìˆæ‚ÌRetrieve‚ª‚Å‚«‚Ü‚¹‚ñB" << endl;
-        
-		return RTC::RTC_ERROR;
+      std::cout << 100/sec << " [FPS]" << std::endl;
     }
+    tm_pre = tm;
+  }
+  ++count;
 
-	// RawImage‚ðRGB8Bit‚ÅConvert‚·‚éB
-    error = rawImage.Convert( PIXEL_FORMAT_RGB8, &convertedImage );
-    if (error != PGRERROR_OK)
-    {
-        cout << "RGBFormat‚Æ‚µ‚Ä•ÏŠ·‚Å‚«‚Ü‚¹‚ñB" << endl;
-        
-		return RTC::RTC_ERROR;
-    }
-		
-	int len = convertedImage.GetCols() * convertedImage.GetRows() * 3;			 //ƒƒ‚ƒŠ‚Ì”ÍˆÍŒÅ’è
-	
-	// ‰æ–Ê‚ÌƒTƒCƒYî•ñ‚ð“ü‚ê‚é
-	m_outputImage.pixels.length(len);
-	m_outputImage.width = convertedImage.GetCols();
-	m_outputImage.height = convertedImage.GetRows();
-	
-	//Žæ“¾‚µ‚½ConvertImage‚ðMomoryCopy‚·‚éB
-	memcpy((void *)&(m_outputImage.pixels[0]),convertedImage.GetData(), len);
-	
-	//BGR‰f‘œ‚ðRGB‚Æ‚µ‚Ä•ÏŠ·‚·‚é‚½‚ß‚ÌImage‚ÌéŒ¾
-	IplImage* frame = cvCreateImage(cvSize(convertedImage.GetRows(), convertedImage.GetCols()), 8, 3);
-	
-	//BGR‚ðRGB‚Æ‚µ‚Ä•ÏŠ·‚·‚éB
-	memcpy(frame->imageData, (void *)&(m_outputImage.pixels[0]), len);
-	cvCvtColor(frame, frame, CV_BGR2RGB);
-	
-	//•ÏŠ·‚µ‚½ImageData‚ðOutport‚Ìƒƒ‚ƒŠƒRƒs[‚·‚éB
-	memcpy((void *)&(m_outputImage.pixels[0]), frame->imageData, len);
-	cvReleaseImage(&frame);
-
-	m_outputImageOut.write();
-
-	if (count > 100)
-	{
-		count = 0;
-		coil::TimeValue tm;
-		tm = coil::gettimeofday();
-
-		double sec(tm - tm_pre);
-		
-		if (sec > 1.0 && sec < 1000.0)
-		{
-		    std::cout << 100/sec << " [FPS]" << std::endl;
-		}
-
-		tm_pre = tm;
-	}
-	++count;
-
-	return RTC::RTC_OK;
+  return RTC::RTC_OK;
 }
 
 /*
