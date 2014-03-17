@@ -276,7 +276,7 @@ class OpenCVCamera
   // </rtc-template>
   int dummy;
 
-  CvCapture* m_capture;	//ƒJƒƒ‰—pƒƒ‚ƒŠ
+  CvCapture* m_capture;	/* ã‚«ãƒ¡ãƒ©ç”¨ãƒ¡ãƒ¢ãƒª */
 };
 
 

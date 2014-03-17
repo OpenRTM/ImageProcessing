@@ -18,7 +18,7 @@ static const char* opencvcamera_spec[] =
     "implementation_id", "OpenCVCamera",
     "type_name",         "OpenCVCamera",
     "description",       "USB Camera Acquire component",
-    "version",           "1.0.0",
+    "version",           "1.1.0",
     "vendor",            "AIST",
     "category",          "example",
     "activity_type",     "PERIODIC",
@@ -108,7 +108,7 @@ RTC::ReturnCode_t OpenCVCamera::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t OpenCVCamera::onActivated(RTC::UniqueId ec_id)
 {
-    //ƒJƒƒ‰ƒfƒoƒCƒX‚Ì’Tõ
+    /* ã‚«ãƒ¡ãƒ©ãƒ‡ãƒã‚¤ã‚¹ã®æ¢ç´¢ */
 /*
     if(NULL==(m_capture = cvCaptureFromCAM(CV_CAP_ANY))){
         cout<<"No Camera Device"<<endl;
@@ -123,10 +123,10 @@ RTC::ReturnCode_t OpenCVCamera::onActivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t OpenCVCamera::onDeactivated(RTC::UniqueId ec_id)
 {
-  //ƒJƒƒ‰—pƒƒ‚ƒŠ‚Ì‰ğ•ú
+  /* ã‚«ãƒ¡ãƒ©ç”¨ãƒ¡ãƒ¢ãƒªã®è§£æ”¾ */
   if(m_capture != NULL)
   {
-	cvReleaseCapture(&m_capture);
+  	cvReleaseCapture(&m_capture);
   }
 
   device_num_old = 1000;
@@ -137,76 +137,74 @@ RTC::ReturnCode_t OpenCVCamera::onDeactivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t OpenCVCamera::onExecute(RTC::UniqueId ec_id)
 {
-    static coil::TimeValue tm_pre;
-    static int count = 0;
-    IplImage *cam_frame = NULL;
-    
-    if(m_device_num != device_num_old){
-    
-		if (device_num_old != 1000)
-		{
-			cvReleaseCapture(&m_capture);
-		}
+  static coil::TimeValue tm_pre;
+  static int count = 0;
+  IplImage *cam_frame = NULL;
 
-		device_num_old = m_device_num;
+  if(m_device_num != device_num_old){
 
-		if(NULL==(m_capture = cvCaptureFromCAM(device_num_old))){
-			cout<<"No Camera Device"<<endl;
-			imgflg = false;
-			//return RTC::RTC_ERROR;
-		}else{
-			imgflg = true;	
-		}
+    if (device_num_old != 1000)
+    {
+      cvReleaseCapture(&m_capture);
     }
 
-	if(imgflg == true){
-	    cam_frame = cvQueryFrame(m_capture);
-	    if(NULL == cam_frame)
-	    {
-			std::cout << "Bad frame or no frame!!" << std::endl;
-			return RTC::RTC_ERROR;
-	    }
+    device_num_old = m_device_num;
 
-	    IplImage* frame = cvCreateImage(cvGetSize(cam_frame), 8, 3);
-
-	    if(cam_frame ->origin == IPL_ORIGIN_TL)
-	    cvCopy(cam_frame, frame);
-	    else
-	    cvFlip(cam_frame, frame);
-
-	    int len = frame->nChannels * frame->width * frame->height;
-
-	    // ‰æ–Ê‚ÌƒTƒCƒYî•ñ‚ğ“ü‚ê‚é
-	    m_out.pixels.length(len);
-	    m_out.width  = frame->width;
-	    m_out.height = frame->height;
-
-	    memcpy((void *)&(m_out.pixels[0]), frame->imageData,len);
-	    cvReleaseImage(&frame);
-
-	    // Œq‚ª‚Á‚Ä‚éƒRƒ“ƒ|[ƒlƒ“ƒg‚ª‚µ‚ñ‚Å‚µ‚Ü‚¤‚Æ–â‘è”­¶
-	    m_outOut.write();
-
-	    if (count > 100)
-	    {
-		count = 0;
-		coil::TimeValue tm;
-		tm = coil::gettimeofday();
-
-		double sec(tm - tm_pre);
-		
-		if (sec > 1.0 && sec < 1000.0)
-		{
-		    std::cout << 100/sec << " [FPS]" << std::endl;
-		}
-
-		tm_pre = tm;
-	    }
-	    ++count;
+    if(NULL==(m_capture = cvCaptureFromCAM(device_num_old))){
+      cout<<"No Camera Device"<<endl;
+      imgflg = false;
+      //return RTC::RTC_ERROR;
+    }else{
+      imgflg = true;	
     }
-	
+  }
 
-    return RTC::RTC_OK;
+  if(imgflg == true){
+    cam_frame = cvQueryFrame(m_capture);
+    if(NULL == cam_frame)
+    {
+      std::cout << "Bad frame or no frame!!" << std::endl;
+      return RTC::RTC_ERROR;
+    }
+
+    IplImage* frame = cvCreateImage(cvGetSize(cam_frame), 8, 3);
+
+    if(cam_frame ->origin == IPL_ORIGIN_TL)
+      cvCopy(cam_frame, frame);
+    else
+      cvFlip(cam_frame, frame);
+
+    int len = frame->nChannels * frame->width * frame->height;
+
+    /* ç”»é¢ã®ã‚µã‚¤ã‚ºæƒ…å ±ã‚’å…¥ã‚Œã‚‹ */
+    m_out.pixels.length(len);
+    m_out.width  = frame->width;
+    m_out.height = frame->height;
+
+    memcpy((void *)&(m_out.pixels[0]), frame->imageData,len);
+    cvReleaseImage(&frame);
+
+    /* ç¹‹ãŒã£ã¦ã‚‹ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆãŒã—ã‚“ã§ã—ã¾ã†ã¨å•é¡Œç™ºç”Ÿ */
+    m_outOut.write();
+
+    if (count > 100)
+    {
+      count = 0;
+      coil::TimeValue tm;
+      tm = coil::gettimeofday();
+
+      double sec(tm - tm_pre);
+
+      if (sec > 1.0 && sec < 1000.0)
+      {
+        std::cout << 100/sec << " [FPS]" << std::endl;
+      }
+
+      tm_pre = tm;
+    }
+    ++count;
+  }
+  return RTC::RTC_OK;
 }
 
 /*
