@@ -19,7 +19,7 @@
 #include <rtm/idl/ExtendedDataTypesSkel.h>
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
-//OpenCV—pƒCƒ“ƒNƒ‹[ƒhƒtƒ@ƒCƒ‹‚ÌƒCƒ“ƒNƒ‹[ƒh
+/* OpenCVç”¨ã‚¤ãƒ³ã‚¯ãƒ«ãƒ¼ãƒ‰ãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚¤ãƒ³ã‚¯ãƒ«ãƒ¼ãƒ‰ */
 #include<cv.h>
 #include<cxcore.h>
 #include<highgui.h>
@@ -35,8 +35,6 @@
 // </rtc-template>
 
 using namespace RTC;
-
-#define SCALE 0.8	//	‰æ‘œ‚ÌŠg‘å—¦
 
 /*!
  * @class Rotate
@@ -236,6 +234,12 @@ class Rotate
    * - DefaultValue: 60
    */
   double m_dbRotate;
+  /*!
+   * 
+   * - Name:  dbScale
+   * - DefaultValue: 0.8
+   */
+  double m_dbScale;
 
   // </rtc-template>
 
@@ -281,14 +285,14 @@ class Rotate
   // <rtc-template block="private_operation">
   
   // </rtc-template>
-    int m_in_height;                // “ü—ÍƒCƒ[ƒW‚ÌHeight
-    int m_in_width;                 // “ü—ÍƒCƒ[ƒW‚ÌWidth
+  int m_in_height;          /* å…¥åŠ›ã‚¤ãƒ¡ãƒ¼ã‚¸ã®Height */
+  int m_in_width;           /* å…¥åŠ›ã‚¤ãƒ¡ãƒ¼ã‚¸ã®Width */
 
-    IplImage* m_image_buff;			// Original Image
+  IplImage* m_image_buff;   /* Original Image */
 
-    IplImage* m_image_dest;         // Œ‹‰Êo—Í—pIplImage
+  IplImage* m_image_dest;   /* çµæœå‡ºåŠ›ç”¨IplImage */
 
-    CvMat *m_transformMatrix;
+  CvMat *m_transformMatrix;
 };
 
 

@@ -107,6 +107,7 @@ The available configuration parameters are described below:
 Parameter        Data type          Default Value    Effect
 ================ ================== ================ ======
 rotate_angle     double             60               
+scale            double             0.8              
 ================ ================== ================ ======
 
 Ports
