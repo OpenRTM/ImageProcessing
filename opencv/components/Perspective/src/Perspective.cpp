@@ -16,7 +16,7 @@ static const char* perspective_spec[] =
     "implementation_id", "Perspective",
     "type_name",         "Perspective",
     "description",       "Perspective image component",
-    "version",           "1.0.0",
+    "version",           "1.1.0",
     "vendor",            "AIST",
     "category",          "Category",
     "activity_type",     "PERIODIC",
@@ -99,103 +99,102 @@ RTC::ReturnCode_t Perspective::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Perspective::onActivated(RTC::UniqueId ec_id)
 {
-    // ƒCƒ[ƒW—pƒƒ‚ƒŠ‚ÌŠm•Û
-    m_image_buff       = NULL;
-    m_image_dest       = NULL;
+  /* ã‚¤ãƒ¡ãƒ¼ã‚¸ç”¨ãƒ¡ãƒ¢ãƒªã®ç¢ºä¿ */
+  m_image_buff       = NULL;
+  m_image_dest       = NULL;
 
-    m_in_height  = 0;
-    m_in_width   = 0;
+  m_in_height  = 0;
+  m_in_width   = 0;
 
-    //	s—ñ‚ğ¶¬‚·‚é
-	m_perspectiveMatrix = cvCreateMat( 3, 3, CV_32FC1);
+  /* è¡Œåˆ—ã‚’ç”Ÿæˆã™ã‚‹ */
+  m_perspectiveMatrix = cvCreateMat( 3, 3, CV_32FC1);
 
-    return RTC::RTC_OK;
+  return RTC::RTC_OK;
 }
 
 
 RTC::ReturnCode_t Perspective::onDeactivated(RTC::UniqueId ec_id)
 {
-    if(m_image_buff       != NULL)
-        cvReleaseImage(&m_image_buff);
-    if(m_image_dest         != NULL)
-        cvReleaseImage(&m_image_dest);
+  if(m_image_buff       != NULL)
+    cvReleaseImage(&m_image_buff);
+  if(m_image_dest         != NULL)
+    cvReleaseImage(&m_image_dest);
 
-    cvReleaseMat(&m_perspectiveMatrix);
+  cvReleaseMat(&m_perspectiveMatrix);
 
-    return RTC::RTC_OK;
+  return RTC::RTC_OK;
 }
 
 
 RTC::ReturnCode_t Perspective::onExecute(RTC::UniqueId ec_id)
 {
-    // Common CV actions
-    // V‚µ‚¢ƒf[ƒ^‚Ìƒ`ƒFƒbƒN
-    if (m_image_origIn.isNew()) 
+  /* Common CV actions */
+  /* æ–°ã—ã„ãƒ‡ãƒ¼ã‚¿ã®ãƒã‚§ãƒƒã‚¯ */
+  if (m_image_origIn.isNew()) 
+  {
+    /* InPortãƒ‡ãƒ¼ã‚¿ã®èª­ã¿è¾¼ã¿ */
+    m_image_origIn.read();
+
+    /* ã‚µã‚¤ã‚ºãŒå¤‰ã‚ã£ãŸã¨ãã ã‘å†ç”Ÿæˆã™ã‚‹ */
+    if(m_in_height != m_image_orig.height || m_in_width != m_image_orig.width)
     {
-        // InPortƒf[ƒ^‚Ì“Ç‚İ‚İ
-        m_image_origIn.read();
+      printf("[onExecute] Size of input image is not match!\n");
 
-        // ƒTƒCƒY‚ª•Ï‚í‚Á‚½‚Æ‚«‚¾‚¯Ä¶¬‚·‚é
-        if(m_in_height != m_image_orig.height || m_in_width != m_image_orig.width)
-        {
-            printf("[onExecute] Size of input image is not match!\n");
+      m_in_height = m_image_orig.height;
+      m_in_width  = m_image_orig.width;
 
-            m_in_height = m_image_orig.height;
-            m_in_width  = m_image_orig.width;
-            
-            if(m_image_buff       != NULL)
-                cvReleaseImage(&m_image_buff);
-            if(m_image_dest         != NULL)
-                cvReleaseImage(&m_image_dest);
+      if(m_image_buff       != NULL)
+        cvReleaseImage(&m_image_buff);
+      if(m_image_dest         != NULL)
+        cvReleaseImage(&m_image_dest);
 
-
-            // ƒTƒCƒY•ÏŠ·‚Ì‚½‚ßTempƒƒ‚ƒŠ[‚ğ‚æ‚¢‚·‚é
-	        m_image_buff = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3);
-	        m_image_dest = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3);
-        }
-
-        // InPort‚Ì‰æ‘œƒf[ƒ^‚ğIplImage‚ÌimageData‚ÉƒRƒs[
-        memcpy(m_image_buff->imageData,(void *)&(m_image_orig.pixels[0]),m_image_orig.pixels.length());
-
-        // Anternative actions
-
-	    CvPoint2D32f original[4];	//	•ÏŠ·‘OÀ•W
-	    CvPoint2D32f translate[4];	//	•ÏŠ·ŒãÀ•W
-
-	    //	•ÏŠ·‘O‚ÌÀ•W‚ğİ’è‚·‚é
-	    original[0] = cvPoint2D32f( 0, 0 );
-	    original[1] = cvPoint2D32f( m_image_buff->width, 0 );
-	    original[2] = cvPoint2D32f( 0, m_image_buff->height );
-	    original[3] = cvPoint2D32f( m_image_buff->width, m_image_buff->height );
-
-	    //	•ÏŠ·Œã‚ÌÀ•W‚ğİ’è‚·‚é
-	    translate[0] = cvPoint2D32f( m_image_buff->width / 5 * 1, m_image_buff->height / 5 * 2 );
-	    translate[1] = cvPoint2D32f( m_image_buff->width / 5 * 4, m_image_buff->height / 5 * 2 );
-	    translate[2] = cvPoint2D32f(                           0, m_image_buff->height / 5 * 4 );
-	    translate[3] = cvPoint2D32f( m_image_buff->width        , m_image_buff->height / 5 * 4 );
-
-	    //	•ÏŠ·s—ñ‚ğ‹‚ß‚é
-	    cvGetPerspectiveTransform( original, translate, m_perspectiveMatrix );
-
-	    //	•ÏŠ·s—ñ‚ğ”½‰f‚³‚¹‚é
-	    cvWarpPerspective( m_image_buff, m_image_dest, m_perspectiveMatrix, CV_INTER_LINEAR | CV_WARP_FILL_OUTLIERS, cvScalarAll( 0 ) );
-
-        // ‰æ‘œƒf[ƒ^‚ÌƒTƒCƒYæ“¾
-        int len = m_image_dest->nChannels * m_image_dest->width * m_image_dest->height;
-                
-        // ‰æ–Ê‚ÌƒTƒCƒYî•ñ‚ğ“ü‚ê‚é
-        m_image_out.pixels.length(len);        
-        m_image_out.width  = m_image_dest->width;
-        m_image_out.height = m_image_dest->height;
-
-        // ”½“]‚µ‚½‰æ‘œƒf[ƒ^‚ğOutPort‚ÉƒRƒs[
-        memcpy((void *)&(m_image_out.pixels[0]), m_image_dest->imageData,len);
-
-        // ”½“]‚µ‚½‰æ‘œƒf[ƒ^‚ğOutPort‚©‚ço—Í‚·‚éB
-        m_image_outOut.write();
+      /* ã‚µã‚¤ã‚ºå¤‰æ›ã®ãŸã‚Tempãƒ¡ãƒ¢ãƒªãƒ¼ã‚’ç”¨æ„ã™ã‚‹ */
+      m_image_buff = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3);
+      m_image_dest = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3);
     }
 
-    return RTC::RTC_OK;
+    /* InPortã®ç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’IplImageã®imageDataã«ã‚³ãƒ”ãƒ¼ */
+    memcpy(m_image_buff->imageData,(void *)&(m_image_orig.pixels[0]),m_image_orig.pixels.length());
+
+    // Anternative actions
+    CvPoint2D32f original[4];   /* å¤‰æ›å‰åº§æ¨™ */
+    CvPoint2D32f translate[4];  /* å¤‰æ›å¾Œåº§æ¨™ */
+
+    /* å¤‰æ›å‰ã®åº§æ¨™ã‚’è¨­å®šã™ã‚‹ */
+    original[0] = cvPoint2D32f( 0, 0 );
+    original[1] = cvPoint2D32f( m_image_buff->width, 0 );
+    original[2] = cvPoint2D32f( 0, m_image_buff->height );
+    original[3] = cvPoint2D32f( m_image_buff->width, m_image_buff->height );
+
+    /* å¤‰æ›å¾Œã®åº§æ¨™ã‚’è¨­å®šã™ã‚‹ */
+    translate[0] = cvPoint2D32f( m_image_buff->width / 5 * 1, m_image_buff->height / 5 * 2 );
+    translate[1] = cvPoint2D32f( m_image_buff->width / 5 * 4, m_image_buff->height / 5 * 2 );
+    translate[2] = cvPoint2D32f(                           0, m_image_buff->height / 5 * 4 );
+    translate[3] = cvPoint2D32f( m_image_buff->width        , m_image_buff->height / 5 * 4 );
+
+    /* å¤‰æ›è¡Œåˆ—ã‚’æ±‚ã‚ã‚‹ */	
+    cvGetPerspectiveTransform( original, translate, m_perspectiveMatrix );
+
+    /* å¤‰æ›è¡Œåˆ—ã‚’åæ˜ ã•ã›ã‚‹ */
+    cvWarpPerspective( m_image_buff, m_image_dest, m_perspectiveMatrix, 
+                        CV_INTER_LINEAR | CV_WARP_FILL_OUTLIERS, cvScalarAll( 0 ) );
+
+    /* ç”»åƒãƒ‡ãƒ¼ã‚¿ã®ã‚µã‚¤ã‚ºå–å¾— */
+    int len = m_image_dest->nChannels * m_image_dest->width * m_image_dest->height;
+          
+    /* ç”»é¢ã®ã‚µã‚¤ã‚ºæƒ…å ±ã‚’å…¥ã‚Œã‚‹ */
+    m_image_out.pixels.length(len);        
+    m_image_out.width  = m_image_dest->width;
+    m_image_out.height = m_image_dest->height;
+
+    /* åè»¢ã—ãŸç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’OutPortã«ã‚³ãƒ”ãƒ¼ */
+    memcpy((void *)&(m_image_out.pixels[0]), m_image_dest->imageData,len);
+
+    /* åè»¢ã—ãŸç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’OutPortã‹ã‚‰å‡ºåŠ›ã™ã‚‹ */
+    m_image_outOut.write();
+  }
+
+  return RTC::RTC_OK;
 }
 
 /*
