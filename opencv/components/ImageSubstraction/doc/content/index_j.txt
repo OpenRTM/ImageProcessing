@@ -98,8 +98,11 @@ ImageSubstractionは ``ImageSubstractionComp`` を実行（ ``${prefix}/componen
 ================ ================== ================ ====
 パラメータ       データ型           デフォルト値     意味
 ================ ================== ================ ====
+control_mode     char               b                
 image_height     int                240              
 image_width      int                320              
+threshold_coefficient double             5.0              
+constant_threshold int                20               
 ================ ================== ================ ====
 
 ポート

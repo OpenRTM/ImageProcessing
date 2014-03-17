@@ -23,10 +23,10 @@
 #include <cxcore.h>
 #include <highgui.h>
 
-#define	NUM_OF_BACKGROUND_FRAMES	50	//	�w�i���f���𐶐�����̂Ɏg�p����摜�̖���
+#define	NUM_OF_BACKGROUND_FRAMES	50	/* 背景モデルを生成するのに使用する画像の枚数 */
 
-#define CONSTANT_MODE		0	//	�摜�S�̂�1��臒l��p����t���O�l
-#define DYNAMIC_MODE		1	//	��f���Ƃ�臒l��݂���t���O�l
+#define CONSTANT_MODE		0	/* 画像全体で1つの閾値を用いるフラグ値 */
+#define DYNAMIC_MODE		1	/* 画素ごとに閾値を設けるフラグ値 */
 
 // Service implementation headers
 // <rtc-template block="service_impl_h">
@@ -262,7 +262,7 @@ class ImageSubstraction
    * - DefaultValue: 20
    */
   int m_constant_thre;
-  
+
   // </rtc-template>
 
   // DataInPort declaration
@@ -271,10 +271,10 @@ class ImageSubstraction
   /*!
    */
   InPort<RTC::CameraImage> m_img_origIn;
-  RTC::TimedLong m_key;
+  RTC::TimedLong m_Key;
   /*!
    */
-  InPort<RTC::TimedLong> m_keyIn;
+  InPort<RTC::TimedLong> m_KeyIn;
   
   // </rtc-template>
 

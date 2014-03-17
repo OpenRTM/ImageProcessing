@@ -106,8 +106,11 @@ The available configuration parameters are described below:
 ================ ================== ================ ======
 Parameter        Data type          Default Value    Effect
 ================ ================== ================ ======
+control_mode     char               b                
 image_height     int                240              
 image_width      int                320              
+threshold_coefficient double             5.0              
+constant_threshold int                20               
 ================ ================== ================ ======
 
 Ports

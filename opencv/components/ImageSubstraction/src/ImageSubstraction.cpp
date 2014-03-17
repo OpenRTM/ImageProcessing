@@ -16,7 +16,7 @@ static const char* imagesubstraction_spec[] =
     "implementation_id", "ImageSubstraction",
     "type_name",         "ImageSubstraction",
     "description",       "Image substraction conponent",
-    "version",           "1.0.0",
+    "version",           "1.1.0",
     "vendor",            "AIST",
     "category",          "Category",
     "activity_type",     "PERIODIC",
@@ -44,108 +44,85 @@ static const char* imagesubstraction_spec[] =
 // </rtc-template>
 
 int ImageSubstraction_count = 0;
-int	mode = DYNAMIC_MODE;	// DYNAMIC_MODE: ‰æ‘f‚²‚Æ‚ÉˆÙ‚È‚éè‡’l / CONSTANT_MODE: ‰æ‘œ‘S‘Ì‚Åˆê‚Â‚Ìè‡’l
+int	mode = DYNAMIC_MODE;
 int g_temp_w = 0;
 int g_temp_h = 0;
 
-//char *windowNameCapture = "Capture";		//	ƒLƒƒƒvƒ`ƒƒ‚µ‚½‰æ‘œ‚ğ•\¦‚·‚éƒEƒBƒ“ƒhƒE‚Ì–¼‘O
-//char *windowNameResult  = "Result";			//	”wŒi·•ªŒ‹‰Ê‚ğ•\¦‚·‚éƒEƒBƒ“ƒhƒE‚Ì–¼‘O
-//char *windowNameBackground = "Background";	//	”wŒi‰æ‘œ‚ğ•\¦‚·‚éƒEƒBƒ“ƒhƒE‚Ì–¼‘O
-//char *windowNameThreshold = "Threshold";	//	è‡’l‚ğ•\¦‚·‚éƒEƒBƒ“ƒhƒE‚Ì–¼‘O
-
 std::string mode_str[2] = {
-	"DYNAMIC_MODE",   //‰æ‘f’PˆÊ
-	"CONSTANT_MODE"    //‰æ‘œ‚Åˆê‚Â
+	"DYNAMIC_MODE",   /* ç”»ç´ ã”ã¨ã«ç•°ãªã‚‹é–¾å€¤ */
+	"CONSTANT_MODE"   /* ç”»åƒå…¨ä½“ã§ä¸€ã¤ã®é–¾å€¤ */
 };
 
-IplImage *backgroundAverageImage = NULL;	//	”wŒi‚Ì•½‹Ï’l•Û‘¶—pIplImage
-IplImage *backgroundThresholdImage = NULL;	//	”wŒi‚Ìè‡’l•Û‘¶—pIplImage
+IplImage *backgroundAverageImage = NULL;	/* èƒŒæ™¯ã®å¹³å‡å€¤ä¿å­˜ç”¨IplImage */
+IplImage *backgroundThresholdImage = NULL;	/* èƒŒæ™¯ã®é–¾å€¤ä¿å­˜ç”¨IplImage */
 
-IplImage *originalImage;		//	ƒLƒƒƒvƒ`ƒƒ‰æ‘œ—pIplImage
-IplImage *differenceImage;	//	·•ª‰æ‘œ—pIplImage
+IplImage *originalImage;		/* ã‚­ãƒ£ãƒ—ãƒãƒ£ç”»åƒç”¨IplImage */
+IplImage *differenceImage;	/* å·®åˆ†ç”»åƒç”¨IplImage */
 IplImage *resultImage;	
 IplImage *outputImage;
 
-//CvCapture *capture = NULL;	//	ƒJƒƒ‰ƒLƒƒƒvƒ`ƒƒ—p‚Ì\‘¢‘Ì
-
 //
-//	‰æ‘œ‚ğã‰º”½“]‚µ‚Ä•\¦‚·‚é
+//	èƒŒæ™¯ãƒ¢ãƒ‡ãƒ«ã‚’åˆæœŸåŒ–ã™ã‚‹
 //
-//	ˆø”:
-//		windowName : ‰æ‘œ‚ğ•\¦‚·‚éƒEƒBƒ“ƒhƒE‚Ì–¼‘O
-//		image      : ã‰º”½“]‚µ‚Ä•\¦‚·‚é‰æ‘œ—pIplImage
-//
-void showFlipImage( char *windowName, IplImage *image ) {
-	//if ( image->origin == 0 ) {
-		//cvFlip( image, image, 0 );
-		//cvShowImage( windowName, image );
-		//cvFlip( image, image, 0 );
-	//}
-}
-
-//
-//	”wŒiƒ‚ƒfƒ‹‚ğ‰Šú‰»‚·‚é
-//
-//	ˆø”:
-//		num  : ”wŒiƒ‚ƒfƒ‹‚ğ¶¬‚·‚é‚Ì‚Ég—p‚·‚é‰æ‘œ‚Ì–‡”
-//		size : ‰æ‘œƒTƒCƒY
+//	å¼•æ•°:
+//		num  : èƒŒæ™¯ãƒ¢ãƒ‡ãƒ«ã‚’ç”Ÿæˆã™ã‚‹ã®ã«ä½¿ç”¨ã™ã‚‹ç”»åƒã®æšæ•°
+//		size : ç”»åƒã‚µã‚¤ã‚º
 //
 void initializeBackgroundModel( int num, CvSize size, double thre_coefficient ){
-	int i;
+  int i;
 
-	// ˆÈ‘O‚Ì”wŒiî•ñ‚ª‚ ‚ê‚Î”jŠü
-	if( backgroundAverageImage != NULL ){
-		cvReleaseImage( &backgroundAverageImage );
-	}
-	if( backgroundThresholdImage != NULL ){
-		cvReleaseImage( &backgroundThresholdImage );
-	}
+  /* ä»¥å‰ã®èƒŒæ™¯æƒ…å ±ãŒã‚ã‚Œã°ç ´æ£„ */
+  if( backgroundAverageImage != NULL ){
+    cvReleaseImage( &backgroundAverageImage );
+  }
+  if( backgroundThresholdImage != NULL ){
+    cvReleaseImage( &backgroundThresholdImage );
+  }
 
-	//	‰æ‘œî•ñ’~Ï—pƒoƒbƒtƒ@‚ğŠm•Û‚·‚é
-	IplImage *acc = cvCreateImage( size, IPL_DEPTH_32F, 3 );
-	IplImage *acc2 = cvCreateImage( size, IPL_DEPTH_32F, 3 );
-	
-	//	‰æ‘œ‚Ì‰Šú‰»‚ğs‚¤
-	cvSetZero( acc );
-	cvSetZero( acc2 );
+  /* ç”»åƒæƒ…å ±è“„ç©ç”¨ãƒãƒƒãƒ•ã‚¡ã‚’ç¢ºä¿ã™ã‚‹ */
+  IplImage *acc = cvCreateImage( size, IPL_DEPTH_32F, 3 );
+  IplImage *acc2 = cvCreateImage( size, IPL_DEPTH_32F, 3 );
 
-	//	‰æ‘œî•ñ‚Ì’~Ï
-	printf( "Getting background...\n" ); //”wŒiæ“¾’†
-	//IplImage *frameImage;
-	for( i = 0; i < num; i++ ){
-		//frameImage = cvQueryFrame( capture );
-		cvAcc( originalImage, acc );
-		cvSquareAcc( originalImage, acc2 );
+  /* ç”»åƒã®åˆæœŸåŒ–ã‚’è¡Œã† */
+  cvSetZero( acc );
+  cvSetZero( acc2 );
+
+  /* ç”»åƒæƒ…å ±ã®è“„ç© */
+  printf( "Getting background...\n" );
+  //IplImage *frameImage;
+  for( i = 0; i < num; i++ ){
+    //frameImage = cvQueryFrame( capture );
+    cvAcc( originalImage, acc );
+    cvSquareAcc( originalImage, acc2 );
     printf( "%d / %d image\n", i + 1, num );
-	}
-	printf( "Completion!\n" ); //”wŒiæ“¾Š®—¹
+  }
+  printf( "Completion!\n" );
 
-	//	cvAddS, cvSubS ‚Í‚ ‚é‚ª cvMulS ‚Í‚È‚¢‚Ì‚ÅAcvConvertScale ‚ğg‚¤
-	cvConvertScale( acc, acc, 1.0 / num );		// •½‹Ï
-	cvConvertScale( acc2, acc2, 1.0 / num );	// “ñæ˜a‚Ì•½‹Ï
+  /* cvAddS, cvSubS ã¯ã‚ã‚‹ãŒ cvMulS ã¯ãªã„ã®ã§ã€cvConvertScale ã‚’ä½¿ã† */
+  cvConvertScale( acc, acc, 1.0 / num );		/* å¹³å‡ */
+  cvConvertScale( acc2, acc2, 1.0 / num );	/* äºŒä¹—å’Œã®å¹³å‡ */
 
-	//	•½‹Ï‚ª‹‚Ü‚Á‚½‚Ì‚Å backgroundAverageImage ‚ÉŠi”[‚·‚éB
-	backgroundAverageImage = cvCreateImage( size, IPL_DEPTH_8U, 3 );
-	cvConvert( acc, backgroundAverageImage );
+  /* å¹³å‡ãŒæ±‚ã¾ã£ãŸã®ã§ backgroundAverageImage ã«æ ¼ç´ã™ã‚‹ */
+  backgroundAverageImage = cvCreateImage( size, IPL_DEPTH_8U, 3 );
+  cvConvert( acc, backgroundAverageImage );
 
-	//	•ªU‚ğŒvZ‚·‚é
-	IplImage *dispersion = cvCreateImage( size, IPL_DEPTH_32F, 3 );
-	cvMul( acc, acc, acc );
-	cvSub( acc2, acc, dispersion );
+  /* åˆ†æ•£ã‚’è¨ˆç®—ã™ã‚‹ */
+  IplImage *dispersion = cvCreateImage( size, IPL_DEPTH_32F, 3 );
+  cvMul( acc, acc, acc );
+  cvSub( acc2, acc, dispersion );
 
-	//	•W€•Î·‚ğŒvZ‚·‚é
-	IplImage *sd = cvCreateImage( size, IPL_DEPTH_32F, 3 );
-	cvPow( dispersion, sd, 0.5 );
+  /* æ¨™æº–åå·®ã‚’è¨ˆç®—ã™ã‚‹ */
+  IplImage *sd = cvCreateImage( size, IPL_DEPTH_32F, 3 );
+  cvPow( dispersion, sd, 0.5 );
 
-	//	è‡’l‚ğŒvZ‚·‚é
-	backgroundThresholdImage = cvCreateImage( size, IPL_DEPTH_8U, 3 );
-	cvConvertScale( sd, backgroundThresholdImage, thre_coefficient );
+  /* é–¾å€¤ã‚’è¨ˆç®—ã™ã‚‹ */
+  backgroundThresholdImage = cvCreateImage( size, IPL_DEPTH_8U, 3 );
+  cvConvertScale( sd, backgroundThresholdImage, thre_coefficient );
 
-	//	ƒƒ‚ƒŠ‚ğ‰ğ•ú‚·‚é
-	cvReleaseImage( &acc );
-	cvReleaseImage( &acc2 );
-	cvReleaseImage( &dispersion );
-	cvReleaseImage( &sd );
+  cvReleaseImage( &acc );
+  cvReleaseImage( &acc2 );
+  cvReleaseImage( &dispersion );
+  cvReleaseImage( &sd );
 }
 
 /*!
@@ -156,7 +133,7 @@ ImageSubstraction::ImageSubstraction(RTC::Manager* manager)
     // <rtc-template block="initializer">
   : RTC::DataFlowComponentBase(manager),
     m_img_origIn("original_image", m_img_orig),
-    m_keyIn("Key", m_key),
+    m_KeyIn("Key", m_Key),
     m_img_captureOut("capture_image", m_img_capture),
     m_img_resultOut("result_image", m_img_result),
     m_img_backOut("back_image", m_img_back),
@@ -181,7 +158,7 @@ RTC::ReturnCode_t ImageSubstraction::onInitialize()
   // <rtc-template block="registration">
   // Set InPort buffers
   addInPort("original_image", m_img_origIn);
-  addInPort("Key", m_keyIn);
+  addInPort("Key", m_KeyIn);
   
   // Set OutPort buffer
   addOutPort("capture_image", m_img_captureOut);
@@ -233,206 +210,201 @@ RTC::ReturnCode_t ImageSubstraction::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t ImageSubstraction::onActivated(RTC::UniqueId ec_id)
 {
-	ImageSubstraction_count = 0;
-	g_temp_w = 0;
-	g_temp_h = 0;
+  ImageSubstraction_count = 0;
+  g_temp_w = 0;
+  g_temp_h = 0;
 
-	originalImage = NULL;
-	outputImage = NULL;
-	resultImage = NULL;
-	differenceImage = NULL;
-	
-  //è‡’l‚Ì‰Šúİ’è‚ğ•\¦
+  originalImage = NULL;
+  outputImage = NULL;
+  resultImage = NULL;
+  differenceImage = NULL;
+
+  /* é–¾å€¤ã®åˆæœŸè¨­å®šã‚’è¡¨ç¤º */
   printf( "threshold: %s\n", mode_str[1-mode].c_str() );
 
-	return RTC::RTC_OK;
+  return RTC::RTC_OK;
 }
 
 
 RTC::ReturnCode_t ImageSubstraction::onDeactivated(RTC::UniqueId ec_id)
 {
-	
-	if(differenceImage != NULL){
-		cvReleaseImage(&differenceImage);
-	}
-	if(originalImage != NULL){
-		cvReleaseImage(&originalImage);
-	}
-	if(resultImage != NULL){
-		cvReleaseImage(&resultImage);
-	}
-	if(outputImage != NULL){
-		cvReleaseImage(&outputImage);
-	}
-  
-	return RTC::RTC_OK;
+  if(differenceImage != NULL){
+    cvReleaseImage(&differenceImage);
+  }
+  if(originalImage != NULL){
+    cvReleaseImage(&originalImage);
+  }
+  if(resultImage != NULL){
+    cvReleaseImage(&resultImage);
+  }
+  if(outputImage != NULL){
+    cvReleaseImage(&outputImage);
+  }
+
+  return RTC::RTC_OK;
 }
 
 
 RTC::ReturnCode_t ImageSubstraction::onExecute(RTC::UniqueId ec_id)
 {	
-	//	ƒL[“ü—Í”»’è
-  if(m_keyIn.isNew()){
-    m_keyIn.read();
+  /* ã‚­ãƒ¼å…¥åŠ›åˆ¤å®š */
+  if(m_KeyIn.isNew())
+  {
+    m_KeyIn.read();
 
-	  if( m_cont_mode == 'b' ){
-		  //	'b'ƒL[‚ª‰Ÿ‚³‚ê‚½‚ç‚»‚Ì“_‚Å‚Ì‰æ‘œ‚ğ”wŒi‰æ‘œ‚Æ‚·‚é
-		  initializeBackgroundModel( NUM_OF_BACKGROUND_FRAMES, cvSize(m_img_width, m_img_height), m_thre_coefficient);
-		
-		  printf( "Background image update\n" );   //”wŒiî•ñXV
-		
-	  } else if( m_cont_mode == 'm' ){
-		  //	'm'ƒL[‚ª‰Ÿ‚³‚ê‚½‚çè‡’l‚Ìİ’è•û–@‚ğ•ÏX‚·‚é
-		  mode = 1 - mode;
-		  printf( "threshold: %s\n", mode_str[mode].c_str() );
-	  }
-	}
+    if( m_cont_mode == 'b' )
+    {
+      /* 'b'ã‚­ãƒ¼ãŒæŠ¼ã•ã‚ŒãŸã‚‰ãã®æ™‚ç‚¹ã§ã®ç”»åƒã‚’èƒŒæ™¯ç”»åƒã¨ã™ã‚‹ */
+      initializeBackgroundModel( NUM_OF_BACKGROUND_FRAMES, cvSize(m_img_width, m_img_height), m_thre_coefficient);
+
+      printf( "Background image update\n" );   /* èƒŒæ™¯æƒ…å ±æ›´æ–° */
+
+    } else if( m_cont_mode == 'm' ){
+      /* 'm'ã‚­ãƒ¼ãŒæŠ¼ã•ã‚ŒãŸã‚‰é–¾å€¤ã®è¨­å®šæ–¹æ³•ã‚’å¤‰æ›´ã™ã‚‹ */
+      mode = 1 - mode;
+      printf( "threshold: %s\n", mode_str[mode].c_str() );
+    }
+  }
 				
-	//‰Šú’l‚ğæ“¾‚·‚éB
-	if(ImageSubstraction_count == 0 && m_img_origIn.isNew()) {
-		
-		m_img_origIn.read();
-		
-		if(g_temp_w != m_img_orig.width || g_temp_h != m_img_orig.height){
-		
-			if(originalImage != NULL){
-				cvReleaseImage(&originalImage);	
-			}
-			if(originalImage == NULL){
-				originalImage = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 3);		//	ƒLƒƒƒvƒ`ƒƒ‰æ‘œ—pIplImage
-			}
-			if(outputImage != NULL){
-				cvReleaseImage(&outputImage);
-			}
-			if(outputImage == NULL){
-				outputImage = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 3);
-			}
-			
-			memcpy(originalImage->imageData,(void *)&(m_img_orig.pixels[0]), m_img_orig.pixels.length());
-			
-			if(differenceImage != NULL){
-				cvReleaseImage(&differenceImage);
-			}
-			if(differenceImage == NULL){
-				differenceImage = cvCloneImage(originalImage);
-			}
-			
-			if(resultImage != NULL){
-				cvReleaseImage(&resultImage);
-			}
-			if(resultImage == NULL){
-				resultImage = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height),IPL_DEPTH_8U, 1);
-			}
+  /* åˆæœŸå€¤ã‚’å–å¾—ã™ã‚‹ */
+  if(ImageSubstraction_count == 0 && m_img_origIn.isNew()) {
 
-			initializeBackgroundModel( NUM_OF_BACKGROUND_FRAMES, cvSize(m_img_orig.width, m_img_orig.height) , m_thre_coefficient);
-			
-			ImageSubstraction_count = 1;
-			g_temp_w = m_img_orig.width;
-			g_temp_h = m_img_orig.height;
-		}
-	}
+    m_img_origIn.read();
 
-	if(ImageSubstraction_count == 1 && m_img_origIn.isNew()) {
-		
-		m_img_origIn.read();
-		
-		if(g_temp_w == m_img_orig.width && g_temp_h == m_img_orig.height){
+    if(g_temp_w != m_img_orig.width || g_temp_h != m_img_orig.height){
 
-			if(originalImage != NULL){
-				cvReleaseImage(&originalImage);	
-			}
+      if(originalImage != NULL){
+        cvReleaseImage(&originalImage);	
+      }
+      if(originalImage == NULL){
+        originalImage = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 3);  /* ã‚­ãƒ£ãƒ—ãƒãƒ£ç”»åƒç”¨IplImage */
+      }
+      if(outputImage != NULL){
+        cvReleaseImage(&outputImage);
+      }
+      if(outputImage == NULL){
+        outputImage = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 3);
+      }
 
-			if(originalImage == NULL){
-				originalImage = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 3);		//	ƒLƒƒƒvƒ`ƒƒ‰æ‘œ—pIplImage
-			}
-			
-			if(outputImage != NULL){
-				cvReleaseImage(&outputImage);
-			}
+      memcpy(originalImage->imageData,(void *)&(m_img_orig.pixels[0]), m_img_orig.pixels.length());
 
-			if(outputImage == NULL){
-				outputImage = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 3);
-			}
+      if(differenceImage != NULL){
+        cvReleaseImage(&differenceImage);
+      }
+      if(differenceImage == NULL){
+        differenceImage = cvCloneImage(originalImage);
+      }
 
-			memcpy(originalImage->imageData,(void *)&(m_img_orig.pixels[0]), m_img_orig.pixels.length());
+      if(resultImage != NULL){
+        cvReleaseImage(&resultImage);
+      }
+      if(resultImage == NULL){
+        resultImage = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height),IPL_DEPTH_8U, 1);
+      }
 
-			//	Œ»İ‚Ì”wŒi‚Æ‚Ì·‚Ìâ‘Î’l‚ğ¬•ª‚²‚Æ‚Éæ‚é
-			cvAbsDiff( originalImage, backgroundAverageImage, differenceImage );
-			
-			//	Sub ‚Íƒ}ƒCƒiƒX‚É‚È‚Á‚½‚ç0‚ÉØ‚è‹l‚ß‚Ä‚­‚ê‚é
-			if( mode == DYNAMIC_MODE ){
-				cvSub( differenceImage, backgroundThresholdImage, differenceImage );
-			} else{
-				cvSubS( differenceImage, cvScalarAll( m_constant_thre ), differenceImage );
-			}
-			
-			//	differenceImage ‚Ì—v‘f‚ª1‚Â‚Å‚à0ˆÈã‚¾‚Á‚½‚ç‘OŒi
-			cvCvtColor( differenceImage, resultImage, CV_BGR2GRAY );
-			cvThreshold( resultImage, resultImage, 0, 255, CV_THRESH_BINARY );
-			
-			//	ƒƒfƒBƒAƒ“ƒtƒBƒ‹ƒ^‚ÅƒmƒCƒY‚ğœ‹‚·‚é
-			cvSmooth( resultImage, resultImage, CV_MEDIAN );
-			
-			//	‰æ‘œ‚ğ•\¦‚·‚é
-			//cvShowImage( windowNameCapture, originalImage );
-			//showFlipImage( windowNameResult, resultImage );
-			//showFlipImage( windowNameBackground, backgroundAverageImage );
-			
-			IplImage *tmp = cvCloneImage( differenceImage );
-			cvConvertScale( tmp, tmp, 3 );
-			//showFlipImage( windowNameThreshold, tmp );
+      initializeBackgroundModel( NUM_OF_BACKGROUND_FRAMES, cvSize(m_img_orig.width, m_img_orig.height) , m_thre_coefficient);
 
-			cvMerge( resultImage, resultImage, resultImage, NULL, outputImage );
-			
-			// ‰æ‘œƒf[ƒ^‚ÌƒTƒCƒYæ“¾
-			double len1 = (originalImage->nChannels * originalImage->width * originalImage->height);
-			double len2 = (outputImage->nChannels * outputImage->width * outputImage->height);
-			double len3 = (backgroundAverageImage->nChannels * backgroundAverageImage->width * backgroundAverageImage->height);
-			double len4 = (tmp->nChannels * tmp->width * tmp->height);
-			
-			m_img_capture.pixels.length(len1);
-			m_img_result.pixels.length(len2);
-			m_img_back.pixels.length(len3);
-			m_img_threshold.pixels.length(len4);
+      ImageSubstraction_count = 1;
+      g_temp_w = m_img_orig.width;
+      g_temp_h = m_img_orig.height;
+    }
+  }
 
-			// ŠY“–‚ÌƒCƒ[ƒW‚ğMemCopy‚·‚é
-			memcpy((void *)&(m_img_capture.pixels[0]), originalImage->imageData, len1);
-			memcpy((void *)&(m_img_result.pixels[0]), outputImage->imageData, len2);
-			memcpy((void *)&(m_img_back.pixels[0]), backgroundAverageImage->imageData, len3);
-			memcpy((void *)&(m_img_threshold.pixels[0]), tmp->imageData, len4);
+  if(ImageSubstraction_count == 1 && m_img_origIn.isNew()) {
 
-			m_img_capture.width = originalImage->width;
-			m_img_capture.height = originalImage->height;
+    m_img_origIn.read();
 
-			m_img_result.width = originalImage->width;
-			m_img_result.height = originalImage->height;
+    if(g_temp_w == m_img_orig.width && g_temp_h == m_img_orig.height){
 
-			m_img_back.width = originalImage->width;
-			m_img_back.height = originalImage->height;
+      if(originalImage != NULL){
+        cvReleaseImage(&originalImage);	
+      }
 
-			m_img_threshold.width = originalImage->width;
-			m_img_threshold.height = originalImage->height;
+      if(originalImage == NULL){
+        originalImage = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 3);  /* ã‚­ãƒ£ãƒ—ãƒãƒ£ç”»åƒç”¨IplImage */
+      }
 
-			m_img_captureOut.write();
-			m_img_resultOut.write();
-			m_img_backOut.write();
-			m_img_thresholdOut.write();
-			
-			cvReleaseImage( &tmp );
+      if(outputImage != NULL){
+        cvReleaseImage(&outputImage);
+      }
 
-			cvReleaseImage(&originalImage);
-			cvReleaseImage(&outputImage);
-			
-			g_temp_w = m_img_orig.width;
-			g_temp_h = m_img_orig.height;
-		
-		}else if(g_temp_w != m_img_orig.width || g_temp_h != m_img_orig.height){
-			ImageSubstraction_count = 0;
-		}
-		
-	}
+      if(outputImage == NULL){
+        outputImage = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 3);
+      }
 
-	return RTC::RTC_OK;
+      memcpy(originalImage->imageData,(void *)&(m_img_orig.pixels[0]), m_img_orig.pixels.length());
+
+      /* ç¾åœ¨ã®èƒŒæ™¯ã¨ã®å·®ã®çµ¶å¯¾å€¤ã‚’æˆåˆ†ã”ã¨ã«å–ã‚‹ */
+      cvAbsDiff( originalImage, backgroundAverageImage, differenceImage );
+
+      /* Sub ã¯ãƒã‚¤ãƒŠã‚¹ã«ãªã£ãŸã‚‰0ã«åˆ‡ã‚Šè©°ã‚ã¦ãã‚Œã‚‹ */
+      if( mode == DYNAMIC_MODE ){
+        cvSub( differenceImage, backgroundThresholdImage, differenceImage );
+      } else{
+        cvSubS( differenceImage, cvScalarAll( m_constant_thre ), differenceImage );
+      }
+
+      /* differenceImage ã®è¦ç´ ãŒ1ã¤ã§ã‚‚0ä»¥ä¸Šã ã£ãŸã‚‰å‰æ™¯ */
+      cvCvtColor( differenceImage, resultImage, CV_BGR2GRAY );
+      cvThreshold( resultImage, resultImage, 0, 255, CV_THRESH_BINARY );
+
+      /* ãƒ¡ãƒ‡ã‚£ã‚¢ãƒ³ãƒ•ã‚£ãƒ«ã‚¿ã§ãƒã‚¤ã‚ºã‚’é™¤å»ã™ã‚‹ */
+      cvSmooth( resultImage, resultImage, CV_MEDIAN );
+
+      IplImage *tmp = cvCloneImage( differenceImage );
+      cvConvertScale( tmp, tmp, 3 );
+      //showFlipImage( windowNameThreshold, tmp );
+
+      cvMerge( resultImage, resultImage, resultImage, NULL, outputImage );
+
+      /* ç”»åƒãƒ‡ãƒ¼ã‚¿ã®ã‚µã‚¤ã‚ºå–å¾— */
+      double len1 = (originalImage->nChannels * originalImage->width * originalImage->height);
+      double len2 = (outputImage->nChannels * outputImage->width * outputImage->height);
+      double len3 = (backgroundAverageImage->nChannels * backgroundAverageImage->width * backgroundAverageImage->height);
+      double len4 = (tmp->nChannels * tmp->width * tmp->height);
+
+      m_img_capture.pixels.length(len1);
+      m_img_result.pixels.length(len2);
+      m_img_back.pixels.length(len3);
+      m_img_threshold.pixels.length(len4);
+
+      /* è©²å½“ã®ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚’MemCopyã™ã‚‹ */
+      memcpy((void *)&(m_img_capture.pixels[0]), originalImage->imageData, len1);
+      memcpy((void *)&(m_img_result.pixels[0]), outputImage->imageData, len2);
+      memcpy((void *)&(m_img_back.pixels[0]), backgroundAverageImage->imageData, len3);
+      memcpy((void *)&(m_img_threshold.pixels[0]), tmp->imageData, len4);
+
+      m_img_capture.width = originalImage->width;
+      m_img_capture.height = originalImage->height;
+
+      m_img_result.width = originalImage->width;
+      m_img_result.height = originalImage->height;
+
+      m_img_back.width = originalImage->width;
+      m_img_back.height = originalImage->height;
+
+      m_img_threshold.width = originalImage->width;
+      m_img_threshold.height = originalImage->height;
+
+      m_img_captureOut.write();
+      m_img_resultOut.write();
+      m_img_backOut.write();
+      m_img_thresholdOut.write();
+
+      cvReleaseImage( &tmp );
+
+      cvReleaseImage(&originalImage);
+      cvReleaseImage(&outputImage);
+
+      g_temp_w = m_img_orig.width;
+      g_temp_h = m_img_orig.height;
+
+    }else if(g_temp_w != m_img_orig.width || g_temp_h != m_img_orig.height){
+      ImageSubstraction_count = 0;
+    }
+  }
+
+  return RTC::RTC_OK;
 }
 
 /*
