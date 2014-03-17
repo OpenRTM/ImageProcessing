@@ -21,7 +21,7 @@ static const char* rockpaperscissors_spec[] =
     "implementation_id", "RockPaperScissors",
     "type_name",         "RockPaperScissors",
     "description",       "RockpaperScissors check compoenet",
-    "version",           "1.0.0",
+    "version",           "1.1.0",
     "vendor",            "AIST",
     "category",          "Category",
     "activity_type",     "PERIODIC",
@@ -98,6 +98,7 @@ RockPaperScissors::RockPaperScissors(RTC::Manager* manager)
 RockPaperScissors::~RockPaperScissors()
 {
 }
+
 
 
 RTC::ReturnCode_t RockPaperScissors::onInitialize()

@@ -308,7 +308,6 @@ class RockPaperScissors
   /*!
    */
   OutPort<RTC::CameraImage> m_img_outputOut;
-  
   RTC::TimedString m_result;
   /*!
    */

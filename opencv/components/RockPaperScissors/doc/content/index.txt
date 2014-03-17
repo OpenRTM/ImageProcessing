@@ -106,8 +106,13 @@ The available configuration parameters are described below:
 ================ ================== ================ ======
 Parameter        Data type          Default Value    Effect
 ================ ================== ================ ======
-image_height     int                240              
-image_width      int                320              
+rock_max         double             1.0              
+rock_min         double             0.85             
+scissor_max      double             0.85             
+scissor_min      double             0.7              
+paper_max        double             0.7              
+paper_min        double             0.5              
+iterations       int                4                
 out_mode         int                1                
 ================ ================== ================ ======
 
@@ -121,6 +126,7 @@ Name            Type        Data type                      Purpose
 =============== =========== ============================== =======
 image_input     InPort      RTC::CameraImage               
 image_output    OutPort     RTC::CameraImage               
+result          OutPort     RTC::TimedString               
 =============== =========== ============================== =======
 
 Examples
