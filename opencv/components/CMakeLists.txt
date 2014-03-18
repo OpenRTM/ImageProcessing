@@ -33,5 +33,5 @@ add_subdirectory(Sepia)
 add_subdirectory(SubStractCaptureImage)
 add_subdirectory(Template)
 add_subdirectory(Translate)
-
+add_subdirectory(TkCalibGUI)
 
