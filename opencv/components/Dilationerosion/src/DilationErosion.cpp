@@ -183,92 +183,92 @@ RTC::ReturnCode_t DilationErosion::onDeactivated(RTC::UniqueId ec_id)
 RTC::ReturnCode_t DilationErosion::onExecute(RTC::UniqueId ec_id)
 {
   /* 新イメージのチェック */
-	if(m_img_origIn.isNew()){
+  if(m_img_origIn.isNew()){
 
-		m_img_origIn.read();
+    m_img_origIn.read();
 
-		m_image_buff = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 3);
-		m_gray_buff = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 1);
-		m_binary_buff = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 1);
-		m_dilation_buff = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 1);
-		m_erosion_buff = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 1);
-		m_output_image_buff = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 3);
-		m_merge_Image = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 3);
-		m_dilation_image = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 1);
-		m_erosion_image = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 1);
-		m_dila_merge_img = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 3);
-		m_ero_merge_img = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 3);
-		m_noise_merge_img = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 3);
+    m_image_buff = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 3);
+    m_gray_buff = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 1);
+    m_binary_buff = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 1);
+    m_dilation_buff = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 1);
+    m_erosion_buff = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 1);
+    m_output_image_buff = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 3);
+    m_merge_Image = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 3);
+    m_dilation_image = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 1);
+    m_erosion_image = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 1);
+    m_dila_merge_img = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 3);
+    m_ero_merge_img = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 3);
+    m_noise_merge_img = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 3);
 
-		// InPortの映像データ
-		memcpy(m_image_buff->imageData,(void *)&(m_img_orig.pixels[0]), m_img_orig.pixels.length());
+    /* InPortの映像データ */
+    memcpy(m_image_buff->imageData,(void *)&(m_img_orig.pixels[0]), m_img_orig.pixels.length());
 
-		//	BGRからグレースケールに変換する
-		cvCvtColor( m_image_buff, m_gray_buff, CV_BGR2GRAY );
+    /* BGRからグレースケールに変換する */
+    cvCvtColor( m_image_buff, m_gray_buff, CV_BGR2GRAY );
 
-		//	グレースケールから2値に変換する
-		cvThreshold( m_gray_buff, m_binary_buff, m_nThreshold, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY );
+    /* グレースケールから2値に変換する */
+    cvThreshold( m_gray_buff, m_binary_buff, m_nThreshold, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY );
 
-		//Dilation/Erosionを行ってノイズを消す
-		cvDilate(m_binary_buff, m_dilation_buff, NULL, m_count_dilation);
-		cvErode(m_dilation_buff, m_erosion_buff, NULL, m_count_erosion);
+    /* Dilation/Erosionを行ってノイズを消す */
+    cvDilate(m_binary_buff, m_dilation_buff, NULL, m_count_dilation);
+    cvErode(m_dilation_buff, m_erosion_buff, NULL, m_count_erosion);
 
-		//Dilationのみ行う
-		cvDilate(m_binary_buff, m_dilation_image, NULL, m_count_dilation);
+    /* Dilationのみ行う */
+    cvDilate(m_binary_buff, m_dilation_image, NULL, m_count_dilation);
 
-		//Erosionのみ行う
-		cvErode(m_binary_buff, m_erosion_image, NULL, m_count_erosion);
-		
-		// 画像データのサイズ取得
-		double len = (m_output_image_buff->nChannels * m_output_image_buff->width * m_output_image_buff->height);
-		m_img_out.pixels.length(len);
-		m_img_dilation.pixels.length(len);
-		m_img_erosion.pixels.length(len);
+    /* Erosionのみ行う */
+    cvErode(m_binary_buff, m_erosion_image, NULL, m_count_erosion);
 
-		//DilationImageをマージする
-		cvMerge(m_dilation_image, m_dilation_image, m_dilation_image, NULL, m_dila_merge_img);
-		
-		//ErosionImageをマージする
-		cvMerge(m_erosion_image, m_erosion_image, m_erosion_image, NULL, m_ero_merge_img);
+    /* 画像データのサイズ取得 */
+    double len = (m_output_image_buff->nChannels * m_output_image_buff->width * m_output_image_buff->height);
+    m_img_out.pixels.length(len);
+    m_img_dilation.pixels.length(len);
+    m_img_erosion.pixels.length(len);
 
-		//ノイズを消したImageをマージする
-		cvMerge(m_erosion_buff, m_erosion_buff, m_erosion_buff, NULL, m_noise_merge_img);
-		
-		// 該当のイメージをMemCopyする
-		memcpy((void *)&(m_img_out.pixels[0]), m_noise_merge_img->imageData, len);
-		memcpy((void *)&(m_img_dilation.pixels[0]), m_dila_merge_img->imageData, len);
-		memcpy((void *)&(m_img_erosion.pixels[0]), m_ero_merge_img->imageData, len);
-		
-		// 反転した画像データをOutPortから出力する。
-		m_img_out.width = m_image_buff->width;
-		m_img_out.height = m_image_buff->height;
+    /* DilationImageをマージする */
+    cvMerge(m_dilation_image, m_dilation_image, m_dilation_image, NULL, m_dila_merge_img);
 
-		m_img_dilation.width = m_image_buff->width;
-		m_img_dilation.height = m_image_buff->height;
+    /* ErosionImageをマージする */
+    cvMerge(m_erosion_image, m_erosion_image, m_erosion_image, NULL, m_ero_merge_img);
 
-		m_img_erosion.width = m_image_buff->width;
-		m_img_erosion.height = m_image_buff->height;
+    /* ノイズを消したImageをマージする */
+    cvMerge(m_erosion_buff, m_erosion_buff, m_erosion_buff, NULL, m_noise_merge_img);
 
-		m_img_outOut.write();
-		m_img_dilationOut.write();
-		m_img_erosionOut.write();
+    /* 該当のイメージをMemCopyする */
+    memcpy((void *)&(m_img_out.pixels[0]), m_noise_merge_img->imageData, len);
+    memcpy((void *)&(m_img_dilation.pixels[0]), m_dila_merge_img->imageData, len);
+    memcpy((void *)&(m_img_erosion.pixels[0]), m_ero_merge_img->imageData, len);
 
-		cvReleaseImage(&m_image_buff);
-		cvReleaseImage(&m_gray_buff);
-		cvReleaseImage(&m_binary_buff);
-		cvReleaseImage(&m_dilation_buff);
-		cvReleaseImage(&m_erosion_buff);
-		cvReleaseImage(&m_output_image_buff);
-		cvReleaseImage(&m_merge_Image);
-		cvReleaseImage(&m_dilation_image);
-		cvReleaseImage(&m_erosion_image);
-		cvReleaseImage(&m_dila_merge_img);
-		cvReleaseImage(&m_ero_merge_img);
-		cvReleaseImage(&m_noise_merge_img);
+    /* 反転した画像データをOutPortから出力する。 */
+    m_img_out.width = m_image_buff->width;
+    m_img_out.height = m_image_buff->height;
 
-	}
+    m_img_dilation.width = m_image_buff->width;
+    m_img_dilation.height = m_image_buff->height;
 
-	return RTC::RTC_OK;
+    m_img_erosion.width = m_image_buff->width;
+    m_img_erosion.height = m_image_buff->height;
+
+    m_img_outOut.write();
+    m_img_dilationOut.write();
+    m_img_erosionOut.write();
+
+    cvReleaseImage(&m_image_buff);
+    cvReleaseImage(&m_gray_buff);
+    cvReleaseImage(&m_binary_buff);
+    cvReleaseImage(&m_dilation_buff);
+    cvReleaseImage(&m_erosion_buff);
+    cvReleaseImage(&m_output_image_buff);
+    cvReleaseImage(&m_merge_Image);
+    cvReleaseImage(&m_dilation_image);
+    cvReleaseImage(&m_erosion_image);
+    cvReleaseImage(&m_dila_merge_img);
+    cvReleaseImage(&m_ero_merge_img);
+    cvReleaseImage(&m_noise_merge_img);
+
+  }
+
+  return RTC::RTC_OK;
 }
 
 /*
