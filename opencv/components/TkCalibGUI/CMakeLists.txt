@@ -18,7 +18,7 @@ set(RTC_VERSION_PATCH "0")
 set(RTC_LANG "python")
 set(RTC_DESCRIPTION "Image Calibration GUI")
 set(RTC_VENDOR "AIST")
-set(RTC_MAINTAINER "author@example.com")
+set(RTC_MAINTAINER "Noriaki Ando <n-ando@aist.go.jp>")
 
 string(TOLOWER ${RTC_NAME} PACKAGE_NAME)
 set(PACKAGE_VERSION "${RTC_VERSION_MAJOR}.${RTC_VERSION_MINOR}.${RTC_VERSION_PATCH}")
