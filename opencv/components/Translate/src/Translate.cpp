@@ -16,7 +16,7 @@ static const char* translate_spec[] =
     "implementation_id", "Translate",
     "type_name",         "Translate",
     "description",       "Translate image component",
-    "version",           "1.0.0",
+    "version",           "1.1.0",
     "vendor",            "AIST",
     "category",          "Category",
     "activity_type",     "PERIODIC",
@@ -109,101 +109,106 @@ RTC::ReturnCode_t Translate::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Translate::onActivated(RTC::UniqueId ec_id)
 {
-    // ƒCƒ[ƒW—pƒƒ‚ƒŠ‚ÌŠm•Û
-    m_image_buff       = NULL;
-    m_image_dest       = NULL;
+  /* ã‚¤ãƒ¡ãƒ¼ã‚¸ç”¨ãƒ¡ãƒ¢ãƒªã®ç¢ºä¿ */
+  m_image_buff       = NULL;
+  m_image_dest       = NULL;
 
-    m_in_height = 0;
-    m_in_width  = 0;
+  m_in_height = 0;
+  m_in_width  = 0;
 
-    //	s—ñ‚ğ¶¬‚·‚é
-	m_transformMatrix = cvCreateMat( 2, 3, CV_32FC1);
+  /* è¡Œåˆ—ã‚’ç”Ÿæˆã™ã‚‹ */
+  m_transformMatrix = cvCreateMat( 2, 3, CV_32FC1);
 
-    return RTC::RTC_OK;
+  return RTC::RTC_OK;
 }
 
 
 RTC::ReturnCode_t Translate::onDeactivated(RTC::UniqueId ec_id)
 {
-    if(m_image_buff       != NULL)
-        cvReleaseImage(&m_image_buff);
-    if(m_image_dest       != NULL)
-        cvReleaseImage(&m_image_dest);
+  if(m_image_buff       != NULL)
+  {
+    cvReleaseImage(&m_image_buff);
+  }  
+  if(m_image_dest       != NULL)
+  {
+    cvReleaseImage(&m_image_dest);
+  }
+  cvReleaseMat(&m_transformMatrix);
 
-    cvReleaseMat(&m_transformMatrix);
-
-    return RTC::RTC_OK;
+  return RTC::RTC_OK;
 }
 
 
 RTC::ReturnCode_t Translate::onExecute(RTC::UniqueId ec_id)
 {
-    // Common CV process
-    // V‚µ‚¢ƒf[ƒ^‚Ìƒ`ƒFƒbƒN
-    if (m_image_origIn.isNew()) 
+  // Common CV process
+  /* æ–°ã—ã„ãƒ‡ãƒ¼ã‚¿ã®ãƒã‚§ãƒƒã‚¯ */
+  if (m_image_origIn.isNew()) 
+  {
+    /* InPortãƒ‡ãƒ¼ã‚¿ã®èª­ã¿è¾¼ã¿ */
+    m_image_origIn.read();
+
+    /* ã‚µã‚¤ã‚ºãŒå¤‰ã‚ã£ãŸã¨ãã ã‘å†ç”Ÿæˆã™ã‚‹ */
+    if(m_in_height != m_image_orig.height || m_in_width != m_image_orig.width)
     {
-        // InPortƒf[ƒ^‚Ì“Ç‚İ‚İ
-        m_image_origIn.read();
+      printf("[onExecute] Size of input image is not match!\n");
+      m_in_height = m_image_orig.height;
+      m_in_width  = m_image_orig.width;
 
-        // ƒTƒCƒY‚ª•Ï‚í‚Á‚½‚Æ‚«‚¾‚¯Ä¶¬‚·‚é
-        if(m_in_height != m_image_orig.height || m_in_width != m_image_orig.width)
-        {
-            printf("[onExecute] Size of input image is not match!\n");
-
-            m_in_height = m_image_orig.height;
-            m_in_width  = m_image_orig.width;
-            
-            if(m_image_buff       != NULL)
-                cvReleaseImage(&m_image_buff);
-            if(m_image_dest       != NULL)
-                cvReleaseImage(&m_image_dest);
-
-
-            // ƒTƒCƒY•ÏŠ·‚Ì‚½‚ßTempƒƒ‚ƒŠ[‚ğ‚æ‚¢‚·‚é
-	        m_image_buff = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3);
-	        m_image_dest = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3);
-        }
-
-        // InPort‚Ì‰æ‘œƒf[ƒ^‚ğIplImage‚ÌimageData‚ÉƒRƒs[
-        memcpy(m_image_buff->imageData,(void *)&(m_image_orig.pixels[0]),m_image_orig.pixels.length());
-
-        // Anternative process
-	    CvPoint2D32f original[3];	//	•ÏŠ·‘OÀ•W
-	    CvPoint2D32f Translate[3];	//	•ÏŠ·ŒãÀ•W
-
-	    //•ÏŠ·‘O‚ÌÀ•W‚ğİ’è‚·‚é
-	    original[0] = cvPoint2D32f( 0, 0 );
-	    original[1] = cvPoint2D32f( m_image_buff->width, 0 );
-	    original[2] = cvPoint2D32f( 0, m_image_buff->height );
-
-	    //•ÏŠ·Œã‚ÌÀ•W‚ğİ’è‚·‚é
-	    Translate[0] = cvPoint2D32f( m_nTransX,                       m_nTransY );
-	    Translate[1] = cvPoint2D32f( m_nTransX + m_image_buff->width, m_nTransY );
-	    Translate[2] = cvPoint2D32f( m_nTransX,                       m_nTransY + m_image_buff->height );
-
-	    //	•ÏŠ·s—ñ‚ğ‹‚ß‚é
-	    cvGetAffineTransform( original, Translate, m_transformMatrix );
-
-	    //	•ÏŠ·s—ñ‚ğ”½‰f‚³‚¹‚é
-	    cvWarpAffine( m_image_buff, m_image_dest, m_transformMatrix, CV_INTER_LINEAR | CV_WARP_FILL_OUTLIERS, cvScalarAll( 0 ) );
-
-        // Common process
-        // ‰æ‘œƒf[ƒ^‚ÌƒTƒCƒYæ“¾
-        int len = m_image_dest->nChannels * m_image_dest->width * m_image_dest->height;
-
-        // ‰æ–Ê‚ÌƒTƒCƒYî•ñ‚ğ“ü‚ê‚é
-        m_image_output.pixels.length(len);        
-        m_image_output.width  = m_image_dest->width;
-        m_image_output.height = m_image_dest->height;
-
-        // ”½“]‚µ‚½‰æ‘œƒf[ƒ^‚ğOutPort‚ÉƒRƒs[
-        memcpy((void *)&(m_image_output.pixels[0]), m_image_dest->imageData,len);
-
-        // ”½“]‚µ‚½‰æ‘œƒf[ƒ^‚ğOutPort‚©‚ço—Í‚·‚éB
-        m_image_outputOut.write();
+      if(m_image_buff       != NULL)
+      {
+        cvReleaseImage(&m_image_buff);
+      }
+      if(m_image_dest       != NULL)
+      {
+        cvReleaseImage(&m_image_dest);
+      }
+      /* ã‚µã‚¤ã‚ºå¤‰æ›ã®ãŸã‚Tempãƒ¡ãƒ¢ãƒªãƒ¼ã‚’ç”¨æ„ã™ã‚‹ */
+      m_image_buff = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3);
+      m_image_dest = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3);
     }
 
-    return RTC::RTC_OK;
+    /* InPortã®ç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’IplImageã®imageDataã«ã‚³ãƒ”ãƒ¼ */
+    memcpy(m_image_buff->imageData,(void *)&(m_image_orig.pixels[0]),m_image_orig.pixels.length());
+
+    // Anternative process
+    CvPoint2D32f original[3];   /* å¤‰æ›å‰åº§æ¨™ */
+    CvPoint2D32f Translate[3];  /* å¤‰æ›å¾Œåº§æ¨™ */
+
+    /* å¤‰æ›å‰ã®åº§æ¨™ã‚’è¨­å®šã™ã‚‹ */
+    original[0] = cvPoint2D32f( 0, 0 );
+    original[1] = cvPoint2D32f( m_image_buff->width, 0 );
+    original[2] = cvPoint2D32f( 0, m_image_buff->height );
+
+    /* å¤‰æ›å¾Œã®åº§æ¨™ã‚’è¨­å®šã™ã‚‹ */
+    Translate[0] = cvPoint2D32f( m_nTransX,                       m_nTransY );
+    Translate[1] = cvPoint2D32f( m_nTransX + m_image_buff->width, m_nTransY );
+    Translate[2] = cvPoint2D32f( m_nTransX,                       m_nTransY + m_image_buff->height );
+
+    /* å¤‰æ›è¡Œåˆ—ã‚’æ±‚ã‚ã‚‹ */
+    cvGetAffineTransform( original, Translate, m_transformMatrix );
+
+    /* å¤‰æ›è¡Œåˆ—ã‚’åæ˜ ã•ã›ã‚‹ */
+    cvWarpAffine( m_image_buff, m_image_dest, m_transformMatrix, 
+                CV_INTER_LINEAR | CV_WARP_FILL_OUTLIERS, cvScalarAll( 0 ) );
+
+    // Common process
+    /* ç”»åƒãƒ‡ãƒ¼ã‚¿ã®ã‚µã‚¤ã‚ºå–å¾— */
+    int len = m_image_dest->nChannels * m_image_dest->width * m_image_dest->height;
+
+    /* ç”»é¢ã®ã‚µã‚¤ã‚ºæƒ…å ±ã‚’å…¥ã‚Œã‚‹ */
+    m_image_output.pixels.length(len);        
+    m_image_output.width  = m_image_dest->width;
+    m_image_output.height = m_image_dest->height;
+
+    /* åè»¢ã—ãŸç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’OutPortã«ã‚³ãƒ”ãƒ¼ */
+    memcpy((void *)&(m_image_output.pixels[0]), m_image_dest->imageData,len);
+
+    /* åè»¢ã—ãŸç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’OutPortã‹ã‚‰å‡ºåŠ›ã™ã‚‹ */
+    m_image_outputOut.write();
+  }
+
+  return RTC::RTC_OK;
 }
 
 /*
