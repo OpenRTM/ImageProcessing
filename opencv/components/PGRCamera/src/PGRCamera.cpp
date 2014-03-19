@@ -116,28 +116,28 @@ RTC::ReturnCode_t PGRCamera::onActivated(RTC::UniqueId ec_id)
   /* IndexからIDを取得する */
   error = busMgr.GetCameraFromIndex(m_index, &guid);
   if ( error != PGRERROR_OK ){ 
-    cout << "カメラがありません。" << endl;
+    cout << "No Camera Device" << endl;
     return RTC::RTC_ERROR;	
   }
 
   /* IDからConnectする */
   error = m_camera->Connect(&guid);
   if ( error != PGRERROR_OK ){ 
-    cout << "Connection 失敗。" << endl;
+    cout << "Connection failed" << endl;
     return RTC::RTC_ERROR;	
   }
 
   /* カメラ情報を取得する */
   error = m_camera->GetCameraInfo(&m_camInfo);
   if ( error != PGRERROR_OK ){ 
-    cout << "情報取得　失敗" << endl;
+    cout << "GetCameraInfo　failed" << endl;
     return RTC::RTC_ERROR;	
   }
 
   /* 映像のCaptureを始める */
   error = m_camera->StartCapture();
   if ( error != PGRERROR_OK ){ 
-    cout << "Capture 失敗" << endl;
+    cout << "Capture failed" << endl;
     return RTC::RTC_ERROR;	
   }
 
@@ -183,7 +183,7 @@ RTC::ReturnCode_t PGRCamera::onExecute(RTC::UniqueId ec_id)
   error = m_camera->RetrieveBuffer( &rawImage );
   if (error != PGRERROR_OK)
   {
-    cout << "映像のRawImageの領域のRetrieveができません" << endl;
+    cout << "RawImage RetrieveBuffer error" << endl;
     return RTC::RTC_ERROR;
   }
 
@@ -191,7 +191,7 @@ RTC::ReturnCode_t PGRCamera::onExecute(RTC::UniqueId ec_id)
   error = rawImage.Convert( PIXEL_FORMAT_RGB8, &convertedImage );
   if (error != PGRERROR_OK)
   {
-    cout << "RGBFormatとして変換できません" << endl;
+    cout << "RawImage Convert error" << endl;
     return RTC::RTC_ERROR;
   }
 
