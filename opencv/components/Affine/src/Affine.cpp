@@ -214,7 +214,7 @@ RTC::ReturnCode_t Affine::onExecute(RTC::UniqueId ec_id)
       cvmSet(m_affineMatrix, 1, 2, m_ve2dbMatrix[1][2]);            
     }else
     {
-      cout<<"コンフィグレーション情報が正しくありません。"<<endl;
+      cout<<"Incorrect configuration information."<<endl;
 
       return RTC::RTC_ERROR;
     }
