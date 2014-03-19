@@ -10,7 +10,7 @@
 #ifndef DILATIONEROSION_H
 #define DILATIONEROSION_H
 
-#define THRESHOLD_MAX_VALUE	255   /* 2値化の際に使用する最大値 */
+#define THRESHOLD_MAX_VALUE	255
 
 #include <rtm/Manager.h>
 #include <rtm/DataFlowComponentBase.h>

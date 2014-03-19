@@ -220,7 +220,7 @@ RTC::ReturnCode_t DilationErosion::onExecute(RTC::UniqueId ec_id)
     cvErode(m_binary_buff, m_erosion_image, NULL, m_count_erosion);
 
     /* 画像データのサイズ取得 */
-    double len = (m_output_image_buff->nChannels * m_output_image_buff->width * m_output_image_buff->height);
+    int len = (m_output_image_buff->nChannels * m_output_image_buff->width * m_output_image_buff->height);
     m_img_out.pixels.length(len);
     m_img_dilation.pixels.length(len);
     m_img_erosion.pixels.length(len);
