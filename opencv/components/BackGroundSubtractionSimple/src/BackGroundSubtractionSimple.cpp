@@ -44,9 +44,9 @@ static const char* backgroundsubtractionsimple_spec[] =
 // </rtc-template>
 
 std::string differenceMethod[3] = {
-	"RGB",          //RGBの成分ごとに評価
-	"CIE L*a*b*",   //CIE L*a*b* で距離を評価
-	"gray scale"    //グレースケールで評価
+	"RGB",
+	"CIE L*a*b*",
+	"gray scale"
 };
 
 std::string noiseMethod[3] = {
@@ -238,9 +238,9 @@ RTC::ReturnCode_t BackGroundSubtractionSimple::onExecute(RTC::UniqueId ec_id)
   cvMerge( m_resultImage, m_resultImage, m_resultImage, NULL, m_outputImage );
 
   /* 画像データのサイズ取得 */
-  double len1 = (m_currentImage->nChannels * m_currentImage->width * m_currentImage->height);
-  double len2 = (m_outputImage->nChannels * m_outputImage->width * m_outputImage->height);
-  double len3 = (m_backgroundImage->nChannels * m_backgroundImage->width * m_backgroundImage->height);
+  int len1 = (m_currentImage->nChannels * m_currentImage->width * m_currentImage->height);
+  int len2 = (m_outputImage->nChannels * m_outputImage->width * m_outputImage->height);
+  int len3 = (m_backgroundImage->nChannels * m_backgroundImage->width * m_backgroundImage->height);
 
   m_img_curr.pixels.length(len1);
   m_img_resu.pixels.length(len2);
