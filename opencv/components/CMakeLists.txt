@@ -4,6 +4,7 @@ project(components)
 include(DirectShowCam/BaseClasses/FindDirectShow.cmake)
 include(PGRCamera/cmake/FindFlyCapture.cmake)
 
+add_subdirectory(TkCalibGUI)
 add_subdirectory(Affine)
 add_subdirectory(BackGroundSubtractionSimple)
 add_subdirectory(Binarization)
@@ -33,5 +34,5 @@ add_subdirectory(Sepia)
 add_subdirectory(SubStractCaptureImage)
 add_subdirectory(Template)
 add_subdirectory(Translate)
-add_subdirectory(TkCalibGUI)
+
 
