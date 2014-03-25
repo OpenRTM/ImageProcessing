@@ -55,7 +55,7 @@ if (SolutionDir)
       TARGET ${PROJECT_NAME}
       POST_BUILD
       COMMAND ${CMAKE_COMMAND} -E 
-        copy ${PROJECT_BINARY_DIR}/src/Release/${PROJECT_NAME}.dll ${SolutionDir}/bin
+        copy ${PROJECT_BINARY_DIR}/Release/${PROJECT_NAME}.lib ${SolutionDir}/bin
     )
   else(WIN32)
     add_custom_command(
