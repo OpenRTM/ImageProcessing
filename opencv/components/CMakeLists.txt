@@ -34,5 +34,10 @@ add_subdirectory(Sepia)
 add_subdirectory(SubStractCaptureImage)
 add_subdirectory(Template)
 add_subdirectory(Translate)
+if(BOOST_ROOT)
+  add_subdirectory(NetworkCameraUtility)
+  add_subdirectory(PanasonicRtComponent)
+  add_subdirectory(SonyRtComponent)
+endif()
 
 
