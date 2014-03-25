@@ -160,149 +160,149 @@ RTC::ReturnCode_t RockPaperScissors::onShutdown(RTC::UniqueId ec_id)
 RTC::ReturnCode_t RockPaperScissors::onActivated(RTC::UniqueId ec_id)
 {
 
-	m_image_buff = NULL; // 入力Image
-	m_hsv_buff = NULL; // HSV用
-	m_convexHull_buff = NULL; // ConvexHull用
-	m_skin_buff = NULL; // 肌色抽出用
-	m_temp_buff = NULL; // 一時保存用
-	m_label_buff = NULL; // ラベル結果保存用
-	m_output_buff = NULL; // 出力用
-	m_prev_judge = "";    // 未判定
+  m_image_buff = NULL;
+  m_hsv_buff = NULL;
+  m_convexHull_buff = NULL;
+  m_skin_buff = NULL;
+  m_temp_buff = NULL;
+  m_label_buff = NULL;
+  m_output_buff = NULL;
+  m_prev_judge = "";
 
-	return RTC::RTC_OK;
+  return RTC::RTC_OK;
 }
 
 
 RTC::ReturnCode_t RockPaperScissors::onDeactivated(RTC::UniqueId ec_id)
 {
-	if(m_image_buff != NULL){
-		cvReleaseImage(&m_image_buff);
-	}
-	if(m_hsv_buff != NULL){
-		cvReleaseImage(&m_hsv_buff);
-	}
-	if(m_convexHull_buff != NULL){
-		cvReleaseImage(&m_convexHull_buff);
-	}
-	if(m_skin_buff != NULL){
-		cvReleaseImage(&m_skin_buff);
-	}
-	if(m_temp_buff != NULL){
-		cvReleaseImage(&m_temp_buff);
-	}
-	if(m_label_buff != NULL){
-		cvReleaseImage(&m_label_buff);
-	}
-	if(m_output_buff != NULL){
-		cvReleaseImage(&m_output_buff);
-	}
-	
-	return RTC::RTC_OK;
+  if(m_image_buff != NULL){
+    cvReleaseImage(&m_image_buff);
+  }
+  if(m_hsv_buff != NULL){
+    cvReleaseImage(&m_hsv_buff);
+  }
+  if(m_convexHull_buff != NULL){
+    cvReleaseImage(&m_convexHull_buff);
+  }
+  if(m_skin_buff != NULL){
+    cvReleaseImage(&m_skin_buff);
+  }
+  if(m_temp_buff != NULL){
+    cvReleaseImage(&m_temp_buff);
+  }
+  if(m_label_buff != NULL){
+    cvReleaseImage(&m_label_buff);
+  }
+  if(m_output_buff != NULL){
+    cvReleaseImage(&m_output_buff);
+  }
+
+  return RTC::RTC_OK;
 }
 
 
 RTC::ReturnCode_t RockPaperScissors::onExecute(RTC::UniqueId ec_id)
 {	
-	//新データのチェック
-	if(m_img_inputIn.isNew()){
-		//データの読み込み
-		m_img_inputIn.read();
+  /* 新データのチェック */
+  if(m_img_inputIn.isNew()){
+    /* データの読み込み */
+    m_img_inputIn.read();
 
-		m_image_buff = cvCreateImage(cvSize(m_img_input.width, m_img_input.height), IPL_DEPTH_8U, 3); // 入力Image
-		m_hsv_buff = cvCreateImage(cvSize(m_img_input.width, m_img_input.height), IPL_DEPTH_8U, 3); // HSV用
-		m_convexHull_buff = cvCreateImage(cvSize(m_img_input.width, m_img_input.height), IPL_DEPTH_8U, 3); // ConvexHull用
-		m_skin_buff = cvCreateImage(cvSize(m_img_input.width, m_img_input.height), IPL_DEPTH_8U, 1); // 肌色抽出用
-		m_temp_buff = cvCreateImage(cvSize(m_img_input.width, m_img_input.height), IPL_DEPTH_8U, 1); // 一時保存用
-		m_label_buff = cvCreateImage(cvSize(m_img_input.width, m_img_input.height), IPL_DEPTH_16S, 1); // ラベル結果保存用
-		m_output_buff = cvCreateImage(cvSize(m_img_input.width, m_img_input.height), IPL_DEPTH_8U, 3); // 出力用
-		
-		//InPortの映像の取得
-		memcpy(m_image_buff->imageData,(void *)&(m_img_input.pixels[0]),m_img_input.pixels.length());
-		
-		// 肌色を抽出する。
-		extractSkinColor();
-		
-		// 欠損領域を補間する
-		interpolate();
-		
-		//	ラベリングを行う
-		Label *labeling = createLabeling();
-		exec( labeling, m_skin_buff, m_label_buff, true, IGNORE_SIZE );
+    m_image_buff = cvCreateImage(cvSize(m_img_input.width, m_img_input.height), IPL_DEPTH_8U, 3);   /* 入力Image */
+    m_hsv_buff = cvCreateImage(cvSize(m_img_input.width, m_img_input.height), IPL_DEPTH_8U, 3);     /* HSV用 */
+    m_convexHull_buff = cvCreateImage(cvSize(m_img_input.width, m_img_input.height), IPL_DEPTH_8U, 3); /* ConvexHull用 */
+    m_skin_buff = cvCreateImage(cvSize(m_img_input.width, m_img_input.height), IPL_DEPTH_8U, 1);    /* 肌色抽出用 */
+    m_temp_buff = cvCreateImage(cvSize(m_img_input.width, m_img_input.height), IPL_DEPTH_8U, 1);    /* 一時保存用 */
+    m_label_buff = cvCreateImage(cvSize(m_img_input.width, m_img_input.height), IPL_DEPTH_16S, 1);  /* ラベル結果保存用 */
+    m_output_buff = cvCreateImage(cvSize(m_img_input.width, m_img_input.height), IPL_DEPTH_8U, 3);  /* 出力用 */
 
-		if(getNumOfResultRegions( labeling ) > 0 ) {
-			//	IGNORE_SIZEよりも大きな領域があった場合
-			int handarea;		//	手領域の面積
-			int hullarea;		//	ConvexHull内の面積
-			int hullcount;		//	ConvexHullの頂点の数
-			CvPoint *handpoint;	//	手領域内の点の座標配列
-			int *hull;			//	ConvexHullの頂点のhandpointにおけるindex番号
-			CvMat pointMatrix;	//	手領域用行列
-			CvMat hullMatrix;	//	ConvexHull用行列
+    /* InPortの映像の取得 */
+    memcpy(m_image_buff->imageData,(void *)&(m_img_input.pixels[0]),m_img_input.pixels.length());
 
-			//	最大領域(手領域)の抽出を行う
-			handarea = pickupMaxArea();
+    /* 肌色を抽出する */
+    extractSkinColor();
 
-			//	ConvexHullを生成する
-			createConvexHull( handarea, &handpoint, &hull, &pointMatrix, &hullMatrix );
-			
-			hullcount = hullMatrix.cols;
+    /* 欠損領域を補間する */
+    interpolate();
 
-			//	ConvexHullを描画する
-			drawConvexHull( handpoint, hull, hullcount );
+    /* ラベリングを行う */
+    Label *labeling = createLabeling();
+    exec( labeling, m_skin_buff, m_label_buff, true, IGNORE_SIZE );
 
-			//	ConvexHull内の面積を求める
-			hullarea = calcConvexHullArea( handpoint,hull, hullcount );
+    if(getNumOfResultRegions( labeling ) > 0 )
+    {
+      /* IGNORE_SIZEよりも大きな領域があった場合 */
+      int handarea;     /* 手領域の面積 */
+      int hullarea;     /* ConvexHull内の面積 */
+      int hullcount;    /* ConvexHullの頂点の数 */
+      CvPoint *handpoint; /* 手領域内の点の座標配列 */
+      int *hull;        /* ConvexHullの頂点のhandpointにおけるindex番号 */
+      CvMat pointMatrix;  /* 手領域用行列 */
+      CvMat hullMatrix;   /* ConvexHull用行列 */
 
-			//	ジャンケンの判定を行う
-			decide( handarea, hullarea );
+      /* 最大領域(手領域)の抽出を行う */
+      handarea = pickupMaxArea();
 
-			//	メモリを解放する
-			free( handpoint );
-			free( hull );
+      /* ConvexHullを生成する */
+      createConvexHull( handarea, &handpoint, &hull, &pointMatrix, &hullMatrix );
 
-		} else {
-		
-			//	画像を初期化する
-			cvSetZero( m_convexHull_buff );
+      hullcount = hullMatrix.cols;
 
-		}
+      /* ConvexHullを描画する */
+      drawConvexHull( handpoint, hull, hullcount );
+
+      /* ConvexHull内の面積を求める */
+      hullarea = calcConvexHullArea( handpoint,hull, hullcount );
+
+      /* ジャンケンの判定を行う */
+      decide( handarea, hullarea );
+
+      /* メモリを解放する */
+      free( handpoint );
+      free( hull );
+
+    } else {
+
+      /* 画像を初期化する */
+      cvSetZero( m_convexHull_buff );
+    }
 	
-		releaseLabeling( labeling );
+    releaseLabeling( labeling );
 
-		if ( m_skin_buff->origin == 0 ) {
-			//　左上が原点の場合
-			cvFlip( m_skin_buff, m_skin_buff, 0 );
-		}
-		if ( m_convexHull_buff->origin == 0 ) {
-			//　左上が原点の場合
-			cvFlip( m_convexHull_buff, m_convexHull_buff, 0 );
-		}
+    if ( m_skin_buff->origin == 0 ) {
+      /* 左上が原点の場合 */
+      cvFlip( m_skin_buff, m_skin_buff, 0 );
+    }
+    if ( m_convexHull_buff->origin == 0 ) {
+      /* 左上が原点の場合 */
+      cvFlip( m_convexHull_buff, m_convexHull_buff, 0 );
+    }
 
-		// 画像データのサイズ取得
-		double len = (m_output_buff->nChannels * m_output_buff->width * m_output_buff->height);
-		
-		m_img_output.pixels.length(len);
+    /* 画像データのサイズ取得 */
+    int len = (m_output_buff->nChannels * m_output_buff->width * m_output_buff->height);
 
-		// 該当のイメージをMemCopyする
-		memcpy((void *)&(m_img_output.pixels[0]), m_convexHull_buff->imageData, len);
-		
-		// 反転した画像データをOutPortから出力する。
-		m_img_output.width = m_image_buff->width;
-		m_img_output.height = m_image_buff->height;
+    m_img_output.pixels.length(len);
 
-		m_img_outputOut.write();
+    /* 該当のイメージをMemCopyする */
+    memcpy((void *)&(m_img_output.pixels[0]), m_convexHull_buff->imageData, len);
 
-		cvReleaseImage(&m_image_buff);
-		cvReleaseImage(&m_hsv_buff);
-		cvReleaseImage(&m_convexHull_buff);
-		cvReleaseImage(&m_skin_buff);
-		cvReleaseImage(&m_temp_buff);
-		cvReleaseImage(&m_label_buff);
-		cvReleaseImage(&m_output_buff);
+    /* 反転した画像データをOutPortから出力する */
+    m_img_output.width = m_image_buff->width;
+    m_img_output.height = m_image_buff->height;
 
-	}
+    m_img_outputOut.write();
 
-	return RTC::RTC_OK;
+    cvReleaseImage(&m_image_buff);
+    cvReleaseImage(&m_hsv_buff);
+    cvReleaseImage(&m_convexHull_buff);
+    cvReleaseImage(&m_skin_buff);
+    cvReleaseImage(&m_temp_buff);
+    cvReleaseImage(&m_label_buff);
+    cvReleaseImage(&m_output_buff);
+
+    }
+
+    return RTC::RTC_OK;
 }
 
 /*
@@ -345,35 +345,35 @@ RTC::ReturnCode_t RockPaperScissors::onRateChanged(RTC::UniqueId ec_id)
 //
 void RockPaperScissors::extractSkinColor( void )
 {
-	CvScalar color;		//	HSV表色系で表した色
-	unsigned char h;	//	H成分
-	unsigned char s;	//	S成分
-	unsigned char v;	//	V成分
-	
-	//	BGRからHSVに変換する
-	
-	cvCvtColor( m_image_buff, m_hsv_buff, CV_BGR2HSV );
-	
-	//肌色抽出
-	for( int x = 0; x < m_skin_buff->width; x++ ) {
-		for( int y = 0 ; y < m_skin_buff->height; y++ ) {
+  CvScalar color;   /* HSV表色系で表した色 */
+  unsigned char h;  /* H成分 */
+  unsigned char s;  /* S成分 */
+  unsigned char v;  /* V成分 */
 
-			color = cvGet2D( m_hsv_buff, y, x );
-			h = color.val[0];
-			s = color.val[1];
-			v = color.val[2];
+  /* BGRからHSVに変換する */
+  cvCvtColor( m_image_buff, m_hsv_buff, CV_BGR2HSV );
 
-			if( h <= HMAX && h >= HMIN &&
-				s <= SMAX && s >= SMIN &&
-					v <= VMAX && v >= VMIN ) {
-				//	肌色の場合
-				cvSetReal2D( m_skin_buff, y, x, 255 );
-			} else {
-				cvSetReal2D( m_skin_buff, y, x, 0 );
-			}
-		}
+  /* 肌色抽出 */
+  for( int x = 0; x < m_skin_buff->width; x++ )
+  {
+    for( int y = 0 ; y < m_skin_buff->height; y++ )
+    {
+      color = cvGet2D( m_hsv_buff, y, x );
+      h = color.val[0];
+      s = color.val[1];
+      v = color.val[2];
 
-	}
+      if( h <= HMAX && h >= HMIN &&
+          s <= SMAX && s >= SMIN &&
+          v <= VMAX && v >= VMIN )
+      {
+        /* 肌色の場合 */
+        cvSetReal2D( m_skin_buff, y, x, 255 );
+      } else {
+        cvSetReal2D( m_skin_buff, y, x, 0 );
+      }
+    }
+  }
 }
 
 //
@@ -381,11 +381,11 @@ void RockPaperScissors::extractSkinColor( void )
 //
 void RockPaperScissors::interpolate( void )
 {
-	//膨張をITERATIONS回行う
-	cvDilate( m_skin_buff, m_temp_buff, NULL, m_iterations );
+  /* 膨張をITERATIONS回行う */
+  cvDilate( m_skin_buff, m_temp_buff, NULL, m_iterations );
 
-	//収縮をITERATIONS回行う
-	cvErode( m_temp_buff, m_skin_buff, NULL, m_iterations );
+  /* 収縮をITERATIONS回行う */
+  cvErode( m_temp_buff, m_skin_buff, NULL, m_iterations );
 }
 
 //
@@ -396,21 +396,24 @@ void RockPaperScissors::interpolate( void )
 //
 int RockPaperScissors::pickupMaxArea( void )
 {
-	int handarea = 0;	//	手領域の面積
+  int handarea = 0;   /* 手領域の面積 */
 
-	for(int x = 0; x < m_skin_buff->width; x++ ) {
-		for( int y=0; y < m_skin_buff->height; y++ ) {
-			if( cvGetReal2D( m_label_buff, y, x ) == 1 ) {
-				//	最大領域だった場合
-				handarea++;
-				cvSet2D( m_convexHull_buff, y, x, CV_RGB( 255, 255, 255 ) );
-			} else {
-				cvSetReal2D( m_skin_buff, y, x, 0 );
-				cvSet2D( m_convexHull_buff, y, x, CV_RGB( 0, 0, 0 ) );
-			}
-		}
-	}
-	return handarea;
+  for(int x = 0; x < m_skin_buff->width; x++ )
+  {
+    for( int y=0; y < m_skin_buff->height; y++ )
+    {
+      if( cvGetReal2D( m_label_buff, y, x ) == 1 )
+      {
+        /* 最大領域だった場合 */
+        handarea++;
+        cvSet2D( m_convexHull_buff, y, x, CV_RGB( 255, 255, 255 ) );
+      } else {
+        cvSetReal2D( m_skin_buff, y, x, 0 );
+        cvSet2D( m_convexHull_buff, y, x, CV_RGB( 0, 0, 0 ) );
+      }
+    }
+  }
+  return handarea;
 }
 
 //
@@ -426,26 +429,29 @@ int RockPaperScissors::pickupMaxArea( void )
 void RockPaperScissors::createConvexHull( int handarea, CvPoint **handpoint, int **hull,
 					  CvMat *pointMatrix, CvMat *hullMatrix )
 {
-	int i=0;
+  int i=0;
 
-	//	ConvexHullを計算するために必要な行列を生成する
-	*handpoint=( CvPoint * )malloc( sizeof( CvPoint ) * handarea );
-	*hull = ( int * )malloc( sizeof( int ) * handarea );
-	*pointMatrix = cvMat( 1, handarea, CV_32SC2, *handpoint );
-	*hullMatrix = cvMat( 1, handarea, CV_32SC1, *hull );
+  /* ConvexHullを計算するために必要な行列を生成する */
+  *handpoint=( CvPoint * )malloc( sizeof( CvPoint ) * handarea );
+  *hull = ( int * )malloc( sizeof( int ) * handarea );
+  *pointMatrix = cvMat( 1, handarea, CV_32SC2, *handpoint );
+  *hullMatrix = cvMat( 1, handarea, CV_32SC1, *hull );
 
-	for( int x = 0; x < m_skin_buff->width; x++ ) {
-		for(  int y = 0; y < m_skin_buff->height; y++ ) {
-			if( cvGetReal2D( m_skin_buff, y, x ) == 255 ) {
-				( *handpoint )[i].x = x;
-				( *handpoint )[i].y = y;
-				i++;
-			}
-		}
-	}
+  for( int x = 0; x < m_skin_buff->width; x++ )
+  {
+    for(  int y = 0; y < m_skin_buff->height; y++ )
+    {
+      if( cvGetReal2D( m_skin_buff, y, x ) == 255 )
+      {
+        ( *handpoint )[i].x = x;
+        ( *handpoint )[i].y = y;
+        i++;
+      }
+    }
+  }
 
-	//	ConvexHullを生成する
-	cvConvexHull2( pointMatrix, hullMatrix, CV_CLOCKWISE, 0 );
+  /* ConvexHullを生成する */
+  cvConvexHull2( pointMatrix, hullMatrix, CV_CLOCKWISE, 0 );
 }
 
 //
@@ -458,12 +464,13 @@ void RockPaperScissors::createConvexHull( int handarea, CvPoint **handpoint, int
 //
 void RockPaperScissors::drawConvexHull( CvPoint *handpoint, int *hull, int hullcount )
 {
-	CvPoint pt0 = handpoint[hull[hullcount-1]];
-	for( int i = 0; i < hullcount; i++ ) {
-		CvPoint pt = handpoint[hull[i]];
-		cvLine( m_convexHull_buff, pt0, pt, CV_RGB( 0, 255, 0 ) );
-		pt0 = pt;
-	}
+  CvPoint pt0 = handpoint[hull[hullcount-1]];
+  for( int i = 0; i < hullcount; i++ )
+  {
+    CvPoint pt = handpoint[hull[i]];
+    cvLine( m_convexHull_buff, pt0, pt, CV_RGB( 0, 255, 0 ) );
+    pt0 = pt;
+  }
 }
 
 //
@@ -479,27 +486,30 @@ void RockPaperScissors::drawConvexHull( CvPoint *handpoint, int *hull, int hullc
 //
 int RockPaperScissors::calcConvexHullArea( CvPoint *handpoint, int *hull, int hullcount )
 {
-	//	ConvexHullの頂点からなる行列を生成
-	CvPoint *hullpoint = ( CvPoint * )malloc( sizeof( CvPoint ) * hullcount );
+  /* ConvexHullの頂点からなる行列を生成 */
+  CvPoint *hullpoint = ( CvPoint * )malloc( sizeof( CvPoint ) * hullcount );
 
-	CvMat hMatrix = cvMat( 1, hullcount, CV_32SC2, hullpoint );
-	for( int i = 0; i < hullcount; i++ ) {
-		hullpoint[i]=handpoint[hull[i]];
-	}
+  CvMat hMatrix = cvMat( 1, hullcount, CV_32SC2, hullpoint );
+  for( int i = 0; i < hullcount; i++ )
+  {
+    hullpoint[i]=handpoint[hull[i]];
+  }
 
-	//	ConvexHull内の点の数を数える
-	int hullarea = 0;
-	for( int x = 0; x < m_convexHull_buff->width; x++ ) {
-		for( int y = 0;y < m_convexHull_buff->height; y++ ) {
+  /* ConvexHull内の点の数を数える */
+  int hullarea = 0;
+  for( int x = 0; x < m_convexHull_buff->width; x++ )
+  {
+    for( int y = 0;y < m_convexHull_buff->height; y++ )
+    {
+      if( cvPointPolygonTest( &hMatrix, cvPoint2D32f( x, y ), 0 ) > 0)
+      {
+        hullarea++;
+      }
+    }
+  }
 
-			if( cvPointPolygonTest( &hMatrix, cvPoint2D32f( x, y ), 0 ) > 0) {
-				hullarea++;
-			}
-		}
-	}
-
-	free( hullpoint );
-	return hullarea;
+  free( hullpoint );
+  return hullarea;
 }
 
 
@@ -512,32 +522,33 @@ int RockPaperScissors::calcConvexHullArea( CvPoint *handpoint, int *hull, int hu
 //
 void RockPaperScissors::decide( int handarea, int hullarea )
 {
-	double ratio;	//	ConvexHull内の面積に対する手領域の面積の割合
-	string judge = "閾値外";
-	
-	ratio=handarea / ( double )hullarea;	
+  double ratio; /* ConvexHull内の面積に対する手領域の面積の割合 */
+  string err_judge = "Threshold out of range";
+  string judge;
 
-	if( ratio >= m_rock_min && ratio <= m_rock_max ) {
-	  judge = "グー";
-	}
-	else if( ratio >= m_scissor_min && ratio <= m_scissor_max )
-	{
+  ratio=handarea / ( double )hullarea;	
+
+  if( ratio >= m_rock_min && ratio <= m_rock_max ) {
+    judge = "グー";
+  }
+  else if( ratio >= m_scissor_min && ratio <= m_scissor_max )
+  {
     judge = "チョキ";
-	}
-	else if( ratio >= m_paper_min && ratio <= m_paper_max )
-	{
+  }
+  else if( ratio >= m_paper_min && ratio <= m_paper_max )
+  {
     judge = "パー";
-	}
-	
-	if( m_out_mode == 1 )
-	{
-	  //前回とジャンケンの種類が異なる場合のみ出力する
-	  //ConvexHull領域は一定以上の大きさでないと、ジャンケンの判定は意味がない
-	  //ここでは暫定的に10000以上の領域に対してジャンケンを判定するものとする
-	  if( judge != "閾値外" && m_prev_judge != judge && hullarea >= 10000 )
-	  {
-	    //printf( "Ratio = %lf\n", ratio );
-	    printf( "Ratio = %lf  : 判定領域の大きさ = %d\n", ratio,  hullarea );
+  }
+
+  if( m_out_mode == 1 )
+  {
+    /* 前回とジャンケンの種類が異なる場合のみ出力する
+     * ConvexHull領域は一定以上の大きさでないと、ジャンケンの判定は意味がない
+     * ここでは暫定的に10000以上の領域に対してジャンケンを判定するものとする
+     */
+    if( judge != err_judge && m_prev_judge != judge && hullarea >= 10000 )
+    {
+      printf( "Ratio = %lf  : 判定領域の大きさ = %d\n", ratio,  hullarea );
       printf( "%s\n", judge.c_str() );
       m_prev_judge = judge;
 
@@ -547,7 +558,7 @@ void RockPaperScissors::decide( int handarea, int hullarea )
   }
   else
   {
-    //すべての結果を出力する
+    /* すべての結果を出力する */
     printf( "Ratio = %lf  : 判定領域の大きさ = %d\n", ratio,  hullarea );
     printf( "%s\n", judge.c_str() );
   }

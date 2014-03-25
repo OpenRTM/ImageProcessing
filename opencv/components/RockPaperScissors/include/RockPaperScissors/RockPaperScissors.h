@@ -19,7 +19,7 @@
 #include <rtm/idl/ExtendedDataTypesSkel.h>
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
-// OpenCVHeadファイルのIncluding
+/* OpenCVHeadファイルのIncluding */
 #include <cv.h>
 #include <cxcore.h>
 #include <highgui.h>
@@ -27,15 +27,16 @@
 #include <string>
 #include "Labeling.h"
 
-//肌色抽出用閾値
-#define HMAX 20			//	H値の上限の閾値
-#define HMIN 0			//	H値の下限の閾値
-#define SMAX 255*1		//	S値の上限の閾値
-#define SMIN 255*0.2	//	S値の下限の閾値
-#define VMAX 255*1.0	//	V値の上限の閾値
-#define VMIN 255*0		//	V値の下限の閾値
+/* 肌色抽出用閾値：上限、下限の閾値設定 */
+#define HMAX 20
+#define HMIN 0
+#define SMAX 255*1
+#define SMIN 255*0.2
+#define VMAX 255*1.0
+#define VMIN 255*0
 
-#define IGNORE_SIZE 1000	//無視する領域サイズ(ラベリング用)
+/* 無視する領域サイズ(ラベリング用) */
+#define IGNORE_SIZE 1000	
 
 // Service implementation headers
 // <rtc-template block="service_impl_h">
@@ -348,17 +349,17 @@ class RockPaperScissors
   int  calcConvexHullArea( CvPoint *handpoint, int *hull, int hullcount );
   void decide( int handarea, int hullarea );
   
-	int dummy;
-	std::string m_prev_judge;   //前回の判定　グー / チョキ / パー
-	
-	IplImage* m_frame_image;
-	IplImage* m_image_buff;
-	IplImage* m_output_buff;
-	IplImage* m_hsv_buff;
-	IplImage* m_convexHull_buff;
-	IplImage* m_skin_buff;
-	IplImage* m_temp_buff;
-	IplImage* m_label_buff;
+  int dummy;
+  std::string m_prev_judge;   /* 前回の判定　グー / チョキ / パー */
+
+  IplImage* m_frame_image;
+  IplImage* m_image_buff;
+  IplImage* m_output_buff;
+  IplImage* m_hsv_buff;
+  IplImage* m_convexHull_buff;
+  IplImage* m_skin_buff;
+  IplImage* m_temp_buff;
+  IplImage* m_label_buff;
 
 };
 
