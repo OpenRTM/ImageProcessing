@@ -63,6 +63,11 @@ set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
 set_source_files_properties(${ALL_IDL_SRCS} PROPERTIES GENERATED 1)
 add_dependencies(${PROJECT_NAME} ALL_IDL_TGT)
 
+find_library(CAMERA_UTIL_LIB
+      NAMES NetworkCameraUtility libNetworkCameraUtility
+	    PATHS ${camera_lib_dir}
+    )
+
 target_link_libraries(${PROJECT_NAME} ${OPENRTM_LIBRARIES} ${OpenCV_LIBS} 
           ${CAMERA_UTIL_LIB})
 
