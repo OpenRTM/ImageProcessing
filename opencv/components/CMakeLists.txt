@@ -11,9 +11,17 @@ add_subdirectory(Binarization)
 add_subdirectory(CameraViewer)
 add_subdirectory(Chromakey)
 add_subdirectory(Dilationerosion)
-if(DIRECTSHOW_FOUND)
+
+if ($ENV{VC_VERSION} MATCHES "10"OR $ENV{VC_VERSION} MATCHES "9")
   add_subdirectory(DirectShowCam)
+else()
+  message(STATUS "VC2012~ you can't use Baseclasses.lib. so set new camera components here.")
 endif()
+
+#if(DIRECTSHOW_FOUND)
+#  add_subdirectory(DirectShowCam)
+#endif()
+
 add_subdirectory(Edge)
 add_subdirectory(Findcontour)
 add_subdirectory(Flip)
