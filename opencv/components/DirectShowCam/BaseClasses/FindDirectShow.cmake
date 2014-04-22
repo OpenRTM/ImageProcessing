@@ -9,7 +9,7 @@
 
 if(MSVC)
 
-  foreach(winsdkver v7.1 v7.0A)
+  foreach(winsdkver v7.1 v7.0A v7.0)
     get_filename_component(sdkdir
       "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows\\${winsdkver};InstallationFolder]"
       ABSOLUTE)
