@@ -37,11 +37,11 @@
 
 set OPENCV_RTC_ROOT=%~dp0
 set BUILD_DIR=%OPENCV_RTC_ROOT%\work
-set PYTHON_DIR=c:\python26;
+set PYTHON_DIR=c:\python27;
 set OpenCV_DIR=C:\distribution\OpenCV2.4.8-win32
 set Baseclasses_DIR=C:\distribution\baseclasses
 
-set RTM_ROOT=C:\distribution\OpenRTM-aist-rv2565
+set RTM_ROOT=C:\distribution\OpenRTM-aist-rv2566
 set COIL_ROOT=%RTM_ROOT%\coil
 set OpenRTM_Dir=%RTM_ROOT%\cmake
 
@@ -73,10 +73,12 @@ if %ARCH% == x86_64    set DLL_ARCH=_x64
 @rem Copying Config.cmake
 @rem ------------------------------------------------------------
 
-@set WindowsSdkDir=
-@for /F "tokens=1,2*" %%i in ('reg query "HKLM\SOFTWARE\Microsoft\Microsoft SDKs\Windows" /v "CurrentInstallFolder"') DO (
-	if "%%i"=="CurrentInstallFolder" (
-		set "WindowsSdkDir=%%k"
+if %VC_VERSION% LEQ 10 (
+	@set WindowsSdkDir=
+	@for /F "tokens=1,2*" %%i in ('reg query "HKLM\SOFTWARE\Microsoft\Microsoft SDKs\Windows" /v "CurrentInstallFolder"') DO (
+		if "%%i"=="CurrentInstallFolder" (
+			set "WindowsSdkDir=%%k"
+		)
 	)
 )
 
@@ -90,8 +92,8 @@ echo work dir : work
 if not exist "work" (
 	mkdir work
 ) else (
-	@rem del /s /q work
-	@rem mkdir work
+	del /s /q work
+	mkdir work
 )
 
 @rem ============================================================
@@ -155,14 +157,12 @@ if %VC_VERSION% == 12 (
 @rem Build (VC2008 x86)
 @rem ------------------------------------------------------------
 :VCBUILDx86
-harumi
 echo Visual Studio Dir: %VSINSTALLDIR%
 echo LIB: %LIB%
-set OPT=/M:4 /toolsversion:%VCTOOLSET% %PLATFORMTOOL% /p:platform=Win64
-set SLN=ImageProcessing_opencv.sln
 
-vcbuild /m:2 /t:rebuild /p:configuration=release %OPT% components\DirectShowCam\BaseClasses\BaseClasses.sln
-vcbuild /M2 /build %OPT% %SLN%
+vcbuild /M2 /rebuild components\DirectShowCam\BaseClasses\BaseClasses.sln "release|win32"
+vcbuild /M2 /rebuild components\ImageCalibration\idl\InterfaceDataTypes_TGT.vcproj "release|win32"
+vcbuild /M2 /build ImageProcessing_opencv.sln "release|win32"
 goto END
 
 @rem ------------------------------------------------------------
