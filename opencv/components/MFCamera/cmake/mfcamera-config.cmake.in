@@ -1,0 +1,54 @@
+# MFCamera CMake config file
+#
+# This file sets the following variables:
+# MFCamera_FOUND - Always TRUE.
+# MFCamera_INCLUDE_DIRS - Directories containing the MFCamera include files.
+# MFCamera_IDL_DIRS - Directories containing the MFCamera IDL files.
+# MFCamera_LIBRARIES - Libraries needed to use MFCamera.
+# MFCamera_DEFINITIONS - Compiler flags for MFCamera.
+# MFCamera_VERSION - The version of MFCamera found.
+# MFCamera_VERSION_MAJOR - The major version of MFCamera found.
+# MFCamera_VERSION_MINOR - The minor version of MFCamera found.
+# MFCamera_VERSION_REVISION - The revision version of MFCamera found.
+# MFCamera_VERSION_CANDIDATE - The candidate version of MFCamera found.
+
+message(STATUS "Found MFCamera-@PROJECT_VERSION@")
+set(MFCamera_FOUND TRUE)
+
+find_package(<dependency> REQUIRED)
+
+#set(MFCamera_INCLUDE_DIRS
+#    "@CMAKE_INSTALL_PREFIX@/include/@PROJECT_NAME_LOWER@-@PROJECT_VERSION_MAJOR@"
+#    ${<dependency>_INCLUDE_DIRS}
+#    )
+#
+#set(MFCamera_IDL_DIRS
+#    "@CMAKE_INSTALL_PREFIX@/include/@PROJECT_NAME_LOWER@-@PROJECT_VERSION_MAJOR@/idl")
+set(MFCamera_INCLUDE_DIRS
+    "@CMAKE_INSTALL_PREFIX@/include/@CPACK_PACKAGE_FILE_NAME@"
+    ${<dependency>_INCLUDE_DIRS}
+    )
+set(MFCamera_IDL_DIRS
+    "@CMAKE_INSTALL_PREFIX@/include/@CPACK_PACKAGE_FILE_NAME@/idl")
+
+
+if(WIN32)
+    set(MFCamera_LIBRARIES
+        "@CMAKE_INSTALL_PREFIX@/@LIB_INSTALL_DIR@/@CMAKE_SHARED_LIBRARY_PREFIX@@PROJECT_NAME_LOWER@@CMAKE_STATIC_LIBRARY_SUFFIX@"
+        ${<dependency>_LIBRARIES}
+        )
+else(WIN32)
+    set(MFCamera_LIBRARIES
+        "@CMAKE_INSTALL_PREFIX@/@LIB_INSTALL_DIR@/@CMAKE_SHARED_LIBRARY_PREFIX@@PROJECT_NAME_LOWER@@CMAKE_SHARED_LIBRARY_SUFFIX@"
+        ${<dependency>_LIBRARIES}
+        )
+endif(WIN32)
+
+set(MFCamera_DEFINITIONS ${<dependency>_DEFINITIONS})
+
+set(MFCamera_VERSION @PROJECT_VERSION@)
+set(MFCamera_VERSION_MAJOR @PROJECT_VERSION_MAJOR@)
+set(MFCamera_VERSION_MINOR @PROJECT_VERSION_MINOR@)
+set(MFCamera_VERSION_REVISION @PROJECT_VERSION_REVISION@)
+set(MFCamera_VERSION_CANDIDATE @PROJECT_VERSION_CANDIDATE@)
+
