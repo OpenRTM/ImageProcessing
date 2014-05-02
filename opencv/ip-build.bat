@@ -41,16 +41,12 @@ set OpenCV_DIR=C:\distribution\OpenCV2.4.8-win32
 set Baseclasses_DIR=C:\distribution\baseclasses
 
 rem set PYTHON_DIR=c:\python27;
-if %PYTHON_DIR% ==         set PYTHON_DIR=c:\python27; 
-
 rem set RTM_ROOT=C:\distribution\OpenRTM-aist-rv2566
-if %RTM_ROOT% ==         set RTM_ROOT==C:\distribution\OpenRTM-aist-rv2566
+rem set OMNI_ROOT=C:\distribution\omniORB-4.1.7-win32-vc10
 
 set COIL_ROOT=%RTM_ROOT%\coil
 set OpenRTM_Dir=%RTM_ROOT%\cmake
 
-rem set OMNI_ROOT=C:\distribution\omniORB-4.1.7-win32-vc10
-if %OMNI_ROOT% ==         set OMNI_ROOT=C:\distribution\omniORB-4.1.7-win32-vc10
 
 if %ARCH% ==              set ARCH=x86
 if %VC_VERSION% ==        set VC_VERSION=10
