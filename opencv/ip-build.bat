@@ -230,19 +230,6 @@ if /i %VC_VERSION% == 12 (
    set PLATFORMTOOL=/p:PlatformToolset=v120
    goto MSBUILDx64
    )
-echo Visual Studio Dir: %VSINSTALLDIR%
-echo LIB: %LIB%
-
-@rem ------------------------------------------------------------
-@rem Build (VC2008 x64)
-@rem ------------------------------------------------------------
-:VCBUILDx64
-echo Visual Studio Dir: %VSINSTALLDIR%
-echo LIB: %LIB%
-set SLN=ImageProcessing_opencv.sln
-
-vcbuild /M2 /build %SLN%
-goto END
 
 @rem ------------------------------------------------------------
 @rem Build (VC2010- x64)
