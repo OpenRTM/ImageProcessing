@@ -40,9 +40,11 @@ set BUILD_DIR=%OPENCV_RTC_ROOT%\work
 set OpenCV_DIR=C:\distribution\OpenCV2.4.8-win32
 set Baseclasses_DIR=C:\distribution\baseclasses
 
-rem set PYTHON_DIR=c:\python27;
-rem set RTM_ROOT=C:\distribution\OpenRTM-aist-rv2566
-rem set OMNI_ROOT=C:\distribution\omniORB-4.1.7-win32-vc10
+set PYTHON_DIR=c:\python27;
+set RTM_ROOT=C:\distribution\OpenRTM-aist-rv2566
+set OMNI_ROOT=C:\distribution\omniORB-4.1.7-win32-vc10
+set ARCH=x86
+set VC_VERSION=10
 
 set COIL_ROOT=%RTM_ROOT%\coil
 set OpenRTM_Dir=%RTM_ROOT%\cmake
@@ -165,7 +167,7 @@ echo LIB: %LIB%
 vcbuild /M2 /rebuild components\DirectShowCam\BaseClasses\BaseClasses.sln "release|win32"
 vcbuild /M2 /rebuild components\ImageCalibration\idl\InterfaceDataTypes_TGT.vcproj "release|win32"
 vcbuild /M2 /build ImageProcessing_opencv.sln "release|win32"
-goto END
+goto MAKE_ZIP
 
 @rem ------------------------------------------------------------
 @rem Build (VC2010- x86)
@@ -185,7 +187,8 @@ if %VC_VERSION% == 10  (
 
 msbuild /t:build /p:configuration=release %OPT% %SLN%
 
-goto END
+goto MAKE_ZIP
+
 
 @rem ============================================================
 @rem start to cmake 64bit 
@@ -245,6 +248,17 @@ set SLN=ImageProcessing_opencv.sln
 
 msbuild /t:clean /p:configuration=release   %OPT% %SLN%
 msbuild /t:build /p:configuration=release %OPT% %SLN%
+
+goto MAKE_ZIP
+
+
+@rem ------------------------------------------------------------
+@rem MAKE_ZIP Making ZIP archive
+@rem ------------------------------------------------------------
+:MAKE_ZIP
+cd %OPENCV_RTC_ROOT%
+set ZIP_DIR=ImageProcessing
+c:\cygwin64\bin\bash ip_make_package.sh
 
 goto END
 
