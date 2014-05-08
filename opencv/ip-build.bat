@@ -37,14 +37,14 @@
 
 set OPENCV_RTC_ROOT=%~dp0
 set BUILD_DIR=%OPENCV_RTC_ROOT%\work
-set OpenCV_DIR=C:\distribution\OpenCV2.4.8-win32
 set Baseclasses_DIR=C:\distribution\baseclasses
 
-set PYTHON_DIR=c:\python27;
-set RTM_ROOT=C:\distribution\OpenRTM-aist-rv2566
-set OMNI_ROOT=C:\distribution\omniORB-4.1.7-win32-vc10
-set ARCH=x86
-set VC_VERSION=10
+set OpenCV_DIR=C:\distribution\OpenCV2.4.8-win32
+rem set PYTHON_DIR=c:\python27;
+rem set RTM_ROOT=C:\distribution\OpenRTM-aist-rv2566
+rem set OMNI_ROOT=C:\distribution\omniORB-4.1.7-win32-vc10
+rem set ARCH=x86
+rem set VC_VERSION=10
 
 set COIL_ROOT=%RTM_ROOT%\coil
 set OpenRTM_Dir=%RTM_ROOT%\cmake
