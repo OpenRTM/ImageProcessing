@@ -39,7 +39,7 @@ set OPENCV_RTC_ROOT=%~dp0
 set BUILD_DIR=%OPENCV_RTC_ROOT%\work
 set Baseclasses_DIR=C:\distribution\baseclasses
 
-set OpenCV_DIR=C:\distribution\OpenCV2.4.8-win32
+rem set OpenCV_DIR=C:\distribution\OpenCV2.4.8-win32
 rem set PYTHON_DIR=c:\python27;
 rem set RTM_ROOT=C:\distribution\OpenRTM-aist-rv2566
 rem set OMNI_ROOT=C:\distribution\omniORB-4.1.7-win32-vc10
