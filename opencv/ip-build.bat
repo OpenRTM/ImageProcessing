@@ -35,6 +35,7 @@
 @rem
 @rem ============================================================
 
+set PATH=%PATH%;C:\cygwin64\bin
 set OPENCV_RTC_ROOT=%~dp0
 set BUILD_DIR=%OPENCV_RTC_ROOT%\work
 set Baseclasses_DIR=C:\distribution\baseclasses
