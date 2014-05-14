@@ -202,7 +202,7 @@ set VC_NAME="Visual Studio %VC_VERSION% Win64"
 if %VC_VERSION% == 9  (
    echo 64bit compilation on Visual C++ 2008 is not supported. Aborting.
    goto END
-   )else(
+   ) else (
    cmake .. -G %VC_NAME%
    goto x86_64
    )
