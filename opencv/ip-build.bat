@@ -40,12 +40,12 @@ set OPENCV_RTC_ROOT=%~dp0
 set BUILD_DIR=%OPENCV_RTC_ROOT%\work
 set Baseclasses_DIR=C:\distribution\baseclasses
 
-rem set OpenCV_DIR=C:\distribution\OpenCV2.4.8-win32
-rem set PYTHON_DIR=c:\python27;
-rem set RTM_ROOT=C:\distribution\OpenRTM-aist-rv2566
-rem set OMNI_ROOT=C:\distribution\omniORB-4.1.7-win32-vc10
-rem set ARCH=x86
-rem set VC_VERSION=10
+set OpenCV_DIR=C:\Jenkins\workspace\60_OpenCV_build_win64\label\windows7-vc2010-x64\OpenCV2.4.9
+set PYTHON_DIR=c:\python27;
+set RTM_ROOT=C:\Jenkins\workspace\openrtm-cxx-build-trunk-win\label\windows7-vc2010-x64\manual\OpenRTM-aist
+set OMNI_ROOT=C:\distribution\omniORB-4.1.7-win64-vc10
+set ARCH=x86_64
+set VC_VERSION=10
 
 set COIL_ROOT=%RTM_ROOT%\coil
 set OpenRTM_Dir=%RTM_ROOT%\cmake
@@ -183,7 +183,7 @@ set LOG=/fileLogger /flp:logfile=debug.log /v:diag
 cd %BUILD_DIR%
 
 if %VC_VERSION% == 10  (
-	msbuild /m:2 /t:rebuild /p:configuration=release %OPT% components\DirectShowCam\BaseClasses\BaseClasses.sln
+	msbuild /t:rebuild /p:configuration=release %OPT% components\DirectShowCam\BaseClasses\BaseClasses.sln
 )
 
 msbuild /t:build /p:configuration=release %OPT% %SLN%
@@ -247,7 +247,9 @@ set OPT=/M:4 /toolsversion:%VCTOOLSET% %PLATFORMTOOL% /p:platform=x64
 set LOG=/fileLogger /flp:logfile=debug.log /v:diag 
 set SLN=ImageProcessing_opencv.sln
 
-msbuild /t:clean /p:configuration=release   %OPT% %SLN%
+if %VC_VERSION% == 10  (
+	msbuild /t:rebuild /p:configuration=release %OPT% components\DirectShowCam\BaseClasses\BaseClasses.sln
+)
 msbuild /t:build /p:configuration=release %OPT% %SLN%
 
 goto MAKE_ZIP
