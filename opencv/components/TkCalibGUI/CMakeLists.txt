@@ -28,7 +28,7 @@ set(IDL_FILES ""
 )
 
 set(EXEC_FILES ""
-               TkCalibGUIComp.py tkcalibgui.py
+               TkCalibGUIComp.py tkcalibgui.py rtutil.py
 )
 
 set(OTHER_SRCS CMakeLists.txt
@@ -206,6 +206,7 @@ if (SolutionDir)
   SET (calib_python_file
             ${PROJECT_SOURCE_DIR}/TkCalibGUIComp.py 
             ${PROJECT_SOURCE_DIR}/tkcalibgui.py 
+            ${PROJECT_SOURCE_DIR}/rtutil.py 
             ${PROJECT_BINARY_DIR}/CalibrationService_idl.py) 
                
   foreach(target ${calib_python_file})
@@ -217,7 +218,6 @@ if (SolutionDir)
   endforeach()
 
   SET (calib_python_dir
-            idl 
             ImageCalibService 
             ImageCalibService__POA)
 

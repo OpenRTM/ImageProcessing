@@ -7,8 +7,85 @@
  @brief Image Calibration GUI
  @date $Date$
 
-
 """
+def check_openrtmpy():
+    try:
+        import OpenRTM_aist
+        print "OpenRTM python is installed."
+    except:
+        import tkMessageBox
+        import Tkinter
+        msg = u'OpenRTM-aist Python is not installed. '
+        msg += u'Please download it from \n'
+        msg += u'http://openrtm.org/openrtm/ja/content/tkcalibgui'
+        Tkinter.Tk().withdraw()
+        tkMessageBox.showerror(title = "OpenRTM not found",
+                  message = msg)
+
+def check_ttk():
+    try:
+        import ttk
+        print "Ttk is installed."
+    except:
+        import tkMessageBox
+        import Tkinter
+        msg = u'Ttk is not installed. '
+        msg += u'Please download it from \n'
+        msg += u'http://openrtm.org/openrtm/ja/content/tkcalibgui'
+        Tkinter.Tk().withdraw()
+        tkMessageBox.showerror(title = "Ttk not found",
+                  message = msg)
+
+def check_pil():
+    try:
+        from PIL import Image, ImageTk
+        print "Python Imaging Library (PIL) is installed."
+    except:
+        import tkMessageBox
+        import Tkinter
+        msg = u'Python Imaging Library (PIL) is not installed. '
+        msg += u'Please download it from \n'
+        msg += u'http://openrtm.org/openrtm/ja/content/tkcalibgui'
+        Tkinter.Tk().withdraw()
+        tkMessageBox.showerror(title = "PIL not found",
+                  message = msg)
+
+def check_numpy():
+    try:
+        import numpy
+        print "Numpy is installed."
+    except:
+        import tkMessageBox
+        import Tkinter
+        msg = u'Numpy is not installed. '
+        msg += u'Please download it from \n'
+        msg += u'http://openrtm.org/openrtm/ja/content/tkcalibgui'
+        Tkinter.Tk().withdraw()
+        tkMessageBox.showerror(title = "Numpy not found",
+                  message = msg)
+                  
+def check_rtctree():
+    try:
+        import rtctree
+        print "rtctree is installed."
+    except:
+        import tkMessageBox
+        import Tkinter
+        msg = u'rtctree is not installed. '
+        msg += u'Please download it from \n'
+        msg += u'http://openrtm.org/openrtm/ja/content/tkcalibgui'
+        Tkinter.Tk().withdraw()
+        tkMessageBox.showerror(title = "rtctree not found",
+                  message = msg)
+        return
+		
+# check execution condition
+check_openrtmpy()
+check_pil()
+check_ttk()
+check_numpy()
+check_rtctree()
+
 import os
 import sys
 import socket
@@ -24,7 +101,9 @@ from omniORB import CORBA
 
 import tkcalibgui
 import CalibrationService_idl
-from rtshell import rtdel
+
+#from rtshell import rtdel
+import rtutil
 
 # Import Service implementation class
 # <rtc-template block="service_impl">
@@ -52,6 +131,7 @@ tkcalibgui_spec = ["implementation_id", "TkCalibGUI",
 		 ""]
 # </rtc-template>
 
+                                    
 ##
 # @class TkCalibGUI
 # @brief Image Calibration GUI
@@ -83,7 +163,7 @@ class TkCalibGUI(OpenRTM_aist.DataFlowComponentBase):
 		# <rtc-template block="init_conf_param">
 		
 		# </rtc-template>
-
+		self.tree=None
 
 		 
 	##
@@ -358,7 +438,11 @@ def main():
 	
 	calibgui.set_options(orb, rt_dir, comp_option)
 	calibgui.mainloop()
-
+	
+	# GUIの×ボタンを押されるとmainloopを抜けてここへ来る
+	# コンポーネントの終了処理を確認する
+	calibgui.exit_comp()
+	
 	while True:
 		comp_list = mgr.getComponents()
 		# is finished?
@@ -368,7 +452,9 @@ def main():
 		
 	# Delete context
 	tree = comp.get_tree()
-	rtdel.main([str(rt_dir)], tree)
+#	rtdel.main([str(rt_dir)], tree)
+	rtutil.delComponentRef(str(rt_dir), tree)
+
 	mgr.shutdown()
 
 if __name__ == "__main__":

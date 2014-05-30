@@ -15,16 +15,19 @@ from PIL import Image, ImageTk
 import time
 import sys
 import os.path
-from cv2.cv import *
+#from cv2.cv import *
+import numpy
 from io import BytesIO
 from StringIO import StringIO
-from rtshell import rtcat, rtcon
 from threading import Thread
+
+import rtutil
 
 WIN_DEFAULT_CAMERA = {
 				"DirectShowCamComp" : ":m_FIN_OUTPORT",
 				"OpenCVCameraComp"  : ":out",
-				"PGRCameraComp"     : ":outputImage"
+				"PGRCameraComp"     : ":outputImage",
+				"MFCameraComp"      : ":out"
 				}
 LINUX_DEFAULT_CAMERA = {
 				"OpenCVCameraComp"  : ":out",
@@ -49,6 +52,9 @@ class TkCalibGUI(Frame):
 		self.save_btn_state = [] # 保存ボタンの状態保存用
 		self.view_flg = True	# カメラ画像を表示する
 		self.comp_all_found = False
+
+		self.camera_select_flg = False
+		self.exit_btn_click = False
 			
 		self.result_mes = StringVar()
 		self.result_mes.set("")
@@ -198,12 +204,15 @@ class TkCalibGUI(Frame):
 			# automatically connect the components
 			ret = self.connect_components_auto()
 			if not ret:
-				self.connect_components_manually()
+				self.register_me()
 				self.comp_all_found = False
 		else:
 			# manually connect the components
-			self.connect_components_manually()		
+			self.register_me()		
 
+		# camera selected
+		self.camera_select_flg = True
+		
 		# right pane (2)
 		fr = Frame(self.frameR_base, width=self.frame_w)
 		fr.pack(ipadx=3, ipady=3, fill=X)		
@@ -363,7 +372,11 @@ class TkCalibGUI(Frame):
 		else:
 			# camera not found
 			self.set_warning_msg()
-		self.comp_btn.config(state = NORMAL)
+			
+		if self.camera_select_flg:
+			self.comp_btn.config(state = DISABLED)
+		else:
+			self.comp_btn.config(state = NORMAL)
 		
 	def set_warning_msg(self):
 		Label(self.fix1, text=self.msg11, fg="red").grid(column = 0, row = 1, columnspan = 3)	
@@ -436,10 +449,11 @@ class TkCalibGUI(Frame):
 		self.comp_startup_check(camera_rtc)
 		tree = self.comp_startup_check(calib_rtc)
 		
-		ret1 = rtcon.main([str(camera_rtc)+str(camera_outport), str(calib_rtc)+":original_image"], tree)
-		ret2 = rtcon.main([str(calib_rtc)+":checker_image", str(tk_rtc)+":checker_image"], tree)
-		ret3 = rtcon.main([str(calib_rtc)+":CameraCalibrationService", str(tk_rtc)+":CameraCalibrationService"], tree)
-		if ret1==1 or ret2==1 or ret3==1:
+		ret1, res = rtutil.connectPorts(str(camera_rtc)+str(camera_outport), str(calib_rtc)+":original_image", tree)
+		ret2, res = rtutil.connectPorts(str(calib_rtc)+":checker_image", str(tk_rtc)+":checker_image", tree)
+		ret3, res = rtutil.connectPorts(str(calib_rtc)+":CameraCalibrationService", str(tk_rtc)+":CameraCalibrationService", tree)
+
+		if ret1 < 0 or ret2 < 0 or ret3 < 0:
 			Label(self.fix1, text=self.err_msg3, fg="red").grid(column = 0, row = 1, columnspan = 3)
 			Label(self.fix1, text=self.msg11, fg="red").grid(column = 0, row = 2, columnspan = 3)
 			return False
@@ -447,7 +461,7 @@ class TkCalibGUI(Frame):
 		self.set_comp_name(camera_rtc, calib_rtc, tk_rtc, tree)
 		return True
 
-	def connect_components_manually(self):
+	def register_me(self):
 		tk_rtc = self.rt_dir + GUI_COMP + "0.rtc"
 		self.tree = self.comp_startup_check(tk_rtc)
 		self.rtc_list = [tk_rtc]
@@ -462,8 +476,8 @@ class TkCalibGUI(Frame):
 		filter = [path]
 		for cnt in range(0, 10):
 			tree = rtctree.tree.RTCTree(paths=path, orb=self.orb, filter=filter)
-			ret, result = rtcat.main([str(name)], tree)
-			if ret == 0:
+			tree1,comp1, port1 = rtutil.getComponent(str(name), tree=tree)
+			if tree1 and comp1:
 				judge = " found."
 				break
 			time.sleep(1)
@@ -514,15 +528,17 @@ class TkCalibGUI(Frame):
 	
 	# [callback] exit button
 	def exit_comp(self):
-		self.comp_button['activate'].config(state = DISABLED)
-		self.comp_button['deactivate'].config(state = DISABLED)
-		self.comp_button['exit'].config(state = DISABLED)
-		
+		if self.exit_btn_click:
+			# exit_comp already completed.
+			return
+			
 		# Start a thread to observe the transition state of the component.
 		self.comp_transition_thread = CompTransitionThread('Exit', self.rtc_list, self.tree)
 		self.comp_transition_thread.start()
 		self.exit_state = True
 		self.check_exit()
+		
+		self.exit_btn_click = True
 
 	def check_exit(self):
 		if not self.comp_transition_thread.running:
@@ -628,8 +644,8 @@ class TkCalibGUI(Frame):
 			self.flip_button['tb'].config(state = DISABLED)
 			self.flip_button['lr'].config(state = DISABLED)
 			return
-		import ImageOps
-		import ImageDraw
+
+		from PIL import ImageOps,ImageDraw
 		# Getting PIL image from buffer, converting RGB->BGR
 		self.pilImage = Image.frombuffer("RGB", (width, height),	image, "raw", "BGR")
 		# Resize if size is different
@@ -670,13 +686,13 @@ class TkCalibGUI(Frame):
 		self.orb = orb
 		self.rt_dir = rt_dir
 		self.comp_option = comp_option
+		self.register_me()
 
 	def set_on_update(self, func):
 		self.on_update = func
 
 #============================================================
 # Thread class
-from rtshell import rtact, rtdeact, rtdis, rtexit, state_control_base
 		
 class CompTransitionThread(Thread):
 	def __init__(self, msg, rtc_list, tree):
@@ -688,38 +704,47 @@ class CompTransitionThread(Thread):
 		
 		if self.msg.find("Activate") != -1:
 			# Activate
-			self.action = rtact.activate_action
 			self.cmd = "rtact"
 		else:
 			# Deactivate or Exit
-			self.action = rtdeact.deactivate_action
 			self.cmd = "rtdeact"
 		
 	def run(self):
 		comp_cnt = len(self.rtc_list)
 		self.running = True
 		for i in range(comp_cnt):
-			self.check_comp(self.cmd, self.rtc_list[i], self.msg, self.action)
+			self.check_comp(self.cmd, self.rtc_list[i])
 			
 		if self.msg == "Exit":
 			for i in range(comp_cnt):
 				# rtdis
-				self.check_comp('rtdis', self.rtc_list[i], None, None)
+				self.check_comp('rtdis', self.rtc_list[i])
 			
 			for i in range(comp_cnt):
 				# rtexit
-				self.check_comp('rtexit', self.rtc_list[i], None, None)
+				self.check_comp('rtexit', self.rtc_list[i])
 		self.running = False
 
-	def check_comp(self, cmd, rtc, msg, action):
+	def check_comp(self, cmd, rtc):
 		for cnt in range(0, 10):
 			if cmd == "rtdis":
-				ret = rtdis.main([str(rtc)], self.tree)
+				ret,res = rtutil.disconnectAll(str(rtc), self.tree)
+
 			elif cmd == "rtexit":
-				ret = rtexit.main([str(rtc)], self.tree)
+				ret,res = rtutil.exitComponent(str(rtc), self.tree)
+
+			elif cmd == "rtact":
+				ret,res = rtutil.activateComponent(str(rtc), tree=self.tree)
+				if ret == 1: ret=0
+				else: ret=0
+
+			elif cmd == "rtdeact":
+				ret,res = rtutil.deactivateComponent(str(rtc), tree=self.tree)
+				if ret == 1: ret=0
+				else: ret=0
 			else:
-				# activate, deactivate
-				ret = state_control_base.base_main(msg, action, [str(rtc)], self.tree)
+				pass
+
 			if ret == 0:
 				print "{0}:{1} OK!".format(cmd, str(rtc))
 				break
