@@ -127,11 +127,11 @@ RTC::ReturnCode_t MFCamera::onActivated(RTC::UniqueId ec_id)
   
   if(m_capture->nDevs == 0)
   {
-    std::cout<<"ビデオキャプチャデバイスは存在しません"<<std::endl;
+    std::cout<<"Video capture device does not exist."<<std::endl;
     return RTC::RTC_ERROR;
   }
 
-  std::cout<< "ビデオキャプチャデバイスは "<< m_capture->nDevs << std::endl;
+  std::cout<< "Video capture device : "<< m_capture->nDevs << std::endl;
   /// 
   hr = m_capture->ActivateDevice(m_device_id);
   if(FAILED(hr))
