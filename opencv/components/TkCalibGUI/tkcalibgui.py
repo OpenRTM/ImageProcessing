@@ -204,7 +204,6 @@ class TkCalibGUI(Frame):
 			# automatically connect the components
 			ret = self.connect_components_auto()
 			if not ret:
-				self.register_me()
 				self.comp_all_found = False
 		else:
 			# manually connect the components
@@ -412,6 +411,10 @@ class TkCalibGUI(Frame):
 			if len(lists) == 0:
 				self.set_warning_msg()
 				self.set_calib_not_found_msg()
+				
+				# register the component found
+				self.tree = self.comp_startup_check(camera_rtc)
+				self.rtc_list.append(camera_rtc)
 				return False
 			else:
 				# Environment variable exists
@@ -419,6 +422,10 @@ class TkCalibGUI(Frame):
 				if val == "":
 					self.set_warning_msg()
 					self.set_calib_not_found_msg()
+					
+					# register the component found
+					self.tree = self.comp_startup_check(camera_rtc)
+					self.rtc_list.append(camera_rtc)
 					return False
 				else:
 					calib_path = val
@@ -438,6 +445,10 @@ class TkCalibGUI(Frame):
 			if val == "":
 				self.set_warning_msg()
 				self.set_calib_not_found_msg()
+
+				# register the component found
+				self.tree = self.comp_startup_check(camera_rtc)
+				self.rtc_list.append(camera_rtc)
 				return False
 			else:
 				calib_path = val
@@ -533,7 +544,7 @@ class TkCalibGUI(Frame):
 			return
 			
 		# Start a thread to observe the transition state of the component.
-		self.comp_transition_thread = CompTransitionThread('Exit', self.rtc_list, self.tree)
+		self.comp_transition_thread = CompTransitionThread('Exit', self.rtc_list, self.tree, self.comp_all_found)
 		self.comp_transition_thread.start()
 		self.exit_state = True
 		self.check_exit()
@@ -695,11 +706,12 @@ class TkCalibGUI(Frame):
 # Thread class
 		
 class CompTransitionThread(Thread):
-	def __init__(self, msg, rtc_list, tree):
+	def __init__(self, msg, rtc_list, tree, flg=True):
 		Thread.__init__(self)
 		self.msg = msg
 		self.rtc_list = rtc_list
 		self.tree = tree
+		self.comp_all_found = flg
 		self.running = False
 		
 		if self.msg.find("Activate") != -1:
@@ -716,9 +728,11 @@ class CompTransitionThread(Thread):
 			self.check_comp(self.cmd, self.rtc_list[i])
 			
 		if self.msg == "Exit":
-			for i in range(comp_cnt):
-				# rtdis
-				self.check_comp('rtdis', self.rtc_list[i])
+			if self.comp_all_found:
+				# components automatically connected
+				for i in range(comp_cnt):
+					# rtdis
+					self.check_comp('rtdis', self.rtc_list[i])
 			
 			for i in range(comp_cnt):
 				# rtexit
