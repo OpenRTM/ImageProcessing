@@ -554,7 +554,7 @@ class TkCalibGUI(Frame):
 		self.buttons[num]['save'].config(state = DISABLED)
 		self.buttons[num]['check'].config(state = NORMAL)
 		self.buttons[num]['cancel'].config(state = NORMAL)
-		self.consumer.captureCalibImage(num)
+		self.provider.captureCalibImage(num)
 		self.save_btn_state[num] = 1
 		if not 0 in self.save_btn_state:
 			self.result_btn.config(state = NORMAL)
@@ -564,7 +564,7 @@ class TkCalibGUI(Frame):
 		return lambda : self.check_img(n)
 
 	def check_img(self, num):
-		cameraImage = self.consumer.getCalibImage(num)
+		cameraImage = self.provider.getCalibImage(num)
 		width = cameraImage.width
 		height = cameraImage.height
 		image = cameraImage.pixels
@@ -578,7 +578,7 @@ class TkCalibGUI(Frame):
 		return lambda : self.cancel_img(n)
 
 	def cancel_img(self, num):
-		cameraImage = self.consumer.removeCalibImage(num)
+		cameraImage = self.provider.removeCalibImage(num)
 		self.buttons[num]['save'].config(state = NORMAL)
 		self.buttons[num]['check'].config(state = DISABLED)
 		self.buttons[num]['cancel'].config(state = DISABLED)
@@ -589,7 +589,7 @@ class TkCalibGUI(Frame):
 					
 	# [callback] get result button
 	def get_result(self):
-		self.cameraInfo = self.consumer.getCalibParameter()
+		self.cameraInfo = self.provider.getCalibParameter()
 		if self.cameraInfo.focalLength.x == 0.0:
 			self.result_mes.set(self.err_msg1)
 			return
@@ -633,8 +633,8 @@ class TkCalibGUI(Frame):
 #------------------------------------------------------------
 # public function
 
-	def setConsumerPointer(self, consumer):
-		self.consumer = consumer
+	def setProviderPointer(self, provider):
+		self.provider = provider
 			
 	def set_image(self, image, width, height):
 		if self.view_flg:
@@ -670,7 +670,7 @@ class TkCalibGUI(Frame):
 	def redraw_gui(self, num):
 		if self.pic_num != num:
 			# Remove all saved images
-			self.consumer.removeCalibImage(-1)
+			self.provider.removeCalibImage(-1)
 			self.pic_num = num
 			print "tkcalibgui.py : redraw_gui : pic_num changed = %d" % self.pic_num
 			self.check_lang()

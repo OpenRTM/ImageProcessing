@@ -245,7 +245,7 @@ class TkCalibGUI(OpenRTM_aist.DataFlowComponentBase):
 	#	#
 	def onActivated(self, ec_id):
 
-		self.gui.setConsumerPointer(self._CalibrationService._ptr())
+		self.gui.setProviderPointer(self._CalibrationService._ptr())
 		
 		return RTC.RTC_OK
 	
