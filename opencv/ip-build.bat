@@ -37,12 +37,10 @@
 
 set PATH=%PATH%;C:\cygwin64\bin
 set OPENCV_RTC_ROOT=%~dp0
-set BUILD_DIR=%OPENCV_RTC_ROOT%\work
-set Baseclasses_DIR=C:\distribution\baseclasses
 
-set OpenCV_DIR=C:\Jenkins\workspace\60_OpenCV_build_win64\label\windows7-vc2010-x64\OpenCV2.4.9
+set OpenCV_DIR=C:\distribution\OpenCV-2.4.9
 set PYTHON_DIR=c:\python27;
-set RTM_ROOT=C:\Jenkins\workspace\openrtm-cxx-build-trunk-win\label\windows7-vc2010-x64\manual\OpenRTM-aist
+set RTM_ROOT=C:\distribution\OpenRTM-aist-rv2567
 set OMNI_ROOT=C:\distribution\omniORB-4.1.7-win64-vc10
 set ARCH=x86_64
 set VC_VERSION=10
@@ -68,15 +66,6 @@ set PATH=%OMNI_ROOT%\bin\x86_win32;%PATH%;%PYTHON_DIR%;
 if %ARCH% == x86       set DLL_ARCH=
 if %ARCH% == x86_64    set DLL_ARCH=_x64
 
-@rem ------------------------------------------------------------
-@rem Copying Config.cmake
-@rem ------------------------------------------------------------
-@rem %PYTHON_DIR%\python build\cmakeconfgen.py rtm_config.vsprops
-@rem move OpenRTMConfig.cmake cmake
-
-@rem ------------------------------------------------------------
-@rem Copying Config.cmake
-@rem ------------------------------------------------------------
 
 if %VC_VERSION% LEQ 10 (
 	@set WindowsSdkDir=
@@ -89,16 +78,17 @@ if %VC_VERSION% LEQ 10 (
 
 @set PATH="c:\WINDOWS\Microsoft.NET\Framework\v4.0.30319";%PATH%
 
-
 @rem ============================================================
 @rem make work dir 
 @rem ============================================================
 echo work dir : work
 if not exist "work" (
 	mkdir work
-) else (
-	del /s /q work
-	mkdir work
+)
+cd work
+if exist "CMakeCache.txt" (
+    del CMakeCache.txt
+    echo delete CMakeCache.txt
 )
 
 @rem ============================================================
@@ -114,7 +104,6 @@ goto END
 @rem start to cmake 32bit 
 @rem ============================================================
 :cmake_x86
-cd %BUILD_DIR%
 set VC_NAME="Visual Studio %VC_VERSION%"
 if %VC_VERSION% == 9  (
    cmake .. -G "Visual Studio 9 2008"
@@ -180,8 +169,6 @@ set OPT=/M:4 /toolsversion:%VCTOOLSET% %PLATFORMTOOL% /p:platform=Win32
 set SLN=ImageProcessing_opencv.sln
 set LOG=/fileLogger /flp:logfile=debug.log /v:diag 
 
-cd %BUILD_DIR%
-
 if %VC_VERSION% == 10  (
 	msbuild /t:rebuild /p:configuration=release %OPT% components\DirectShowCam\BaseClasses\BaseClasses.sln
 )
@@ -195,9 +182,6 @@ goto MAKE_ZIP
 @rem start to cmake 64bit 
 @rem ============================================================
 :cmake_x86_64
-@rem cd %OPENCV_RTC_ROOT%
-cd %BUILD_DIR%
-@rem cd %RTM_ROOT%
 set VC_NAME="Visual Studio %VC_VERSION% Win64"
 if %VC_VERSION% == 9  (
    echo 64bit compilation on Visual C++ 2008 is not supported. Aborting.
@@ -259,7 +243,13 @@ goto MAKE_ZIP
 @rem MAKE_ZIP Making ZIP archive
 @rem ------------------------------------------------------------
 :MAKE_ZIP
-cd %OPENCV_RTC_ROOT%
+cd %OPENCV_RTC_ROOT%/bin
+python setup.py py2exe
+if not "%ERRORLEVEL%" == "0" (
+	goto END
+)
+
+cd ../
 set ZIP_DIR=ImageProcessing
 c:\cygwin64\bin\bash ip_make_package.sh
 

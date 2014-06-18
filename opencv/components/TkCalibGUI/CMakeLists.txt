@@ -28,7 +28,7 @@ set(IDL_FILES ""
 )
 
 set(EXEC_FILES ""
-               TkCalibGUIComp.py tkcalibgui.py rtutil.py
+               TkCalibGUIComp.py tkcalibgui.py rtutil.py setup.py
 )
 
 set(OTHER_SRCS CMakeLists.txt
@@ -207,7 +207,8 @@ if (SolutionDir)
             ${PROJECT_SOURCE_DIR}/TkCalibGUIComp.py 
             ${PROJECT_SOURCE_DIR}/tkcalibgui.py 
             ${PROJECT_SOURCE_DIR}/rtutil.py 
-            ${PROJECT_BINARY_DIR}/CalibrationService_idl.py) 
+            ${PROJECT_BINARY_DIR}/CalibrationService_idl.py 
+            ${PROJECT_BINARY_DIR}/setup.py) 
                
   foreach(target ${calib_python_file})
     add_custom_command(
