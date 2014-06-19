@@ -38,19 +38,15 @@
 set PATH=%PATH%;C:\cygwin64\bin
 set OPENCV_RTC_ROOT=%~dp0
 
-set OpenCV_DIR=C:\distribution\OpenCV-2.4.9
-set PYTHON_DIR=c:\python27;
-set RTM_ROOT=C:\distribution\OpenRTM-aist-rv2567
-set OMNI_ROOT=C:\distribution\omniORB-4.1.7-win64-vc10
-set ARCH=x86_64
-set VC_VERSION=10
+if not DEFINED ARCH       set ARCH=x86
+if not DEFINED VC_VERSION set VC_VERSION=10
+if not DEFINED PYTHON_DIR set PYTHON_DIR=c:\python27
+if not DEFINED OpenCV_DIR set OpenCV_DIR=C:\distribution\OpenCV-2.4.9
+if not DEFINED RTM_ROOT   set RTM_ROOT=C:\distribution\OpenRTM-aist-rv2567
+if not DEFINED OMNI_ROOT  set OMNI_ROOT=C:\distribution\omniORB-4.1.7-win32-vc10
 
 set COIL_ROOT=%RTM_ROOT%\coil
 set OpenRTM_Dir=%RTM_ROOT%\cmake
-
-
-if %ARCH% ==              set ARCH=x86
-if %VC_VERSION% ==        set VC_VERSION=10
 
 @rem ------------------------------------------------------------
 @rem Printing env variables
