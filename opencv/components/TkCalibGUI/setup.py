@@ -9,7 +9,9 @@ option = {
   }
 
 setup(
-  options = { "py2exe"	:	option },
+  options = { "py2exe"	:{
+    "includes": ["OpenRTM_aist"] }
+  },
   console = [
    {"script"	:	"TkCalibGUIComp.py" }
   ],
