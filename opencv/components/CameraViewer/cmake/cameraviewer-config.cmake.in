@@ -1,0 +1,54 @@
+# CameraViewer CMake config file
+#
+# This file sets the following variables:
+# CameraViewer_FOUND - Always TRUE.
+# CameraViewer_INCLUDE_DIRS - Directories containing the CameraViewer include files.
+# CameraViewer_IDL_DIRS - Directories containing the CameraViewer IDL files.
+# CameraViewer_LIBRARIES - Libraries needed to use CameraViewer.
+# CameraViewer_DEFINITIONS - Compiler flags for CameraViewer.
+# CameraViewer_VERSION - The version of CameraViewer found.
+# CameraViewer_VERSION_MAJOR - The major version of CameraViewer found.
+# CameraViewer_VERSION_MINOR - The minor version of CameraViewer found.
+# CameraViewer_VERSION_REVISION - The revision version of CameraViewer found.
+# CameraViewer_VERSION_CANDIDATE - The candidate version of CameraViewer found.
+
+message(STATUS "Found CameraViewer-@PROJECT_VERSION@")
+set(CameraViewer_FOUND TRUE)
+
+find_package(<dependency> REQUIRED)
+
+#set(CameraViewer_INCLUDE_DIRS
+#    "@CMAKE_INSTALL_PREFIX@/include/@PROJECT_NAME_LOWER@-@PROJECT_VERSION_MAJOR@"
+#    ${<dependency>_INCLUDE_DIRS}
+#    )
+#
+#set(CameraViewer_IDL_DIRS
+#    "@CMAKE_INSTALL_PREFIX@/include/@PROJECT_NAME_LOWER@-@PROJECT_VERSION_MAJOR@/idl")
+set(CameraViewer_INCLUDE_DIRS
+    "@CMAKE_INSTALL_PREFIX@/include/@CPACK_PACKAGE_FILE_NAME@"
+    ${<dependency>_INCLUDE_DIRS}
+    )
+set(CameraViewer_IDL_DIRS
+    "@CMAKE_INSTALL_PREFIX@/include/@CPACK_PACKAGE_FILE_NAME@/idl")
+
+
+if(WIN32)
+    set(CameraViewer_LIBRARIES
+        "@CMAKE_INSTALL_PREFIX@/@LIB_INSTALL_DIR@/@CMAKE_SHARED_LIBRARY_PREFIX@@PROJECT_NAME_LOWER@@CMAKE_STATIC_LIBRARY_SUFFIX@"
+        ${<dependency>_LIBRARIES}
+        )
+else(WIN32)
+    set(CameraViewer_LIBRARIES
+        "@CMAKE_INSTALL_PREFIX@/@LIB_INSTALL_DIR@/@CMAKE_SHARED_LIBRARY_PREFIX@@PROJECT_NAME_LOWER@@CMAKE_SHARED_LIBRARY_SUFFIX@"
+        ${<dependency>_LIBRARIES}
+        )
+endif(WIN32)
+
+set(CameraViewer_DEFINITIONS ${<dependency>_DEFINITIONS})
+
+set(CameraViewer_VERSION @PROJECT_VERSION@)
+set(CameraViewer_VERSION_MAJOR @PROJECT_VERSION_MAJOR@)
+set(CameraViewer_VERSION_MINOR @PROJECT_VERSION_MINOR@)
+set(CameraViewer_VERSION_REVISION @PROJECT_VERSION_REVISION@)
+set(CameraViewer_VERSION_CANDIDATE @PROJECT_VERSION_CANDIDATE@)
+

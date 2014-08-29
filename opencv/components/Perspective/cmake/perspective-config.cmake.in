@@ -1,0 +1,54 @@
+# Perspective CMake config file
+#
+# This file sets the following variables:
+# Perspective_FOUND - Always TRUE.
+# Perspective_INCLUDE_DIRS - Directories containing the Perspective include files.
+# Perspective_IDL_DIRS - Directories containing the Perspective IDL files.
+# Perspective_LIBRARIES - Libraries needed to use Perspective.
+# Perspective_DEFINITIONS - Compiler flags for Perspective.
+# Perspective_VERSION - The version of Perspective found.
+# Perspective_VERSION_MAJOR - The major version of Perspective found.
+# Perspective_VERSION_MINOR - The minor version of Perspective found.
+# Perspective_VERSION_REVISION - The revision version of Perspective found.
+# Perspective_VERSION_CANDIDATE - The candidate version of Perspective found.
+
+message(STATUS "Found Perspective-@PROJECT_VERSION@")
+set(Perspective_FOUND TRUE)
+
+find_package(<dependency> REQUIRED)
+
+#set(Perspective_INCLUDE_DIRS
+#    "@CMAKE_INSTALL_PREFIX@/include/@PROJECT_NAME_LOWER@-@PROJECT_VERSION_MAJOR@"
+#    ${<dependency>_INCLUDE_DIRS}
+#    )
+#
+#set(Perspective_IDL_DIRS
+#    "@CMAKE_INSTALL_PREFIX@/include/@PROJECT_NAME_LOWER@-@PROJECT_VERSION_MAJOR@/idl")
+set(Perspective_INCLUDE_DIRS
+    "@CMAKE_INSTALL_PREFIX@/include/@CPACK_PACKAGE_FILE_NAME@"
+    ${<dependency>_INCLUDE_DIRS}
+    )
+set(Perspective_IDL_DIRS
+    "@CMAKE_INSTALL_PREFIX@/include/@CPACK_PACKAGE_FILE_NAME@/idl")
+
+
+if(WIN32)
+    set(Perspective_LIBRARIES
+        "@CMAKE_INSTALL_PREFIX@/@LIB_INSTALL_DIR@/@CMAKE_SHARED_LIBRARY_PREFIX@@PROJECT_NAME_LOWER@@CMAKE_STATIC_LIBRARY_SUFFIX@"
+        ${<dependency>_LIBRARIES}
+        )
+else(WIN32)
+    set(Perspective_LIBRARIES
+        "@CMAKE_INSTALL_PREFIX@/@LIB_INSTALL_DIR@/@CMAKE_SHARED_LIBRARY_PREFIX@@PROJECT_NAME_LOWER@@CMAKE_SHARED_LIBRARY_SUFFIX@"
+        ${<dependency>_LIBRARIES}
+        )
+endif(WIN32)
+
+set(Perspective_DEFINITIONS ${<dependency>_DEFINITIONS})
+
+set(Perspective_VERSION @PROJECT_VERSION@)
+set(Perspective_VERSION_MAJOR @PROJECT_VERSION_MAJOR@)
+set(Perspective_VERSION_MINOR @PROJECT_VERSION_MINOR@)
+set(Perspective_VERSION_REVISION @PROJECT_VERSION_REVISION@)
+set(Perspective_VERSION_CANDIDATE @PROJECT_VERSION_CANDIDATE@)
+

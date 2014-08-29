@@ -1,299 +1,122 @@
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
+cmake_policy(SET CMP0002 OLD)
 
 project(DilationErosion)
-
-set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
-set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake_modules")
+string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
+include("${PROJECT_SOURCE_DIR}/cmake/utils.cmake")
+set(PROJECT_VERSION 1.1.0 CACHE STRING "DilationErosion version")
+DISSECT_VERSION()
+set(PROJECT_DESCRIPTION "Dilation and erosion component")
+set(PROJECT_VENDOR "AIST")
+set(PROJECT_AUTHOR "AIST")
+set(PROJECT_AUTHOR_SHORT "AIST")
 
 set(LINUX_PACKAGE_GENERATOR "DEB")
 #set(LINUX_PACKAGE_GENERATOR "RPM")
+set(PROJECT_MAINTAINER "Noriaki Ando <n-ando@aist.go.jp>")
+set(PROJECT_TYPE "c++/opencv-rtcs")
+
+# Add an "uninstall" target
+CONFIGURE_FILE ("${PROJECT_SOURCE_DIR}/cmake/uninstall_target.cmake.in"
+    "${PROJECT_BINARY_DIR}/uninstall_target.cmake" IMMEDIATE @ONLY)
+ADD_CUSTOM_TARGET (${PROJECT_NAME}_uninstall "${CMAKE_COMMAND}" -P
+    "${PROJECT_BINARY_DIR}/uninstall_target.cmake")
+
+#option(BUILD_EXAMPLES "Build and install examples" OFF)
+option(BUILD_DOCUMENTATION "Build the documentation" OFF)
+#option(BUILD_TESTS "Build the tests" OFF)
+#option(BUILD_TOOLS "Build the tools" OFF)
+option(BUILD_IDL "Build and install idl" ON)
+option(BUILD_SOURCES "Build and install sources" OFF)
+
+option(STATIC_LIBS "Build static libraries" OFF)
+if(STATIC_LIBS)
+    set(LIB_TYPE STATIC)
+else(STATIC_LIBS)
+    set(LIB_TYPE SHARED)
+endif(STATIC_LIBS)
+
+if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+   # Mac OS X specific code
+   SET(CMAKE_CXX_COMPILER "g++")
+endif (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 
-# component settings
-set(RTC_NAME "${PROJECT_NAME}")
-set(RTC_VERSION "1.0.0")
-set(RTC_VERSION_MAJOR "1")
-set(RTC_VERSION_MINOR "0")
-set(RTC_VERSION_PATCH "0")
-set(RTC_LANG "c++")
-set(RTC_DESCRIPTION "DilationErosion Agent Component")
-set(RTC_VENDOR "AIST")
-set(RTC_MAINTAINER "openrtm@openrtm.org")
-
-string(TOLOWER ${RTC_NAME} PACKAGE_NAME)
-set(PACKAGE_VERSION "${RTC_VERSION_MAJOR}.${RTC_VERSION_MINOR}.${RTC_VERSION_PATCH}")
-
-set(IDL_FILES ""
-	#              WiiInfo.idl
-)
-
-set(SKEL_SRCS ""
-	#              WiiInfoSkel.cpp
-)
-
-set(STUB_SRCS ""
-)
-
-set(IMPL_SRCS ""
-	#              WiiInfoSVC_impl.cpp
-)
-
-set(IMPL_INCS ""
-	#              WiiInfoSVC_impl.h
-)
-
-set(LIBS_SRCS DilationErosion.cpp)
-
-set(LIBS_INCS DilationErosion.h)
-
-set(EXEC_SRCS DilationErosionComp.cpp)
-
-set(OTHER_SRCS CMakeLists.txt Doxyfile.in
-               DilationErosion.conf rtc.conf)
-
-
-# check OpenRTM installed
-find_package(OpenRTM REQUIRED)
-
-list(APPEND CFLAGS ${OMNIORB_CFLAGS} ${OPENRTM_CFLAGS})
-list(APPEND INCLUDE_DIRS ${OMNIORB_INCLUDE_DIRS} ${OPENRTM_INCLUDE_DIRS})
-list(APPEND LDFLAGS ${OMNIORB_LDFLAGS} ${OPENRTM_LDFLAGS})
-list(APPEND LIBRARY_DIRS ${OMNIORB_LIBRARY_DIRS} ${OPENRTM_LIBRARY_DIRS})
-list(APPEND LIBRARIES ${OMNIORB_LIBRARIES} ${OPENRTM_LIBRARIES})
-
-# check doxygen installed
-find_package(Doxygen)
-if(DOXYGEN_FOUND STREQUAL "NO")
-    message(FATAL_ERROR "Doxygen not found.")
-endif()
-
-
+# Set up installation directories
 if(WIN32)
-    # add command path
-    set($ENV{PATH} $ENV{PATH} "${OPENRTM_DIR}/bin")
-    set($ENV{PATH} $ENV{PATH} "${OMNIORB_DIR}/bin/x86_win32")
-    # set install path prefix
-    set(CMAKE_INSTALL_PREFIX "${OPENRTM_DIR}")
-    set(INSTALL_PREFIX "components/${RTC_LANG}/${PACKAGE_NAME}${PACKAGE_VERSION}")
-else()
-    # add command path
-    set($ENV{PATH} $ENV{PATH} "${OPENRTM_DIR}/bin")
-    set($ENV{PATH} $ENV{PATH} "${OMNIORB_DIR}/bin")
-    # set install path prefix
-    set(CMAKE_INSTALL_PREFIX "${OPENRTM_DIR}")
-    set(OPENRTM_SHARE_PREFIX "share/openrtm-${OPENRTM_VERSION_MAJOR}.${OPENRTM_VERSION_MINOR}")
-    set(INSTALL_PREFIX "${OPENRTM_SHARE_PREFIX}/components/${RTC_LANG}/${PACKAGE_NAME}${PACKAGE_VERSION}")
-endif()
+#  set(BIN_INSTALL_DIR "components/bin")
+#  set(LIB_INSTALL_DIR "components/lib")
+  set(INSTALL_PREFIX "components/${PROJECT_TYPE}")
+else(WIN32)
+  set(OPENRTM_SHARE_PREFIX "share/openrtm-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}")
+  set(INSTALL_PREFIX "${OPENRTM_SHARE_PREFIX}/components/${PROJECT_TYPE}")
+endif(WIN32)
 
-# check OpenCV installed
-find_package(OpenCV REQUIRED)
+#set(INC_INSTALL_DIR
+#    "components/include/${PROJECT_NAME_LOWER}-${PROJECT_VERSION_MAJOR}")
+#set(SHARE_INSTALL_DIR
+#    "components/share/${PROJECT_NAME_LOWER}-${PROJECT_VERSION_MAJOR}")
 
-list(APPEND INCLUDE_DIRS ${OpenCV_INCLUDE_DIRS})
-list(APPEND LIBRARY_DIRS ${OpenCV_LIB_DIRS})
-list(APPEND LIBRARIES ${OpenCV_LIBS})
+# Get necessary dependency information
+find_package(OpenRTM)
+if(${OpenRTM_FOUND})
+  MESSAGE(STATUS "OpenRTM configuration Found")
+else(${OpenRTM_FOUND})
+  message(STATUS "Use cmake/Modules/FindOpenRTM.cmake in the project")
+  list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
+  find_package(OpenRTM REQUIRED)
+endif(${OpenRTM_FOUND})
 
+# Universal settings
+#enable_testing()
 
-# add uninstall target
-configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/cmake_uninstall.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
-    IMMEDIATE @ONLY)
-add_custom_target(uninstall_${RTC_NAME} COMMAND 
-    ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+# Subdirectories
+add_subdirectory(cmake)
+if(BUILD_DOCUMENTATION)
+    add_subdirectory(doc)
+endif(BUILD_DOCUMENTATION)
 
+#if(BUILD_EXAMPLES)
+#    add_subdirectory(examples)
+#endif(BUILD_EXAMPLES)
 
-# target settings for library/executable
-list(APPEND INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR})
-include_directories(${INCLUDE_DIRS})
+if(BUILD_IDL)
+    add_subdirectory(idl)
+endif(BUILD_IDL)
 
-link_directories(${LIBRARY_DIRS})
+add_subdirectory(include)
+MAP_ADD_STR(headers  "include/" comp_hdrs)
+add_subdirectory(src)
 
-add_definitions(${CFLAGS})
+#if(BUILD_TESTS)
+#    add_subdirectory(test)
+#endif(BUILD_TESTS)
 
-foreach(idl ${IDL_FILES})
-    string(REGEX REPLACE "([^\\/]*)\\.idl" "\\1" idl_base ${idl})
-    add_custom_command(OUTPUT ${idl_base}Stub.cpp ${idl_base}Skel.cpp
-                       COMMAND ${OPENRTM_IDL_WRAPPER} ${OPENRTM_IDL_WRAPPER_FLAGS} --idl-file=${idl}
-                       COMMAND ${OPENRTM_IDLC} ${OPENRTM_IDLFLAGS} ${PROJECT_SOURCE_DIR}/${idl}
-                       DEPENDS ${idl})
-endforeach()
+#if(BUILD_TOOLS)
+#    add_subdirectory(tools)
+#endif(BUILD_TOOLS)
 
-if(CMAKE_COMPILER_IS_GNUCC)
-    string(REPLACE ";" " " LDFLAGS "${LDFLAGS}")
-endif()
+if(BUILD_SOURCES)
+    add_subdirectory(include)
+    add_subdirectory(src)
+endif(BUILD_SOURCES)
 
-add_library(${RTC_NAME} SHARED
-            ${LIBS_SRCS} ${IMPL_SRCS} ${SKEL_SRCS} ${STUB_SRCS})
-target_link_libraries(${RTC_NAME} ${LIBRARIES})
-set_target_properties(${RTC_NAME} PROPERTIES PREFIX "")
-set_target_properties(${RTC_NAME} PROPERTIES LINK_FLAGS "${LDFLAGS}")
+# Package creation
+# By default, do not warn when built on machines using only VS Express:
+IF(NOT DEFINED CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_NO_WARNINGS)
+SET(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_NO_WARNINGS ON)
+ENDIF()
+include(InstallRequiredSystemLibraries)
+set(PROJECT_EXECUTABLES ${PROJECT_NAME_LOWER}Comp
+    "${PROJECT_NAME_LOWER}Comp")
 
-if(UNIX)
-    add_library(${RTC_NAME}-static STATIC
-                ${LIBS_SRCS} ${IMPL_SRCS} ${SKEL_SRCS} ${STUB_SRCS})
-    target_link_libraries(${RTC_NAME}-static ${LIBRARIES})
-    set_target_properties(${RTC_NAME}-static PROPERTIES PREFIX "")
-    set_target_properties(${RTC_NAME}-static PROPERTIES LINK_FLAGS "${LDFLAGS}")
-endif()
+set(cpack_options "${PROJECT_BINARY_DIR}/cpack_options.cmake")
 
-if(UNIX)
-    add_executable(${RTC_NAME}Comp ${EXEC_SRCS})
-    add_dependencies(${RTC_NAME}Comp ${RTC_NAME}-static)
-    target_link_libraries(${RTC_NAME}Comp ${RTC_NAME}-static ${LIBRARIES})
+configure_file("${PROJECT_SOURCE_DIR}/cmake/cpack_options.cmake.in"
+    ${cpack_options} @ONLY)
 
-    add_executable(${RTC_NAME}Comp-dynamic ${EXEC_SRCS})
-    add_dependencies(${RTC_NAME}Comp-dynamic ${RTC_NAME})
-    target_link_libraries(${RTC_NAME}Comp-dynamic ${RTC_NAME} ${LIBRARIES})
-    set_target_properties(${RTC_NAME}Comp-dynamic PROPERTIES LINK_FLAGS "${LDFLAGS}")
-
-else()
-    add_executable(${RTC_NAME}Comp ${EXEC_SRCS})
-    add_dependencies(${RTC_NAME}Comp ${RTC_NAME})
-    target_link_libraries(${RTC_NAME}Comp ${RTC_NAME} ${LIBRARIES})
-    set_target_properties(${RTC_NAME}Comp PROPERTIES LINK_FLAGS "${LDFLAGS}")
-endif()
-
-if(WIN32)
-    set (LIBRARY_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/${RTC_NAME}/)
-    set (EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/${RTC_NAME}Comp/)
-
-    ADD_CUSTOM_COMMAND(
-       TARGET ${RTC_NAME}
-       POST_BUILD
-       COMMAND ${CMAKE_COMMAND} -E copy
-       "${CMAKE_CURRENT_SOURCE_DIR}/${RTC_NAME}/Release/${RTC_NAME}.dll"
-       "${CMAKE_CURRENT_SOURCE_DIR}/../../bin"
-     )
-    ADD_CUSTOM_COMMAND(
-       TARGET ${RTC_NAME}Comp
-       POST_BUILD
-       COMMAND ${CMAKE_COMMAND} -E copy
-       "${CMAKE_CURRENT_SOURCE_DIR}/${RTC_NAME}Comp/Release/${RTC_NAME}Comp.exe"
-       "${CMAKE_CURRENT_SOURCE_DIR}/../../bin"
-     )
-endif()
-
-install(TARGETS ${RTC_NAME} LIBRARY DESTINATION "${INSTALL_PREFIX}"
-                            ARCHIVE DESTINATION "${INSTALL_PREFIX}"
-                            RUNTIME DESTINATION "${INSTALL_PREFIX}"
-        COMPONENT "applications")
-install(TARGETS ${RTC_NAME}Comp RUNTIME DESTINATION "${INSTALL_PREFIX}"
-        COMPONENT "applications")
-
-
-# target settings for document
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in"
-               "${CMAKE_CURRENT_BINARY_DIR}/Doxyfile")
-
-add_custom_target(doxygen_${RTC_NAME} COMMAND
-                  ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
-
-set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES)
-#set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES doc)
-
-#get_target_property(DOC_TARGET doc TYPE)
-#if(NOT DOC_TARGET)
-#    add_custom_target(doc)
-#endif()
-#add_dependencies(doc doxygen)
-
-#install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/doc DESTINATION "${INSTALL_PREFIX}"
-#        COMPONENT "documents")
-
-
-# install source files
-install(FILES ${IDL_FILES} ${IMPL_SRCS} ${IMPL_INCS}
-        DESTINATION "${INSTALL_PREFIX}/src"
-        COMPONENT "sources")
-
-install(FILES ${LIBS_SRCS} ${LIBS_INCS} ${EXEC_SRCS}
-        DESTINATION "${INSTALL_PREFIX}/src"
-        COMPONENT "sources")
-
-install(FILES ${OTHER_SRCS}
-        DESTINATION "${INSTALL_PREFIX}/src"
-        COMPONENT "sources")
-
-install(DIRECTORY cmake_modules cpack_resources
-        DESTINATION "${INSTALL_PREFIX}/src"
-        COMPONENT "sources")
-
-
-# package settings
-set(CPACK_PACKAGE_NAME "${RTC_NAME}")
-set(CPACK_PACKAGE_VERSION_MAJOR "${RTC_VERSION_MAJOR}")
-set(CPACK_PACKAGE_VERSION_MINOR "${RTC_VERSION_MINOR}")
-set(CPACK_PACKAGE_VERSION_PATCH "${RTC_VERSION_PATCH}")
-set(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
-set(CPACK_PACKAGE_VENDOR "${RTC_VENDOR}")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${RTC_DESCRIPTION}")
-set(CPACK_PACKAGE_CONTACT "${RTC_MAINTAINER}")
-
-set(CPACK_RESOURCE_FILE_LICENSE
-    "${CMAKE_CURRENT_SOURCE_DIR}/cpack_resources/License.txt")
-set(CPACK_PACKAGE_DESCRIPTION_FILE
-    "${CMAKE_CURRENT_SOURCE_DIR}/cpack_resources/Description.txt")
-
-set(CPACK_COMPONENTS_ALL applications documents sources)
-set(CPACK_COMPONENT_APPLICATIONS_DISPLAY_NAME "Applications")
-set(CPACK_COMPONENT_APPLICATIONS_DESCRIPTION "RT-Component applications")
-set(CPACK_COMPONENT_APPLICATIONS_DISABLED FALSE)
-
-set(CPACK_COMPONENT_DOCUMENTS_DISPLAY_NAME "Documents")
-set(CPACK_COMPONENT_DOCUMENTS_DESCRIPTION "RT-Component documents")
-set(CPACK_COMPONENT_DOCUMENTS_DISABLED TRUE)
-
-set(CPACK_COMPONENT_SOURCES_DISPLAY_NAME "Source files")
-set(CPACK_COMPONENT_SOURCES_DESCRIPTION "RT-Component source files")
-set(CPACK_COMPONENT_SOURCES_DISABLED TRUE)
-
-if(WIN32)
-    set(CPACK_GENERATOR "WIX")
-
-    # Windows WiX package settings
-
-    set(CPACK_WIX_XSL "@CMAKE_CURRENT_BINARY_DIR@/wix.xsl")
-    set(CPACK_WIX_LANG "ja-jp")
-    set(CPACK_RESOURCE_FILE_LICENSE
-        "@CMAKE_CURRENT_SOURCE_DIR@/cpack_resources/License.rtf")
-    configure_file(
-        "${CMAKE_CURRENT_SOURCE_DIR}/cpack_resources/wix.xsl.in"
-        "${CMAKE_CURRENT_BINARY_DIR}/wix.xsl" @ONLY)
-
-    set(CPACK_PACKAGE_FILE_NAME
-        "rtc${OPENRTM_VERSION}-${PACKAGE_NAME}${PACKAGE_VERSION}")
-
-else()
-    set(CPACK_GENERATOR "${LINUX_PACKAGE_GENERATOR}")
-
-    if(CPACK_GENERATOR STREQUAL "DEB")
-        # Linux Debian package settings
-
-        set(CPACK_DEBIAN_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION}-1")
-        set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "i386")
-        set(CPACK_DEBIAN_PACKAGE_SECTION "main")
-        set(CPACK_DEBIAN_PACKAGE_PRIORITY  "extra")
-        set(CPACK_DEBIAN_PACKAGE_DEPENDS "openrtm-aist (>= 1.0.0)")
-
-        set(CPACK_PACKAGE_FILE_NAME
-            "rtc${OPENRTM_VERSION}-${PACKAGE_NAME}_${CPACK_DEBIAN_PACKAGE_VERSION}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}")
-
-    elseif(CPACK_GENERATOR STREQUAL "RPM")
-        # Linux RPM package settings
-
-        set(CPACK_RPM_PACKAGE_RELEASE "1.fc10")
-        set(CPACK_RPM_PACKAGE_ARCHITECTURE "i386")
-        set(CPACK_RPM_PACKAGE_GROUP "Development/Libraries")
-        set(CPACK_RPM_PACKAGE_LICENSE "LGPL")
-        set(CPACK_RPM_PACKAGE_REQUIRES "OpenRTM-aist >= 1.0.0")
-
-        set(CPACK_PACKAGE_FILE_NAME
-            "rtc${OPENRTM_VERSION}-${PACKAGE_NAME}-${PACKAGE_VERSION}-${CPACK_RPM_PACKAGE_RELEASE}.${CPACK_RPM_PACKAGE_ARCHITECTURE}")
-
-    endif()
-endif()
-
-message(STATUS "Package type: ${CPACK_GENERATOR}")
-message(STATUS "Package name: ${CPACK_PACKAGE_FILE_NAME}")
-
+set(CPACK_PROJECT_CONFIG_FILE ${cpack_options})
+include(${CPACK_PROJECT_CONFIG_FILE})
 include(CPack)
+
+

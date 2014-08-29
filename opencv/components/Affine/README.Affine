@@ -10,7 +10,7 @@
 #   --module-desc='Affine image component' --module-version=1.0.0 --module-vendor=AIST 
 #   --module-category=Category --module-comp-type=STATIC 
 #   --module-act-type=PERIODIC --module-max-inst=1 
-#   --config=image_height:int:conf_default --config=image_width:int:conf_default --config=translate0:RTC::Point2D:conf_default --config=translate1:RTC::Point2D:conf_default --config=translate2:RTC::Point2D:conf_default 
+#   --config=affine_matrix:double:0.825,-0.167,40;-0.1,0.83,30 
 #   --inport=original_image:RTC::CameraImage --outport=affined_image:RTC::CameraImage 
 
 
@@ -20,7 +20,7 @@
 # <rtc-template block="module">
 Module Name: Affine
 Description: Affine image component
-Version:     1.0.0
+Version:     1.1.0
 Vendor:      AIST
 Category:    Category
 Kind:        DataFlowComponent
@@ -37,7 +37,7 @@ Lang Type:
     Activity definition
 ======================================================================
 
-[on_initialize]
+[on_initialize]    implemented
 
 [on_finalize]
 
@@ -125,46 +125,20 @@ Lang Type:
 ======================================================================
 # <rtc-template block="configuration">
 	Configuration:
-		Name:             image_height
+		Name:             affine_matrix
 		Description:     
-		Type:            int
-		DefaultValue:     conf_default
-		Unit:            
-		Range:           
-		Constraint:      
-
-		Name:             image_width
-		Description:     
-		Type:            int
-		DefaultValue:     conf_default
-		Unit:            
-		Range:           
-		Constraint:      
-
-		Name:             translate0
-		Description:     
-		Type:            RTC::Point2D
-		DefaultValue:     conf_default
-		Unit:            
-		Range:           
-		Constraint:      
-
-		Name:             translate1
-		Description:     
-		Type:            RTC::Point2D
-		DefaultValue:     conf_default
-		Unit:            
-		Range:           
-		Constraint:      
-
-		Name:             translate2
-		Description:     
-		Type:            RTC::Point2D
-		DefaultValue:     conf_default
+		Type:            double
+		DefaultValue:     0.825,-0.167,40;-0.1,0.83,30
 		Unit:            
 		Range:           
 		Constraint:      
 
 # </rtc-template> 
+
+This software is developed at the National Institute of Advanced
+Industrial Science and Technology. Approval number H23PRO-????. This
+software is licensed under the Lesser General Public License. See
+COPYING.LESSER.
+
 This area is reserved for future OpenRTM.
 

@@ -1,0 +1,54 @@
+# ObjectTracking CMake config file
+#
+# This file sets the following variables:
+# ObjectTracking_FOUND - Always TRUE.
+# ObjectTracking_INCLUDE_DIRS - Directories containing the ObjectTracking include files.
+# ObjectTracking_IDL_DIRS - Directories containing the ObjectTracking IDL files.
+# ObjectTracking_LIBRARIES - Libraries needed to use ObjectTracking.
+# ObjectTracking_DEFINITIONS - Compiler flags for ObjectTracking.
+# ObjectTracking_VERSION - The version of ObjectTracking found.
+# ObjectTracking_VERSION_MAJOR - The major version of ObjectTracking found.
+# ObjectTracking_VERSION_MINOR - The minor version of ObjectTracking found.
+# ObjectTracking_VERSION_REVISION - The revision version of ObjectTracking found.
+# ObjectTracking_VERSION_CANDIDATE - The candidate version of ObjectTracking found.
+
+message(STATUS "Found ObjectTracking-@PROJECT_VERSION@")
+set(ObjectTracking_FOUND TRUE)
+
+find_package(<dependency> REQUIRED)
+
+#set(ObjectTracking_INCLUDE_DIRS
+#    "@CMAKE_INSTALL_PREFIX@/include/@PROJECT_NAME_LOWER@-@PROJECT_VERSION_MAJOR@"
+#    ${<dependency>_INCLUDE_DIRS}
+#    )
+#
+#set(ObjectTracking_IDL_DIRS
+#    "@CMAKE_INSTALL_PREFIX@/include/@PROJECT_NAME_LOWER@-@PROJECT_VERSION_MAJOR@/idl")
+set(ObjectTracking_INCLUDE_DIRS
+    "@CMAKE_INSTALL_PREFIX@/include/@CPACK_PACKAGE_FILE_NAME@"
+    ${<dependency>_INCLUDE_DIRS}
+    )
+set(ObjectTracking_IDL_DIRS
+    "@CMAKE_INSTALL_PREFIX@/include/@CPACK_PACKAGE_FILE_NAME@/idl")
+
+
+if(WIN32)
+    set(ObjectTracking_LIBRARIES
+        "@CMAKE_INSTALL_PREFIX@/@LIB_INSTALL_DIR@/@CMAKE_SHARED_LIBRARY_PREFIX@@PROJECT_NAME_LOWER@@CMAKE_STATIC_LIBRARY_SUFFIX@"
+        ${<dependency>_LIBRARIES}
+        )
+else(WIN32)
+    set(ObjectTracking_LIBRARIES
+        "@CMAKE_INSTALL_PREFIX@/@LIB_INSTALL_DIR@/@CMAKE_SHARED_LIBRARY_PREFIX@@PROJECT_NAME_LOWER@@CMAKE_SHARED_LIBRARY_SUFFIX@"
+        ${<dependency>_LIBRARIES}
+        )
+endif(WIN32)
+
+set(ObjectTracking_DEFINITIONS ${<dependency>_DEFINITIONS})
+
+set(ObjectTracking_VERSION @PROJECT_VERSION@)
+set(ObjectTracking_VERSION_MAJOR @PROJECT_VERSION_MAJOR@)
+set(ObjectTracking_VERSION_MINOR @PROJECT_VERSION_MINOR@)
+set(ObjectTracking_VERSION_REVISION @PROJECT_VERSION_REVISION@)
+set(ObjectTracking_VERSION_CANDIDATE @PROJECT_VERSION_CANDIDATE@)
+
