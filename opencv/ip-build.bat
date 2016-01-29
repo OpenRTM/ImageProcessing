@@ -39,14 +39,14 @@ set PATH=%PATH%;C:\cygwin64\bin
 set OPENCV_RTC_ROOT=%~dp0
 
 if not DEFINED ARCH       set ARCH=x86
-if not DEFINED VC_VERSION set VC_VERSION=10
+if not DEFINED VC_VERSION set VC_VERSION=12
 if not DEFINED PYTHON_DIR set PYTHON_DIR=c:\python27
-if not DEFINED OpenCV_DIR set OpenCV_DIR=C:\distribution\OpenCV-2.4.9
-if not DEFINED RTM_ROOT   set RTM_ROOT=C:\distribution\OpenRTM-aist-rv2567
-if not DEFINED OMNI_ROOT  set OMNI_ROOT=C:\distribution\omniORB-4.1.7-win32-vc10
+if not DEFINED OpenCV_DIR set OpenCV_DIR=C:\distribution\OpenCV-2.4.11
+if not DEFINED RTM_ROOT   set RTM_ROOT=C:\distribution\OpenRTM-aist
+if not DEFINED OMNI_ROOT  set OMNI_ROOT=%RTM_ROOT%\omniORB
 
 set COIL_ROOT=%RTM_ROOT%\coil
-set OpenRTM_Dir=%RTM_ROOT%\cmake
+set OpenRTM_DIR=%RTM_ROOT%\cmake
 
 @rem ------------------------------------------------------------
 @rem Printing env variables
@@ -142,6 +142,12 @@ if %VC_VERSION% == 12 (
    set PLATFORMTOOL=/p:PlatformToolset=v120
    goto MSBUILDx86
    )
+if %VC_VERSION% == 14 (
+   call C:\"Program Files (x86)"\"Microsoft Visual Studio 14.0"\VC\vcvarsall.bat x86
+   set VCTOOLSET=14.0
+   set PLATFORMTOOL=/p:PlatformToolset=v140
+   goto MSBUILDx86
+   )
 
 @rem ------------------------------------------------------------
 @rem Build (VC2008 x86)
@@ -214,6 +220,12 @@ if /i %VC_VERSION% == 12 (
    call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" amd64
    set VCTOOLSET=12.0
    set PLATFORMTOOL=/p:PlatformToolset=v120
+   goto MSBUILDx64
+   )
+if /i %VC_VERSION% == 14 (
+   call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
+   set VCTOOLSET=14.0
+   set PLATFORMTOOL=/p:PlatformToolset=v140
    goto MSBUILDx64
    )
 
