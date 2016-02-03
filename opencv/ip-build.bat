@@ -41,7 +41,8 @@ set OPENCV_RTC_ROOT=%~dp0
 if not DEFINED ARCH       set ARCH=x86
 if not DEFINED VC_VERSION set VC_VERSION=12
 if not DEFINED PYTHON_DIR set PYTHON_DIR=c:\python27
-if not DEFINED OpenCV_DIR set OpenCV_DIR=C:\distribution\OpenCV-2.4.11
+if not DEFINED PYTHONPATH set PYTHONPATH=%PYTHON_DIR%\Lib
+if not DEFINED OpenCV_DIR set OpenCV_DIR=C:\distribution\OpenCV2.4.11
 if not DEFINED RTM_ROOT   set RTM_ROOT=C:\distribution\OpenRTM-aist
 if not DEFINED OMNI_ROOT  set OMNI_ROOT=%RTM_ROOT%\omniORB
 
@@ -78,14 +79,9 @@ if %VC_VERSION% LEQ 10 (
 @rem make work dir 
 @rem ============================================================
 echo work dir : work
-if not exist "work" (
-	mkdir work
-)
+if exist work rmdir /s/q work
+mkdir work
 cd work
-if exist "CMakeCache.txt" (
-    del CMakeCache.txt
-    echo delete CMakeCache.txt
-)
 
 @rem ============================================================
 @rem  switching to x86 or x86_64
