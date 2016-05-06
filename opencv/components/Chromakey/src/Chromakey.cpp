@@ -27,22 +27,22 @@ static const char* chromakey_spec[] =
     // Configuration variables
     "conf.default.lower_blue", "0",
     "conf.default.upper_blue", "0",
-    "conf.default.lower_yellow", "0",
-    "conf.default.upper_yellow", "0",
+    "conf.default.lower_green", "0",
+    "conf.default.upper_green", "0",
     "conf.default.lower_red", "0",
     "conf.default.upper_red", "0",
     // Widget
     "conf.__widget__.lower_blue", "slider.1",
     "conf.__widget__.upper_blue", "slider.1",
-    "conf.__widget__.lower_yellow", "slider.1",
-    "conf.__widget__.upper_yellow", "slider.1",
+    "conf.__widget__.lower_green", "slider.1",
+    "conf.__widget__.upper_green", "slider.1",
     "conf.__widget__.lower_red", "slider.1",
     "conf.__widget__.upper_red", "slider.1",
     // Constraints
     "conf.__constraints__.lower_blue", "0<=x<=255",
     "conf.__constraints__.upper_blue", "0<=x<=255",
-    "conf.__constraints__.lower_yellow", "0<=x<=255",
-    "conf.__constraints__.upper_yellow", "0<=x<=255",
+    "conf.__constraints__.lower_green", "0<=x<=255",
+    "conf.__constraints__.upper_green", "0<=x<=255",
     "conf.__constraints__.lower_red", "0<=x<=255",
     "conf.__constraints__.upper_red", "0<=x<=255",
     ""
@@ -96,8 +96,8 @@ RTC::ReturnCode_t Chromakey::onInitialize()
   // Bind variables and configuration variable
   bindParameter("lower_blue", m_nLowerBlue, "0");
   bindParameter("upper_blue", m_nUpperBlue, "0");
-  bindParameter("lower_yellow", m_nLowerYellow, "0");
-  bindParameter("upper_yellow", m_nUpperYellow, "0");
+  bindParameter("lower_green", m_nLowerGreen, "0");
+  bindParameter("upper_green", m_nUpperGreen, "0");
   bindParameter("lower_red", m_nLowerRed, "0");
   bindParameter("upper_red", m_nUpperRed, "0");
   // </rtc-template>
@@ -247,8 +247,8 @@ RTC::ReturnCode_t Chromakey::onExecute(RTC::UniqueId ec_id)
     memcpy(m_image_buff->imageData,(void *)&(m_image_original.pixels[0]),m_image_original.pixels.length());
 
     // Anternative actions
-    CvScalar lowerValue = cvScalar( m_nLowerBlue,     m_nLowerYellow,     m_nLowerRed );
-    CvScalar upperValue = cvScalar( m_nUpperBlue + 1, m_nUpperYellow + 1, m_nUpperRed + 1 );
+	CvScalar lowerValue = cvScalar(m_nLowerBlue, m_nLowerGreen, m_nLowerRed);
+	CvScalar upperValue = cvScalar(m_nUpperBlue + 1, m_nUpperGreen + 1, m_nUpperRed + 1);
 
     /* RGB各チャンネルごとに範囲内の値以外の画素をマスクに設定する */
     cvInRangeS( m_image_buff, lowerValue, upperValue, m_image_mask );

@@ -242,16 +242,16 @@ class Chromakey
   int m_nUpperBlue;
   /*!
    * 
-   * - Name:  nLowerYellow
+   * - Name:  nLowerGreen
    * - DefaultValue: 0
    */
-  int m_nLowerYellow;
+  int m_nLowerGreen;
   /*!
    * 
-   * - Name:  nUpperYellow
+   * - Name:  nUpperGreen
    * - DefaultValue: 0
    */
-  int m_nUpperYellow;
+  int m_nUpperGreen;
   /*!
    * 
    * - Name:  nLowerRed

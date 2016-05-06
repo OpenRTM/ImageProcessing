@@ -529,15 +529,15 @@ void RockPaperScissors::decide( int handarea, int hullarea )
   ratio=handarea / ( double )hullarea;	
 
   if( ratio >= m_rock_min && ratio <= m_rock_max ) {
-    judge = "グー";
+    judge = "Rock";
   }
   else if( ratio >= m_scissor_min && ratio <= m_scissor_max )
   {
-    judge = "チョキ";
+    judge = "Scissors";
   }
   else if( ratio >= m_paper_min && ratio <= m_paper_max )
   {
-    judge = "パー";
+    judge = "Paper";
   }
 
   if( m_out_mode == 1 )
@@ -548,7 +548,8 @@ void RockPaperScissors::decide( int handarea, int hullarea )
      */
     if( judge != err_judge && m_prev_judge != judge && hullarea >= 10000 )
     {
-      printf( "Ratio = %lf  : 判定領域の大きさ = %d\n", ratio,  hullarea );
+      //printf( "Ratio = %lf  : 判定領域の大きさ = %d\n", ratio,  hullarea );
+	  printf("Ratio = %lf  : Size of hand region = %d\n", ratio, hullarea);
       printf( "%s\n", judge.c_str() );
       m_prev_judge = judge;
 
@@ -559,7 +560,8 @@ void RockPaperScissors::decide( int handarea, int hullarea )
   else
   {
     /* すべての結果を出力する */
-    printf( "Ratio = %lf  : 判定領域の大きさ = %d\n", ratio,  hullarea );
+    //printf( "Ratio = %lf  : 判定領域の大きさ = %d\n", ratio,  hullarea );
+	 printf("Ratio = %lf  : Size of hand region = %d\n", ratio, hullarea);
     printf( "%s\n", judge.c_str() );
   }
 }
