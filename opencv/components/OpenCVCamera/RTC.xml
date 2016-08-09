@@ -21,6 +21,15 @@
         <rtc:Configuration xsi:type="rtcExt:configuration_ext" rtcExt:variableName="device_num" rtc:unit="" rtc:defaultValue="0" rtc:type="int" rtc:name="device_num">
             <rtcExt:Properties rtcExt:value="text" rtcExt:name="__widget__"/>
         </rtc:Configuration>
+        <rtc:Configuration xsi:type="rtcExt:configuration_ext" rtcExt:variableName="frame_width" rtc:unit="" rtc:defaultValue="0" rtc:type="int" rtc:name="frame_width">
+            <rtcExt:Properties rtcExt:value="text" rtcExt:name="__widget__"/>
+        </rtc:Configuration>
+        <rtc:Configuration xsi:type="rtcExt:configuration_ext" rtcExt:variableName="frame_height" rtc:unit="" rtc:defaultValue="0" rtc:type="int" rtc:name="frame_height">
+            <rtcExt:Properties rtcExt:value="text" rtcExt:name="__widget__"/>
+        </rtc:Configuration>
+        <rtc:Configuration xsi:type="rtcExt:configuration_ext" rtcExt:variableName="frame_rate" rtc:unit="" rtc:defaultValue="0" rtc:type="int" rtc:name="frame_rate">
+            <rtcExt:Properties rtcExt:value="text" rtcExt:name="__widget__"/>
+        </rtc:Configuration>
     </rtc:ConfigurationSet>
     <rtc:DataPorts xsi:type="rtcExt:dataport_ext" rtcExt:position="RIGHT" rtcExt:variableName="out" rtc:unit="" rtc:subscriptionType="" rtc:dataflowType="" rtc:interfaceType="" rtc:idlFile="" rtc:type="RTC::CameraImage" rtc:name="out" rtc:portType="DataOutPort"/>
     <rtc:Language xsi:type="rtcExt:language_ext" rtc:kind="C++"/>

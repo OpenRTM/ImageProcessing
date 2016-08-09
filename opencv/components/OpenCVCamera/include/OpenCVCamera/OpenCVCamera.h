@@ -234,6 +234,28 @@ class OpenCVCamera
    */
   int m_device_num;
 
+  /*!
+  *
+  * - Name:  frame_width
+  * - DefaultValue: 640
+  */
+  int m_frame_width;
+
+  /*!
+  *
+  * - Name:  frame_height
+  * - DefaultValue: 480
+  */
+  int m_frame_height;
+
+  /*!
+  *
+  * - Name:  frame_rate
+  * - DefaultValue: 10
+  */
+  int m_frame_rate;
+
+
   // </rtc-template>
 
   // DataInPort declaration
@@ -275,7 +297,7 @@ class OpenCVCamera
   
   // </rtc-template>
   int dummy;
-
+  int m_device_id;	/* 使用中のカメラデバイスID */
   CvCapture* m_capture;	/* カメラ用メモリ */
 };
 

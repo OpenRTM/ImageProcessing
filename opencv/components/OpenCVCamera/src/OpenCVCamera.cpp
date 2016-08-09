@@ -9,6 +9,8 @@
 
 #include "OpenCVCamera.h"
 #include <iostream>
+#include <sapi.h>
+
 using namespace std;
 
 // Module specification
@@ -28,14 +30,19 @@ static const char* opencvcamera_spec[] =
     "lang_type",         "compile",
     // Configuration variables
     "conf.default.device_num", "0",
-    // Widget
+	"conf.default.frame_width", "640",
+	"conf.default.frame_height", "480",
+	"conf.default.frame_rate", "10",
+	// Widget
     "conf.__widget__.device_num", "text",
+	"conf.__widget__.frame_width", "text",
+	"conf.__widget__.frame_height", "text",
+	"conf.__widget__.frame_rate", "text",
     // Constraints
     ""
   };
 // </rtc-template>
-  int device_num_old = 1000;
-  bool imgflg = false;
+
 /*!
  * @brief constructor
  * @param manager Maneger Object
@@ -79,8 +86,14 @@ RTC::ReturnCode_t OpenCVCamera::onInitialize()
   // <rtc-template block="bind_config">
   // Bind variables and configuration variable
   bindParameter("device_num", m_device_num, "0");
+  bindParameter("frame_width", m_frame_width, "640");
+  bindParameter("frame_height", m_frame_height, "480");
+  bindParameter("frame_rate", m_frame_rate, "10");
   // </rtc-template>
-  
+ 
+  m_device_id = -1;
+  m_capture = NULL;
+
   return RTC::RTC_OK;
 }
 
@@ -108,102 +121,98 @@ RTC::ReturnCode_t OpenCVCamera::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t OpenCVCamera::onActivated(RTC::UniqueId ec_id)
 {
-    /* カメラデバイスの探索 */
-/*
-    if(NULL==(m_capture = cvCaptureFromCAM(CV_CAP_ANY))){
-        cout<<"No Camera Device"<<endl;
-        return RTC::RTC_ERROR;
-    }
+  m_device_id = m_device_num;
 
-    return RTC::RTC_OK;
-*/
-    return RTC::RTC_OK;
+  /* カメラデバイスの探索 */
+  if (NULL == (m_capture = cvCaptureFromCAM(m_device_id)))
+  {
+    cout << "No Camera Device" << endl;
+    return RTC::RTC_ERROR;
+  }
+
+  return RTC::RTC_OK;
 }
 
 
 RTC::ReturnCode_t OpenCVCamera::onDeactivated(RTC::UniqueId ec_id)
 {
   /* カメラ用メモリの解放 */
-  if(m_capture != NULL)
+  if (m_capture != NULL)
   {
   	cvReleaseCapture(&m_capture);
   }
 
-  device_num_old = 1000;
-
   return RTC::RTC_OK;
 }
 
-
 RTC::ReturnCode_t OpenCVCamera::onExecute(RTC::UniqueId ec_id)
 {
-  static coil::TimeValue tm_pre;
+  static coil::TimeValue tmOld;
   static int count = 0;
+  const int DISPLAY_PERIOD_FRAME_NUM = 100;
   IplImage *cam_frame = NULL;
 
-  if(m_device_num != device_num_old){
+  /* 実行中にコンフィグレーションによりデバイスIDが更新された場合 */
+  if (m_device_num != m_device_id)
+  {
+    cvReleaseCapture(&m_capture);
+    m_device_id = m_device_num;
 
-    if (device_num_old != 1000)
+    /* カメラデバイスの再探索 */
+    if (NULL == (m_capture = cvCaptureFromCAM(m_device_id)))
     {
-      cvReleaseCapture(&m_capture);
-    }
-
-    device_num_old = m_device_num;
-
-    if(NULL==(m_capture = cvCaptureFromCAM(device_num_old))){
-      cout<<"No Camera Device"<<endl;
-      imgflg = false;
-      //return RTC::RTC_ERROR;
-    }else{
-      imgflg = true;	
-    }
-  }
-
-  if(imgflg == true){
-    cam_frame = cvQueryFrame(m_capture);
-    if(NULL == cam_frame)
-    {
-      std::cout << "Bad frame or no frame!!" << std::endl;
+      cout << "No Camera Device" << endl;
       return RTC::RTC_ERROR;
     }
-
-    IplImage* frame = cvCreateImage(cvGetSize(cam_frame), 8, 3);
-
-    if(cam_frame ->origin == IPL_ORIGIN_TL)
-      cvCopy(cam_frame, frame);
-    else
-      cvFlip(cam_frame, frame);
-
-    int len = frame->nChannels * frame->width * frame->height;
-
-    /* 画面のサイズ情報を入れる */
-    m_out.pixels.length(len);
-    m_out.width  = frame->width;
-    m_out.height = frame->height;
-
-    memcpy((void *)&(m_out.pixels[0]), frame->imageData,len);
-    cvReleaseImage(&frame);
-
-    /* 繋がってるコンポーネントがしんでしまうと問題発生 */
-    m_outOut.write();
-
-    if (count > 100)
-    {
-      count = 0;
-      coil::TimeValue tm;
-      tm = coil::gettimeofday();
-
-      double sec(tm - tm_pre);
-
-      if (sec > 1.0 && sec < 1000.0)
-      {
-        std::cout << 100/sec << " [FPS]" << std::endl;
-      }
-
-      tm_pre = tm;
-    }
-    ++count;
   }
+
+  cvSetCaptureProperty(m_capture, CV_CAP_PROP_FRAME_WIDTH, m_frame_width);
+  cvSetCaptureProperty(m_capture, CV_CAP_PROP_FRAME_HEIGHT, m_frame_height);
+  cvSetCaptureProperty(m_capture, CV_CAP_PROP_FPS, m_frame_rate);
+
+  cam_frame = cvQueryFrame(m_capture);
+  if (NULL == cam_frame)
+  {
+    cout << "Bad frame or no frame!!" << endl;
+    return RTC::RTC_ERROR;
+  }
+
+  IplImage* frame = cvCreateImage(cvGetSize(cam_frame), 8, 3);
+
+  if (cam_frame->origin == IPL_ORIGIN_TL)
+  {
+    cvCopy(cam_frame, frame);
+  } else {
+	cvFlip(cam_frame, frame);
+  }
+
+  int len = frame->nChannels * frame->width * frame->height;
+
+  /* 画面のサイズ情報を入れる */
+  m_out.pixels.length(len);
+  m_out.width  = frame->width;
+  m_out.height = frame->height;
+
+  memcpy((void *)&(m_out.pixels[0]), frame->imageData, len);
+  cvReleaseImage(&frame);
+
+  /* 繋がってるコンポーネントがしんでしまうと問題発生 */
+  m_outOut.write();
+
+  /* フレームレートの表示 */
+  if (count++ > DISPLAY_PERIOD_FRAME_NUM)
+  {
+    coil::TimeValue tmNow = coil::gettimeofday();
+    double sec(tmNow - tmOld);
+
+    if (sec > 1.0)
+	{
+	 cout << (DISPLAY_PERIOD_FRAME_NUM / sec) << " [FPS]" << endl;
+     tmOld = tmNow;
+	}
+	count = 0;
+  }
+
   return RTC::RTC_OK;
 }
 
