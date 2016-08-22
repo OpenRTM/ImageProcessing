@@ -9,7 +9,6 @@
 
 #include "OpenCVCamera.h"
 #include <iostream>
-#include <sapi.h>
 
 using namespace std;
 
