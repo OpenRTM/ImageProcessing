@@ -20,9 +20,8 @@
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
 /* OpenCVHeadファイルのIncluding */
-#include <cv.h>
-#include <cxcore.h>
-#include <highgui.h>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 #include <string>
 #include "Labeling.h"
@@ -343,23 +342,24 @@ class RockPaperScissors
   void extractSkinColor( void );
   void interpolate( void );
   int  pickupMaxArea( void );
-  void createConvexHull( int handarea, CvPoint **handpoint, int **hull,
-					  CvMat *pointMatrix, CvMat *hullMatrix );
-  void drawConvexHull( CvPoint *handpoint, int *hull, int hullcount );
-  int  calcConvexHullArea( CvPoint *handpoint, int *hull, int hullcount );
+  void createConvexHull(int handarea, cv::Mat &pointMatrix, cv::Mat &hullMatrix );
+  void drawConvexHull(cv::Mat &handpoint, cv::Mat &hull, int hullcount);
+  int  calcConvexHullArea(cv::Mat &handpoint, cv::Mat &hull, int hullcount);
   void decide( int handarea, int hullarea );
   
   int dummy;
   std::string m_prev_judge;   /* 前回の判定　グー / チョキ / パー */
 
-  IplImage* m_frame_image;
-  IplImage* m_image_buff;
-  IplImage* m_output_buff;
-  IplImage* m_hsv_buff;
-  IplImage* m_convexHull_buff;
-  IplImage* m_skin_buff;
-  IplImage* m_temp_buff;
-  IplImage* m_label_buff;
+  cv::Mat m_frame_image;
+  cv::Mat m_image_buff;
+  cv::Mat m_output_buff;
+  cv::Mat m_hsv_buff;
+  cv::Mat m_convexHull_buff;
+  cv::Mat m_skin_buff;
+  cv::Mat m_temp_buff;
+  cv::Mat m_label_buff;
+
+  cv::VideoCapture capture;
 
 };
 

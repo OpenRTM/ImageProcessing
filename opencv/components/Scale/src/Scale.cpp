@@ -127,13 +127,14 @@ RTC::ReturnCode_t Scale::onActivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Scale::onDeactivated(RTC::UniqueId ec_id)
 {
-  if(m_image_buff != NULL)
+
+  if (!m_image_buff.empty())
   {
-    cvReleaseImage(&m_image_buff);
+	  m_image_buff.release();
   }
-  if(m_image_dest != NULL)
+  if (!m_image_dest.empty())
   {
-    cvReleaseImage(&m_image_dest);
+	  m_image_dest.release();
   }
   return RTC::RTC_OK;
 }
@@ -158,18 +159,15 @@ RTC::ReturnCode_t Scale::onExecute(RTC::UniqueId ec_id)
       m_in_height = m_image_orig.height;
       m_in_width  = m_image_orig.width;
 
-      if(m_image_buff != NULL)
-      {
-        cvReleaseImage(&m_image_buff);
-      }
-      m_image_buff = cvCreateImage(cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_8U, 3);
+
+	  m_image_buff.create(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3);
     }
 
     /* InPortの画像データをIplImageのimageDataにコピー */
-    memcpy(m_image_buff->imageData, (void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length());
+    memcpy(m_image_buff.data, (void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length());
 
     /* 拡大比率が更新されたら出力イメージ用メモリを再確保する */
-    if(m_image_dest == NULL || m_currentScaleX != m_scale_x || m_currentScaleY != m_scale_y)
+    if(m_image_dest.empty() || m_currentScaleX != m_scale_x || m_currentScaleY != m_scale_y)
     {
       m_currentScaleX    = m_scale_x;
       m_currentScaleY    = m_scale_y;
@@ -179,25 +177,23 @@ RTC::ReturnCode_t Scale::onExecute(RTC::UniqueId ec_id)
                                                                      (int)(m_in_height * m_currentScaleY));
 
       /* 既存のメモリを解放する */
-      if(m_image_dest != NULL)
-        cvReleaseImage(&m_image_dest);
-      m_image_dest = cvCreateImage(cvSize((int)(m_in_width  * m_currentScaleX), 
-                                    (int)(m_in_height * m_currentScaleY)), IPL_DEPTH_8U, 3);
+	  m_image_dest.create(cv::Size(m_in_width  * m_currentScaleX, m_in_height * m_currentScaleY), CV_8UC3);
+   
     }        
 
     /* 画像の大きさを変換する */
-    cvResize( m_image_buff, m_image_dest, CV_INTER_LINEAR );
+	cv::resize(m_image_buff, m_image_dest, m_image_dest.size(), CV_INTER_LINEAR);
 
     /* 画像データのサイズ取得 */
-    int len = m_image_dest->nChannels * m_image_dest->width * m_image_dest->height;
+	int len = m_image_dest.channels() * m_image_dest.size().width * m_image_dest.size().height;
           
     m_image_output.pixels.length(len);
     /* 画面のサイズ情報を入れる */
-    m_image_output.width  = m_image_dest->width;
-    m_image_output.height = m_image_dest->height;
+	m_image_output.width = m_image_dest.size().width;
+	m_image_output.height = m_image_dest.size().height;
 
     /* 反転した画像データをOutPortにコピー */
-    memcpy((void *)&(m_image_output.pixels[0]), m_image_dest->imageData,len);
+    memcpy((void *)&(m_image_output.pixels[0]), m_image_dest.data, len);
 
     m_image_outputOut.write();
   }

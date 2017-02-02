@@ -18,10 +18,10 @@
 #include <coil/Mutex.h>
 
 /* OpenCVHeadファイルのIncluding */
-#include <cv.h>
-#include <cxcore.h>
-#include <highgui.h>
- 
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/imgcodecs/imgcodecs.hpp>
+#include <opencv2/calib3d/calib3d.hpp>
+
 /*!
  * @class CalibrationServiceSVC_impl
  * Example class implementing IDL interface ImageCalibService::CalibrationService

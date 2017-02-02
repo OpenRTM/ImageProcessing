@@ -21,9 +21,7 @@
 
 
 /* OpenCV用インクルードファイルのインクルード */
-#include <cv.h>
-#include <cxcore.h>
-#include <highgui.h>
+#include <opencv2/imgproc/imgproc.hpp>
 
 // Service implementation headers
 // <rtc-template block="service_impl_h">
@@ -280,8 +278,8 @@ class Flip
   // <rtc-template block="private_operation">
   
   // </rtc-template>
-  IplImage* m_image_buff;
-  IplImage* m_flip_image_buff;
+	 cv::Mat m_imageBuff;
+	 cv::Mat m_flipImageBuff;
 };
 
 

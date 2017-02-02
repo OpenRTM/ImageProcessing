@@ -22,9 +22,7 @@
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
 /* OpenCVHeadファイルのIncluding */
-#include <cv.h>
-#include <cxcore.h>
-#include <highgui.h>
+#include <opencv2/imgproc/imgproc.hpp>
 
 // Service implementation headers
 // <rtc-template block="service_impl_h">
@@ -302,18 +300,18 @@ class DilationErosion
   
   // </rtc-template>
   int dummy;
-  IplImage* m_image_buff;
-  IplImage* m_output_image_buff;
-  IplImage* m_gray_buff;
-  IplImage* m_binary_buff;
-  IplImage* m_dilation_buff;
-  IplImage* m_erosion_buff;
-  IplImage* m_merge_Image;
-  IplImage* m_dilation_image;
-  IplImage* m_erosion_image;
-  IplImage* m_dila_merge_img;
-  IplImage* m_ero_merge_img;
-  IplImage* m_noise_merge_img;
+  cv::Mat m_image_buff;
+  cv::Mat m_output_image_buff;
+  cv::Mat m_gray_buff;
+  cv::Mat m_binary_buff;
+  cv::Mat m_dilation_buff;
+  cv::Mat m_erosion_buff;
+  cv::Mat m_merge_Image;
+  cv::Mat m_dilation_image;
+  cv::Mat m_erosion_image;
+  cv::Mat m_dila_merge_img;
+  cv::Mat m_ero_merge_img;
+  cv::Mat m_noise_merge_img;
 
 };
 

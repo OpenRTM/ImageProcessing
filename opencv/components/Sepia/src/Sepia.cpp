@@ -109,17 +109,7 @@ RTC::ReturnCode_t Sepia::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Sepia::onActivated(RTC::UniqueId ec_id)
 {
-  /* イメージ用メモリの確保 */
-  m_image_buff       = NULL;
 
-  m_hsvImage         = NULL;
-
-  m_hueImage         = NULL;
-  m_saturationImage  = NULL;
-  m_valueImage       = NULL;
-
-  m_mergeImage       = NULL;
-  m_destinationImage = NULL;
 
   m_in_height        = 0;
   m_in_width         = 0;
@@ -131,20 +121,36 @@ RTC::ReturnCode_t Sepia::onActivated(RTC::UniqueId ec_id)
 RTC::ReturnCode_t Sepia::onDeactivated(RTC::UniqueId ec_id)
 {
   /* イメージ用メモリの解放 */
-  if(m_image_buff       != NULL)
-      cvReleaseImage(&m_image_buff);
-  if(m_hsvImage         != NULL)
-      cvReleaseImage(&m_hsvImage);
-  if(m_hueImage         != NULL)
-      cvReleaseImage(&m_hueImage);
-  if(m_saturationImage  != NULL)
-      cvReleaseImage(&m_saturationImage);
-  if(m_valueImage       != NULL)
-      cvReleaseImage(&m_valueImage);
-  if(m_mergeImage       != NULL)
-      cvReleaseImage(&m_mergeImage);
-  if(m_destinationImage != NULL)
-      cvReleaseImage(&m_destinationImage);
+
+
+  if (!m_image_buff.empty())
+  {
+	  m_image_buff.release();
+  }
+  if (!m_hsvImage.empty())
+  {
+	  m_hsvImage.release();
+  }
+  if (!m_hueImage.empty())
+  {
+	  m_hueImage.release();
+  }
+  if (!m_saturationImage.empty())
+  {
+	  m_saturationImage.release();
+  }
+  if (!m_valueImage.empty())
+  {
+	  m_valueImage.release();
+  }
+  if (!m_mergeImage.empty())
+  {
+	  m_mergeImage.release();
+  }
+  if (!m_destinationImage.empty())
+  {
+	  m_destinationImage.release();
+  }
 
   return RTC::RTC_OK;
 }
@@ -167,61 +173,60 @@ RTC::ReturnCode_t Sepia::onExecute(RTC::UniqueId ec_id)
       m_in_height = m_image_orig.height;
       m_in_width  = m_image_orig.width;
 
-      if(m_image_buff       != NULL)
-        cvReleaseImage(&m_image_buff);
-      if(m_hsvImage         != NULL)
-        cvReleaseImage(&m_hsvImage);
-      if(m_hueImage         != NULL)
-        cvReleaseImage(&m_hueImage);
-      if(m_saturationImage  != NULL)
-        cvReleaseImage(&m_saturationImage);
-      if(m_valueImage       != NULL)
-        cvReleaseImage(&m_valueImage);
-      if(m_mergeImage       != NULL)
-        cvReleaseImage(&m_mergeImage);
-      if(m_destinationImage != NULL)
-        cvReleaseImage(&m_destinationImage);
 
-      m_image_buff       = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3);
-      m_hsvImage         = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3);
-      m_hueImage         = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 1);
-      m_saturationImage  = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 1);
-      m_valueImage       = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 1);
-      m_mergeImage       = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3);
-      m_destinationImage = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3);
+
+      
+      
+	  m_image_buff.create(cv::Size(m_in_width, m_in_height), CV_8UC3);
+	  m_hsvImage.create(cv::Size(m_in_width, m_in_height), CV_8UC3);
+	  m_hueImage.create(cv::Size(m_in_width, m_in_height), CV_8UC1);
+	  m_saturationImage.create(cv::Size(m_in_width, m_in_height), CV_8UC1);
+	  m_valueImage.create(cv::Size(m_in_width, m_in_height), CV_8UC1);
+	  m_mergeImage.create(cv::Size(m_in_width, m_in_height), CV_8UC3);
+	  m_destinationImage.create(cv::Size(m_in_width, m_in_height), CV_8UC3);
     }
 
     /* InPortの画像データをIplImageのimageDataにコピー */
-    memcpy(m_image_buff->imageData,(void *)&(m_image_orig.pixels[0]),m_image_orig.pixels.length());
+    memcpy(m_image_buff.data,(void *)&(m_image_orig.pixels[0]),m_image_orig.pixels.length());
 
     // Anternative actions
 
     /* BGRからHSVに変換する */
-    cvCvtColor(m_image_buff, m_hsvImage, CV_BGR2HSV);
+    cv::cvtColor(m_image_buff, m_hsvImage, CV_BGR2HSV);
 
     /* HSV画像をH、S、V画像に分ける */
-    cvSplit(m_hsvImage, m_hueImage, m_saturationImage, m_valueImage, NULL); 
+	std::vector<cv::Mat> tmp;
+	tmp.push_back(m_hueImage);
+	tmp.push_back(m_saturationImage);
+	tmp.push_back(m_valueImage);
+	cv::split(m_hsvImage, tmp);
 
     /* HとSの値を変更する */
-    cvSet(m_hueImage,        cvScalar( m_nHue ),        NULL);
-    cvSet(m_saturationImage, cvScalar( m_nSaturation ), NULL);
+	m_hueImage.setTo(cv::Scalar(m_nHue));
+	m_saturationImage.setTo(cv::Scalar(m_nSaturation));
+    
+    
 
     /* 3チャンネルを結合 */
-    cvMerge(m_hueImage, m_saturationImage, m_valueImage, NULL, m_mergeImage);
+	tmp.clear();
+	tmp.push_back(m_hueImage);
+	tmp.push_back(m_saturationImage);
+	tmp.push_back(m_valueImage);
+	cv::merge(tmp, m_mergeImage);
 
     /* HSVからBGRに変換する */
-    cvCvtColor(m_mergeImage, m_destinationImage, CV_HSV2BGR);
+    cv::cvtColor(m_mergeImage, m_destinationImage, CV_HSV2BGR);
 
     /* 画像データのサイズ取得 */
-    int len = m_destinationImage->nChannels * m_destinationImage->width * m_destinationImage->height;
+	int len = m_destinationImage.channels() * m_destinationImage.size().width * m_destinationImage.size().height;
           
     /* 画面のサイズ情報を入れる */
     m_image_sepia.pixels.length(len);        
-    m_image_sepia.width  = m_destinationImage->width;
-    m_image_sepia.height = m_destinationImage->height;
+	m_image_sepia.width = m_destinationImage.size().width;
+	m_image_sepia.height = m_destinationImage.size().height;
 
     /* 反転した画像データをOutPortにコピー */
-    memcpy((void *)&(m_image_sepia.pixels[0]), m_destinationImage->imageData,len);
+    memcpy((void *)&(m_image_sepia.pixels[0]), m_destinationImage.data,len);
 
     m_image_sepiaOut.write();
   }

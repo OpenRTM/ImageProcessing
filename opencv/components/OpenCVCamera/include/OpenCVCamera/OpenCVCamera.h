@@ -19,9 +19,8 @@
 #include <rtm/idl/ExtendedDataTypesSkel.h>
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
-#include<cv.h>
-#include<cxcore.h>
-#include<highgui.h>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 // Service implementation headers
 // <rtc-template block="service_impl_h">
@@ -298,7 +297,7 @@ class OpenCVCamera
   // </rtc-template>
   int dummy;
   int m_device_id;	/* 使用中のカメラデバイスID */
-  CvCapture* m_capture;	/* カメラ用メモリ */
+  cv::VideoCapture m_capture;	/* カメラ用メモリ */
 };
 
 

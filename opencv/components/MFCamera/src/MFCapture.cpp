@@ -12,10 +12,8 @@
  *  Constructor
  */
 MFCapture::MFCapture() : nDevs(0), devId(-1), image_width(0), image_height(0),
-      image_buf(NULL), pSource(NULL), pReader(NULL), pAttributes(NULL),
-      ppDevices(NULL), pType(NULL),  image_format(MFVideoFormat_RGB24), YUV_Matrix(0),
-      outMediaTypes(NULL),numOutMediaTypes(0),image_stride(0),
-      image_length(0),pMFT(NULL),pHandler(NULL)
+      image_format(MFVideoFormat_RGB24), YUV_Matrix(0),
+      numOutMediaTypes(0),image_stride(0),image_length(0)
 {
   // Create an attribute store to specify the enumeration parameters.
   hr = MFCreateAttributes(&pAttributes, 1);
@@ -70,7 +68,7 @@ MFCapture::~MFCapture()
   }
   CoTaskMemFree(ppDevices);
   SafeRelease(&pSource);
-  if (image_buf != NULL) { cvReleaseImage(&image_buf); }
+
 }
 
 /*
@@ -261,8 +259,9 @@ MFCapture::GetMediaTypeInfo(IMFMediaType *type)
 void
 MFCapture::CreateImageBuffer(UINT32 depth, UINT32 channels)
 {
-  if (image_buf != NULL) { cvReleaseImage(&image_buf); }
-  image_buf = cvCreateImage(cvSize(image_width, image_height), depth, channels);
+
+	image_buf.create(cv::Size(image_width, image_height), CV_MAKETYPE(depth, channels));
+
   image_length = image_width * image_height * channels;
 
   return;
@@ -319,7 +318,7 @@ MFCapture::GetSample()
 /*
  *  Get Captured Image
  */
-IplImage *
+cv::Mat
 MFCapture::GetBufferData()
 {
   IMFMediaBuffer *buff=NULL;
@@ -341,13 +340,13 @@ MFCapture::GetBufferData()
     hr = sample->GetBufferByIndex(0, &buff);
     if (FAILED(hr))
     {
-      return NULL;
+      return cv::Mat();
     }
 
     hr = buff->Lock(&memory, &maxLen, &curLen);
     if (FAILED(hr))
     {
-      return NULL;
+		return cv::Mat();
     }
 
     UINT32 size = image_length;
@@ -355,11 +354,11 @@ MFCapture::GetBufferData()
 #if 1
     if(image_format == MFVideoFormat_YUY2){
       /// If the captured image format is YUY2, convert to RGB24
-      YUY2_to_RGB((char *)memory, (char *)image_buf->imageData,
-                     image_buf->width, image_buf->height, size, YUV_Matrix);
+      YUY2_to_RGB((char *)memory, (char *)image_buf.data,
+		  image_buf.size().width, image_buf.size().height, size, YUV_Matrix);
 
     }else{ // Should be MFVideoFormat_RGB24
-      memcpy(image_buf->imageData, (void *)memory, size);
+      memcpy(image_buf.data, (void *)memory, size);
     }
 #else
       memcpy(image_buf->imageData, (void *)memory, size);
@@ -371,7 +370,7 @@ MFCapture::GetBufferData()
 
     return image_buf;
   }
-  return NULL;
+  return cv::Mat();
 }
 
 /*

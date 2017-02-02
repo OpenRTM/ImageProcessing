@@ -196,19 +196,19 @@ RTC::ReturnCode_t MFCamera::onExecute(RTC::UniqueId ec_id)
 	std::cout << "Format = "<< m_vfmt_id << std::endl;
     }
 
-    if(!m_capture->image_buf)
+    if(m_capture->image_buf.empty())
     {
       std::cout << "No image buffer..." << std::endl;
       return RTC::RTC_ERROR; 
     }
 
-    if(m_capture->GetBufferData())
+	if (!m_capture->GetBufferData().empty())
     {
       m_out.pixels.length(m_capture->image_length);
-      m_out.width  = m_capture->image_buf->width;
-      m_out.height = m_capture->image_buf->height;
+      m_out.width  = m_capture->image_buf.size().width;
+	  m_out.height = m_capture->image_buf.size().height;
 
-      memcpy((void *)&(m_out.pixels[0]), m_capture->image_buf->imageData, m_capture->image_length);
+      memcpy((void *)&(m_out.pixels[0]), m_capture->image_buf.data, m_capture->image_length);
       m_outOut.write();
     }
     

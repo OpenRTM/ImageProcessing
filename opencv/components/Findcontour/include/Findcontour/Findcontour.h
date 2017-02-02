@@ -20,9 +20,7 @@
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
 //OpenCV header file include
-#include <cv.h>
-#include <cxcore.h>
-#include <highgui.h>
+#include <opencv2/imgproc/imgproc.hpp>
 
 #define THRESHOLD_MAX_VALUE	255	  /* 2値化の際に使用する最大値 */
 
@@ -299,14 +297,14 @@ class Findcontour
   // <rtc-template block="private_operation">
   
   // </rtc-template>
-  IplImage* imageBuff;
-  IplImage* grayImage;
-  IplImage* binaryImage;
-  IplImage* contourImage;
+  cv::Mat imageBuff;
+  cv::Mat grayImage;
+  cv::Mat binaryImage;
+  cv::Mat contourImage;
   int find_contour_num;
-  CvSeq* find_contour;
-  CvScalar red;
-  CvScalar green;
+  std::vector<std::vector<cv::Point>> find_contour;
+  cv::Scalar red;
+  cv::Scalar green;
 };
 
 

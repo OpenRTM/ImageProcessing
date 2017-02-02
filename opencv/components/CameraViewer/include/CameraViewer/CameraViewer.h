@@ -19,9 +19,8 @@
 #include <rtm/idl/ExtendedDataTypesSkel.h>
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
-#include<cv.h>
-#include<cxcore.h>
-#include<highgui.h>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 // Service implementation headers
 // <rtc-template block="service_impl_h">
@@ -302,7 +301,7 @@ class CameraViewer
 
 private:
   int dummy;
-  IplImage* m_orig_img;
+  cv::Mat m_orig_img;
 
   int m_nOldHeight;     /* CFG更新チェック用 */
   int m_nOldWidth;

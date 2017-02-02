@@ -122,14 +122,7 @@ RTC::ReturnCode_t Edge::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Edge::onActivated(RTC::UniqueId ec_id)
 {
-  /* イメージ用メモリの初期化 */
-  imageBuff = NULL;
-  grayImage = NULL;
-  destinationImage_x = NULL;
-  destinationImage_y = NULL;
-  destinationImage_LAPLACIAN = NULL;
-  destinationEdge = NULL;
-  edgeImage = NULL;
+
 
   /* OutPort画面サイズの初期化 */
   m_image_edge_sobel_x.width = m_image_edge_sobel_y.width = m_image_edge_LAPLACIAN.width = 0;
@@ -143,16 +136,39 @@ RTC::ReturnCode_t Edge::onActivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Edge::onDeactivated(RTC::UniqueId ec_id)
 {
-  if(imageBuff != NULL)
-  {
-    cvReleaseImage(&imageBuff);
-    cvReleaseImage(&destinationImage_x);
-    cvReleaseImage(&destinationImage_y);
-    cvReleaseImage(&destinationImage_LAPLACIAN);
-    cvReleaseImage(&destinationEdge);
-    cvReleaseImage(&grayImage);
-    cvReleaseImage(&edgeImage);
-  }
+	if (!imageBuff.empty())
+	{
+		imageBuff.release();
+	}
+	if (!destinationImage_x.empty())
+	{
+		destinationImage_x.release();
+	}
+	if (!destinationImage_y.empty())
+	{
+		destinationImage_y.release();
+	}
+	if (!destinationImage_LAPLACIAN.empty())
+	{
+		destinationImage_LAPLACIAN.release();
+	}
+	if (!destinationEdge.empty())
+	{
+		destinationEdge.release();
+	}
+	if (!destinationEdge.empty())
+	{
+		destinationEdge.release();
+	}
+	if (!grayImage.empty())
+	{
+		grayImage.release();
+	}
+	if (!edgeImage.empty())
+	{
+		edgeImage.release();
+	}
+
 
   return RTC::RTC_OK;
 }
@@ -171,50 +187,43 @@ RTC::ReturnCode_t Edge::onExecute(RTC::UniqueId ec_id)
       m_image_edge_sobel_x.width = m_image_edge_sobel_y.width = m_image_edge_LAPLACIAN.width = m_image_orig.width;
       m_image_edge_sobel_x.height = m_image_edge_sobel_y.height = m_image_edge_LAPLACIAN.height = m_image_orig.height;
 
-      /* InPortのイメージサイズが変更された場合 */
-      if(imageBuff != NULL)
-      {
-        cvReleaseImage(&imageBuff);
-        cvReleaseImage(&destinationImage_x);
-        cvReleaseImage(&destinationImage_y);
-        cvReleaseImage(&destinationImage_LAPLACIAN);
-        cvReleaseImage(&destinationEdge);
-        cvReleaseImage(&grayImage);
-        cvReleaseImage(&edgeImage);
-      }
+
 
       /* イメージ用メモリの確保 */
-      imageBuff = cvCreateImage( cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_8U, 3 );
-      grayImage = cvCreateImage( cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_8U, 1 );
-      destinationImage_x = cvCreateImage( cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_16S, 1 );
-      destinationImage_y = cvCreateImage( cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_16S, 1 );
-      destinationImage_LAPLACIAN = cvCreateImage( cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_16S, 1 );
-      destinationEdge = cvCreateImage( cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_8U, 1 );
-      edgeImage = cvCreateImage( cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_8U, 3 );
+	  imageBuff.create(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3);
+	  grayImage.create(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC1);
+	  destinationImage_x.create(cv::Size(m_image_orig.width, m_image_orig.height), CV_16UC1);
+	  destinationImage_y.create(cv::Size(m_image_orig.width, m_image_orig.height), CV_16UC1);
+	  destinationImage_LAPLACIAN.create(cv::Size(m_image_orig.width, m_image_orig.height), CV_16UC1);
+	  destinationEdge.create(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC1);
+	  edgeImage.create(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3);
+
+
     }
 
     /* InPortの画面データをコピー */
-    memcpy( imageBuff->imageData, (void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length() );
+    memcpy( imageBuff.data, (void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length() );
 
     /* RGBからグレースケールに変換 */
-    cvCvtColor( imageBuff, grayImage, CV_RGB2GRAY );
+    cv::cvtColor( imageBuff, grayImage, CV_RGB2GRAY );
 
     /* Sobel_X */
     /* X方向のSobelオペレータをかける */
-    cvSobel( grayImage, destinationImage_x, 1, 0, m_sobel_x_size );
+	cv::Sobel(grayImage, destinationImage_x, destinationImage_x.type(), 1, 0, m_sobel_x_size);
 
     /* 16ビットの符号ありデータを8ビットの符号なしデータに変換する */
-    cvConvertScaleAbs( destinationImage_x, destinationEdge, SCALE, SHIFT );
+    cv::convertScaleAbs( destinationImage_x, destinationEdge, SCALE, SHIFT );
 
     /* グレースケールからRGBに変換 */
-    cvCvtColor( destinationEdge, edgeImage, CV_GRAY2RGB );
+    cv::cvtColor( destinationEdge, edgeImage, CV_GRAY2RGB );
 
     /* 画像データのサイズ取得 */
-    len = edgeImage->nChannels * edgeImage->width * edgeImage->height;
+	len = edgeImage.channels() * edgeImage.size().width * edgeImage.size().height;
+	
     m_image_edge_sobel_x.pixels.length(len);
 
     /* 反転した画像データをOutPortにコピー */
-    memcpy( (void *)&(m_image_edge_sobel_x.pixels[0]), edgeImage->imageData, len );
+    memcpy( (void *)&(m_image_edge_sobel_x.pixels[0]), edgeImage.data, len );
 
     /* 反転した画像データをOutPortから出力 */
     m_image_edge_sobel_xOut.write();
@@ -222,29 +231,30 @@ RTC::ReturnCode_t Edge::onExecute(RTC::UniqueId ec_id)
 
     /* Sobel_Y */
     /* Y方向のSobelオペレータをかける */
-    cvSobel( grayImage, destinationImage_y, 0, 1, m_sobel_y_size );
+	cv::Sobel(grayImage, destinationImage_y, destinationImage_y.type(), 0, 1, m_sobel_y_size);
 
-    cvConvertScaleAbs( destinationImage_y, destinationEdge, SCALE, SHIFT );
+    cv::convertScaleAbs( destinationImage_y, destinationEdge, SCALE, SHIFT );
 
-    cvCvtColor( destinationEdge, edgeImage, CV_GRAY2RGB );
+    cv::cvtColor( destinationEdge, edgeImage, CV_GRAY2RGB );
 
-    len = edgeImage->nChannels * edgeImage->width * edgeImage->height;
+	len = edgeImage.channels() * edgeImage.size().width * edgeImage.size().height;
     m_image_edge_sobel_y.pixels.length(len);
-    memcpy( (void *)&(m_image_edge_sobel_y.pixels[0]), edgeImage->imageData, len );
+    memcpy( (void *)&(m_image_edge_sobel_y.pixels[0]), edgeImage.data, len );
 
     m_image_edge_sobel_yOut.write();
 
 
     // LAPLACIAN
-    cvLaplace( grayImage, destinationImage_LAPLACIAN, m_laplacian_size );
+	cv::Laplacian(grayImage, destinationImage_LAPLACIAN, m_laplacian_size);
 
-    cvConvertScaleAbs( destinationImage_LAPLACIAN, destinationEdge, SCALE, SHIFT );
+    cv::convertScaleAbs( destinationImage_LAPLACIAN, destinationEdge, SCALE, SHIFT );
 
-    cvCvtColor( destinationEdge, edgeImage, CV_GRAY2RGB );
+    cv::cvtColor( destinationEdge, edgeImage, CV_GRAY2RGB );
 
-    len = edgeImage->nChannels * edgeImage->width * edgeImage->height;
+	len = edgeImage.channels() * edgeImage.size().width * edgeImage.size().height;
+	
     m_image_edge_LAPLACIAN.pixels.length(len);
-    memcpy( (void *)&(m_image_edge_LAPLACIAN.pixels[0]), edgeImage->imageData, len );
+    memcpy( (void *)&(m_image_edge_LAPLACIAN.pixels[0]), edgeImage.data, len );
 
     m_image_edge_LAPLACIANOut.write();
 

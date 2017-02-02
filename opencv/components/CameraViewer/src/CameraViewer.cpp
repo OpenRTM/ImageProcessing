@@ -120,14 +120,14 @@ RTC::ReturnCode_t CameraViewer::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t CameraViewer::onActivated(RTC::UniqueId ec_id)
 { 
-  m_orig_img  = NULL;
+
 
   m_in_height = 0;
   m_in_width  = 0;
 
   /* 画像表示用ウィンドウの作成 */
-  cvNamedWindow("CaptureImage", CV_WINDOW_AUTOSIZE);
-  cvSetMouseCallback("CaptureImage", onMouse, (void*)this);
+  cv::namedWindow("CaptureImage", CV_WINDOW_AUTOSIZE);
+  cv::setMouseCallback("CaptureImage", onMouse, (void*)this);
   
   return RTC::RTC_OK;
 }
@@ -135,11 +135,14 @@ RTC::ReturnCode_t CameraViewer::onActivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t CameraViewer::onDeactivated(RTC::UniqueId ec_id)
 {
-  if(m_orig_img != NULL)
-      cvReleaseImage(&m_orig_img);
 
-  /* 表示ウィンドウの消去 */    
-  cvDestroyWindow("CaptureImage");
+  if (!m_orig_img.empty())
+  {
+	  m_orig_img.release();
+  }
+  cv::destroyWindow("CaptureImage");
+
+
   return RTC::RTC_OK;
 }
 
@@ -151,7 +154,7 @@ RTC::ReturnCode_t CameraViewer::onExecute(RTC::UniqueId ec_id)
 
   int nLength;
 
-  m_lKey.data = cvWaitKey(1);
+  m_lKey.data = cv::waitKey(1);
   if(m_lKey.data >= 0)
   {
     printf("[onExecute] Key number %ld is down\n", m_lKey.data);
@@ -177,25 +180,24 @@ RTC::ReturnCode_t CameraViewer::onExecute(RTC::UniqueId ec_id)
   {
     printf("[onExecute] Size of input image is not match!\n");
 
-    if(m_orig_img != NULL)
-      cvReleaseImage(&m_orig_img);
+
 
     m_in_height = m_in.height;
     m_in_width  = m_in.width;
 
     /* サイズ変換のためTempメモリーを用意する */
-    m_orig_img = cvCreateImage(cvSize(m_in.width, m_in.height), IPL_DEPTH_8U, 3);
+	m_orig_img.create(cv::Size(m_in.width, m_in.height), CV_8UC3);
   }
 
   /* データコピー */
-  memcpy(m_orig_img->imageData,(void *)&(m_in.pixels[0]), m_in.pixels.length());
+  memcpy(m_orig_img.data,(void *)&(m_in.pixels[0]), m_in.pixels.length());
 
 
   /* 画像表示 */
 #if (!defined WIN32) || (!defined WIN64)
-  cvStartWindowThread();
+  cv::startWindowThread();
 #endif
-  cvShowImage("CaptureImage", m_orig_img);
+  cv::imshow("CaptureImage", m_orig_img);
 
   if (count > 100)
   {

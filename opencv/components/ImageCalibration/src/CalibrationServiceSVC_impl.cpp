@@ -138,16 +138,16 @@ RTC::CameraInfo CalibrationServiceSVC_impl::getCalibParameter()
   cv::Mat gray;
   RTC::CameraImage image;
   /* チェッカー交点座標を格納する行列 */
-  cv::vector<cv::vector<cv::Point2f> >	imagePoints(m_current_image_num);
+  std::vector<std::vector<cv::Point2f> >	imagePoints(m_current_image_num);
 
   /* チェッカー交点座標と対応する世界座標の値を格納する行列 */
-  cv::vector<cv::vector<cv::Point3f> >  worldPoints(m_current_image_num);
+  std::vector<std::vector<cv::Point3f> >  worldPoints(m_current_image_num);
   
   /* カメラパラメータ行列 */
   cv::Mat cameraMatrix;
   cv::Mat distCoeffs;
-  cv::vector<cv::Mat> rotationVectors;
-  cv::vector<cv::Mat> translationVectors;
+  std::vector<cv::Mat> rotationVectors;
+  std::vector<cv::Mat> translationVectors;
   
   /* コーナー位置高精度化のための繰り返し処理の停止基準
    * 「反復回数が20回に達する」または「イプシロンが0.001に達する」どちらかの条件を満たした時に終了する

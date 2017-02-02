@@ -147,13 +147,11 @@ RTC::ReturnCode_t Affine::onShutdown(RTC::UniqueId ec_id)
 RTC::ReturnCode_t Affine::onActivated(RTC::UniqueId ec_id)
 {
   /* イメージ用メモリの確保 */
-  m_affineMatrix     = cvCreateMat( 2, 3, CV_32FC1);
 
   m_in_height  = 0;
   m_in_width   = 0;
 
-  m_image_buff = NULL;
-  m_image_dest = NULL; 
+
 
   return RTC::RTC_OK;
 }
@@ -161,12 +159,17 @@ RTC::ReturnCode_t Affine::onActivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Affine::onDeactivated(RTC::UniqueId ec_id)
 {
-  if(m_image_buff != NULL)
-      cvReleaseImage(&m_image_buff);
-  if(m_image_dest != NULL)
-      cvReleaseImage(&m_image_dest);
 
-  cvReleaseMat(&m_affineMatrix);
+
+  if (!m_image_buff.empty())
+  {
+	  m_image_buff.release();
+  }
+  if (!m_image_dest.empty())
+  {
+	  m_image_dest.release();
+  }
+
 
   return RTC::RTC_OK;
 }
@@ -189,49 +192,55 @@ RTC::ReturnCode_t Affine::onExecute(RTC::UniqueId ec_id)
       m_in_height = m_image_orig.height;
       m_in_width  = m_image_orig.width;
 
-      if(m_image_buff != NULL)
-        cvReleaseImage(&m_image_buff);
-      if(m_image_dest != NULL)
-        cvReleaseImage(&m_image_dest);
+
 
       /* サイズ変換のためTempメモリーを用意する */
-      m_image_buff = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3);
-      m_image_dest = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3);
+	  m_image_buff.create(cv::Size(m_in_width, m_in_height), CV_8UC3);
+	  m_image_dest.create(cv::Size(m_in_width, m_in_height), CV_8UC3);
+
     }
 
     /* InPortの画像データをIplImageのimageDataにコピー */
-    memcpy(m_image_buff->imageData,(void *)&(m_image_orig.pixels[0]),m_image_orig.pixels.length());
+	memcpy(m_image_buff.data, (void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length());
 
+	cv::Mat_<double> m_affineMatrix(2, 3);
    	/* 変換後の座標を設定する */
+	
     // Check configuration validations
     if(isConfigurationValidated())
     {
-      cvmSet(m_affineMatrix, 0, 0, m_ve2dbMatrix[0][0]);
-      cvmSet(m_affineMatrix, 0, 1, m_ve2dbMatrix[0][1]);
-      cvmSet(m_affineMatrix, 0, 2, m_ve2dbMatrix[0][2]);
-      cvmSet(m_affineMatrix, 1, 0, m_ve2dbMatrix[1][0]);
-      cvmSet(m_affineMatrix, 1, 1, m_ve2dbMatrix[1][1]);
-      cvmSet(m_affineMatrix, 1, 2, m_ve2dbMatrix[1][2]);            
+		m_affineMatrix(0, 0) = m_ve2dbMatrix[0][0];
+		m_affineMatrix(0, 1) = m_ve2dbMatrix[0][1];
+		m_affineMatrix(0, 2) = m_ve2dbMatrix[0][2];
+		m_affineMatrix(1, 0) = m_ve2dbMatrix[1][0];
+		m_affineMatrix(1, 1) = m_ve2dbMatrix[1][1];
+		m_affineMatrix(1, 2) = m_ve2dbMatrix[1][2];
+
+           
     }else
     {
       cout<<"Incorrect configuration information."<<endl;
 
       return RTC::RTC_ERROR;
     }
+
+	
+	
         
     /* 変換行列を反映させる */
-    cvWarpAffine( m_image_buff, m_image_dest, m_affineMatrix, CV_INTER_LINEAR | CV_WARP_FILL_OUTLIERS, cvScalarAll(0));
+	warpAffine(m_image_buff, m_image_dest, m_affineMatrix, m_image_dest.size());
 
     /* 画像データのサイズ取得 */
-    int len = m_image_dest->nChannels * m_image_dest->width * m_image_dest->height;
+	int len = m_image_dest.channels() * m_image_dest.size().width * m_image_dest.size().height;
 
     /* 画面のサイズ情報を入れる */
-    m_image_affine.pixels.length(len);        
-    m_image_affine.width  = m_image_dest->width;
-    m_image_affine.height = m_image_dest->height;
+
+	m_image_affine.pixels.length(len);
+	m_image_affine.width = m_image_dest.size().width;
+	m_image_affine.height = m_image_dest.size().height;
 
     /* 反転した画像データをOutPortにコピー */
-    memcpy((void *)&(m_image_affine.pixels[0]), m_image_dest->imageData,len);
+    memcpy((void *)&(m_image_affine.pixels[0]), m_image_dest.data,len);
 
     /* 反転した画像データをOutPortから出力する */
     m_image_affineOut.write();

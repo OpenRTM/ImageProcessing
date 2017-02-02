@@ -19,9 +19,8 @@
 #include <rtm/idl/ExtendedDataTypesSkel.h>
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
-#include <cv.h>
-#include <cxcore.h>
-#include <highgui.h>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 #define	MASK_THRESHOLD		1       /* backgroundMaskImageやstillObjectMaskImageを生成するための閾値 */
 #define THRESHOLD_MAX_VALUE	255   /* 2値化の際に使用する最大値 */
@@ -304,34 +303,34 @@ class SubStractCaptureImage
   
   // </rtc-template>
 
-  IplImage* inputImage;
-  IplImage* backgroundAverageImage;     /* 背景の平均値保存用IplImage */
-  IplImage* backgroundThresholdImage;   /* 背景の閾値保存用IplImage */
-  IplImage* stillObjectAverageImage;    /* 静止物体の平均値保存用IplImage */
-  IplImage* stillObjectThresholdImage;  /* 静止物体の閾値保存用IplImage */
-  IplImage* stillObjectCounterImage;    /* 静止物体のカウンタ用IplImage */
-  IplImage* backgroundDifferenceImage;  /* 背景差分画像用IplImage */
-  IplImage* stillObjectDifferenceImage; /* 静止物体差分画像用IplIMage */
-  IplImage* thresholdImage32;           /* 32bitの閾値画像用IplImage */
-  IplImage* thresholdImage;             /* 閾値画像用IplImage */
-  IplImage* resultImage;                /* 結果画像用IplImage */
-  IplImage* backgroundMaskImage;        /* 背景マスク画像用IplImage */
-  IplImage* foregroundMaskImage;        /* 前景マスク用IplImage */
-  IplImage* stillObjectMaskImage;       /* 静止物体マスク用IplImage */
-  IplImage* movingObjectMask;           /* 動物体マスク用IplImage */
-  IplImage* backgroundCopyMaskImage;    /* 背景にコピーする際に使用するマスク用IplImage */
-  IplImage* tmpMaskImage;       /* テンポラリ用IplImage */
-  IplImage* tmp2MaskImage;      /* テンポラリ用IplImage(その2) */
-  IplImage* frameImage32;       /* 32bitのキャプチャした画像用IplImage */
-  IplImage* backgroundImage;    /* 背景画像用IplImage */
-  IplImage* stillObjectImage;   /* 静止物体画像用IplImage */
-  IplImage* outputImage;
+	 cv::Mat inputImage;
+	 cv::Mat backgroundAverageImage;     /* 背景の平均値保存用IplImage */
+	 cv::Mat backgroundThresholdImage;   /* 背景の閾値保存用IplImage */
+	 cv::Mat stillObjectAverageImage;    /* 静止物体の平均値保存用IplImage */
+	 cv::Mat stillObjectThresholdImage;  /* 静止物体の閾値保存用IplImage */
+	 cv::Mat stillObjectCounterImage;    /* 静止物体のカウンタ用IplImage */
+	 cv::Mat backgroundDifferenceImage;  /* 背景差分画像用IplImage */
+	 cv::Mat stillObjectDifferenceImage; /* 静止物体差分画像用IplIMage */
+	 cv::Mat thresholdImage32;           /* 32bitの閾値画像用IplImage */
+	 cv::Mat thresholdImage;             /* 閾値画像用IplImage */
+	 cv::Mat resultImage;                /* 結果画像用IplImage */
+	 cv::Mat backgroundMaskImage;        /* 背景マスク画像用IplImage */
+	 cv::Mat foregroundMaskImage;        /* 前景マスク用IplImage */
+	 cv::Mat stillObjectMaskImage;       /* 静止物体マスク用IplImage */
+	 cv::Mat movingObjectMask;           /* 動物体マスク用IplImage */
+	 cv::Mat backgroundCopyMaskImage;    /* 背景にコピーする際に使用するマスク用IplImage */
+	 cv::Mat tmpMaskImage;       /* テンポラリ用IplImage */
+	 cv::Mat tmp2MaskImage;      /* テンポラリ用IplImage(その2) */
+	 cv::Mat frameImage32;       /* 32bitのキャプチャした画像用IplImage */
+	 cv::Mat backgroundImage;    /* 背景画像用IplImage */
+	 cv::Mat stillObjectImage;   /* 静止物体画像用IplImage */
+	 cv::Mat outputImage;
 
-  IplImage* foreGroundMaskBuff;
-  IplImage* stillObjectMaskBuff;
-  IplImage* backGroundBuff;
-  IplImage* stillObjectImageBuff;
-  IplImage* stillObjectCounterBuff;
+	 cv::Mat foreGroundMaskBuff;
+	 cv::Mat stillObjectMaskBuff;
+	 cv::Mat backGroundBuff;
+	 cv::Mat stillObjectImageBuff;
+	 cv::Mat stillObjectCounterBuff;
 
   int key;    /* キー入力用の変数 */
 };

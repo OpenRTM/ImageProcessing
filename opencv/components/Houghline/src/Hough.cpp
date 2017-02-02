@@ -52,7 +52,7 @@ static const char* hough_spec[] =
     "conf.__constraints__.canny_thresld1", "0<=x<=255",
     "conf.__constraints__.canny_thresld2", "0<=x<=255",
     "conf.__constraints__.hough_method", "(PROBABILISTIC,STANDARD,MULTI_SCALE)",
-    "conf.__constraints__.hough_thresld", "0<=x<=255",
+    "conf.__constraints__.hough_thresld", "1<=x<=255",
     "conf.__constraints__.line_type", "(8,4,CV_AA)",
     ""
   };
@@ -141,16 +141,11 @@ RTC::ReturnCode_t Hough::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Hough::onActivated(RTC::UniqueId ec_id)
 {
-  /* イメージ用メモリの初期化 */
-  imageBuff = NULL;
-  grayImage = NULL;
-  edgeImage = NULL;
-  hough = NULL;
-  houghImage = NULL;
+
 
   m_in_height        = 0;
   m_in_width         = 0;
-  lines = NULL;
+
   len=0;
   
   debug_method = -1;
@@ -162,15 +157,29 @@ RTC::ReturnCode_t Hough::onActivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Hough::onDeactivated(RTC::UniqueId ec_id)
 {
-  if(imageBuff != NULL)
+
+
+  if (!imageBuff.empty())
   {
-    /* イメージ用メモリの解放 */
-    cvReleaseImage(&imageBuff);
-    cvReleaseImage(&grayImage);
-    cvReleaseImage(&edgeImage);
-    cvReleaseImage(&hough);
-    cvReleaseImage(&houghImage);
+	  imageBuff.release();
   }
+  if (!grayImage.empty())
+  {
+	  grayImage.release();
+  }
+  if (!edgeImage.empty())
+  {
+	  edgeImage.release();
+  }
+  if (!hough.empty())
+  {
+	  hough.release();
+  }
+  if (!houghImage.empty())
+  {
+	  houghImage.release();
+  }
+
 
   return RTC::RTC_OK;
 }
@@ -190,63 +199,65 @@ RTC::ReturnCode_t Hough::onExecute(RTC::UniqueId ec_id)
       m_in_width = m_image_orig.width;
       m_in_height = m_image_orig.height;
 
-      /* InPortのイメージサイズが変更された場合 */
-      if(imageBuff != NULL)
-      {
-        cvReleaseImage(&imageBuff);
-        cvReleaseImage(&grayImage);
-        cvReleaseImage(&edgeImage);
-        cvReleaseImage(&hough);
-        cvReleaseImage(&houghImage);
-      }
+
 
       /* イメージ用メモリの確保 */
-      imageBuff = cvCreateImage( cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3 );
-      grayImage = cvCreateImage( cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 1 );
-      edgeImage = cvCreateImage( cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 1 );
-      hough = cvCreateImage( cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3 );
-      houghImage = cvCreateImage( cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3 );
+
+	  imageBuff.create(cv::Size(m_in_width, m_in_height), CV_8UC3);
+	  grayImage.create(cv::Size(m_in_width, m_in_height), CV_8UC1);
+	  edgeImage.create(cv::Size(m_in_width, m_in_height), CV_8UC1);
+	  hough.create(cv::Size(m_in_width, m_in_height), CV_8UC3);
+	  houghImage.create(cv::Size(m_in_width, m_in_height), CV_8UC3);
+
     }
 
     /* InPortの画面データをコピー */
-    memcpy( imageBuff->imageData, (void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length() );
+    memcpy( imageBuff.data, (void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length() );
 
     /* RGBからグレースケールに変換 */
-    cvCvtColor( imageBuff, grayImage, CV_RGB2GRAY );
+    cv::cvtColor( imageBuff, grayImage, CV_RGB2GRAY );
 
     /* ハフ変換に必要なメモリ領域 */
-    CvMemStorage *storage = cvCreateMemStorage( 0 );
+	std::vector<cv::Vec4i> storage;
 
     /* エッジ抽出を行う */
-    cvCanny( grayImage, edgeImage, m_canny_threshold1, m_canny_threshold2, APERTURE_SIZE );
+    cv::Canny( grayImage, edgeImage, m_canny_threshold1, m_canny_threshold2, APERTURE_SIZE );
 
     /* グレースケールからRGBに変換する */
-    cvCvtColor( edgeImage, houghImage, CV_GRAY2RGB );
+    cv::cvtColor( edgeImage, houghImage, CV_GRAY2RGB );
 
+	std::vector<cv::Vec2f>  lines;
+	std::vector<cv::Vec4i>  lines_P;
     /* ハフ変換により直線の抽出を行う */
     int hough_method;
     if ( m_hough_method == "PROBABILISTIC" )
     {
       /* 確率的ハフ変換 */
-      hough_method = CV_HOUGH_PROBABILISTIC;
+      //hough_method = CV_HOUGH_PROBABILISTIC;
+		cv::HoughLinesP(edgeImage, lines_P, RHO, THETA, m_hough_threshold);
     }
     else if ( m_hough_method == "STANDARD" )
     {
       /* 標準的ハフ変換 */
-      hough_method = CV_HOUGH_STANDARD;
+      //hough_method = CV_HOUGH_STANDARD;
+		cv::HoughLines(edgeImage, lines, RHO, THETA, m_hough_threshold);
     }
     else
     {
       /* マルチスケール型の古典的ハフ変換 */
-      hough_method = CV_HOUGH_MULTI_SCALE;
+      //hough_method = CV_HOUGH_MULTI_SCALE;
+		cv::HoughLines(edgeImage, lines, RHO, THETA, m_hough_threshold, m_hough_param1, m_hough_param2);
+		
     }
-    if ( hough_method != debug_method )
+    /*if ( hough_method != debug_method )
     {
       std::cout << "hough_method = " << hough_method << std::endl;
       debug_method = hough_method;
-    }
-    lines = cvHoughLines2( edgeImage, storage, hough_method, RHO, THETA, m_hough_threshold, m_hough_param1, m_hough_param2 );
+    }*/
 
+	
+	//cv::HoughCircles(edgeImage, lines, hough_method, RHO, m_hough_threshold , m_hough_param1, m_hough_param2);
+	
     /* 抽出された直線を描く */
     int line_type;
     if ( m_line_type == "CV_AA" )
@@ -257,30 +268,55 @@ RTC::ReturnCode_t Hough::onExecute(RTC::UniqueId ec_id)
     {
       line_type = atoi( m_line_type.c_str() );
     }
-    if ( line_type != debug_type )
+    /*if ( line_type != debug_type )
     {
       std::cout << "line_type = " << line_type << std::endl;
       debug_type = line_type;
-    }
-    for ( int i = 0; i < lines->total; i++ ) {
-      CvPoint *line = ( CvPoint* )cvGetSeqElem( lines, i );
-      cvLine( houghImage, line[0], line[1], CV_RGB( m_line_color_R, m_line_color_G, m_line_color_B ), m_line_thickness, line_type, SHIFT );
-    }
+    }*/
+	
+	if (m_hough_method == "PROBABILISTIC")
+	{
+		for (unsigned int i = 0; i < lines_P.size(); i++) {
+			//CvPoint *line = ( CvPoint* )cv::getSeqElem( lines, i );
+			cv::line(houghImage, cv::Point(lines_P[i][0], lines_P[i][1]), cv::Point(lines_P[i][2], lines_P[i][3]),
+				cv::Scalar(m_line_color_R, m_line_color_G, m_line_color_B), m_line_thickness,
+				line_type, SHIFT);
+		}
+	}
+	else
+	{
+		for (unsigned int i = 0; i < lines.size(); i++) {
+			float rho = lines[i][0];
+			float theta = lines[i][1];
+			cv::Point pt1, pt2;
+			double a = cos(theta);
+			double b = sin(theta);
+			double x0 = a*rho;
+			double y0 = b*rho;
+			pt1.x = cvRound(x0 + 1000 * (-b));
+			pt1.y = cvRound(y0 + 1000 * (a));
+			pt2.x = cvRound(x0 - 1000 * (-b));
+			pt2.y = cvRound(y0 - 1000 * (a));
+			//CvPoint *line = ( CvPoint* )cv::getSeqElem( lines, i );
+			cv::line(houghImage, pt1, pt2, cv::Scalar(m_line_color_R, m_line_color_G, m_line_color_B), m_line_thickness,
+				line_type, SHIFT);
+		}
+	}
+	
 
     /* 画像データのサイズ取得 */
-    len = houghImage->nChannels * houghImage->width * houghImage->height;
+	len = houghImage.channels() * houghImage.size().width * houghImage.size().height;
     m_image_hough.pixels.length(len);
-    m_image_hough.width  = houghImage->width;
-    m_image_hough.height = houghImage->height;
+    m_image_hough.width  = houghImage.size().width;
+	m_image_hough.height = houghImage.size().height;
 
     /* 反転した画像データをOutPortにコピー */
-    memcpy( (void *)&(m_image_hough.pixels[0]), houghImage->imageData, len );
+    memcpy( (void *)&(m_image_hough.pixels[0]), houghImage.data, len );
 
     /* 反転した画像データをOutPortから出力 */
     m_image_houghOut.write();
 
-    /* ハフ変換に使用したメモリ解放 */
-    cvReleaseMemStorage(&storage);
+
   }
 
   return RTC::RTC_OK;

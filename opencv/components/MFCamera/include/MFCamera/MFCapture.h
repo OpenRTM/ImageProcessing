@@ -7,9 +7,7 @@
 
 #include "MFUtils.h"
 
-#include<opencv/cv.h>
-#include<opencv/cxcore.h>
-#include<opencv/highgui.h>
+#include <opencv2/imgproc/imgproc.hpp>
 
 enum FMT_Values {
   FMT_RGB24, FMT_YUY2, FMT_UNKNOWN=256
@@ -291,7 +289,7 @@ public:
    *   The image data will store in image_buf(IplImage).
    *   If the video format is 'YUY2', the date will convert to RGB24 format.
    */
-  IplImage *MFCapture::GetBufferData();
+  cv::Mat MFCapture::GetBufferData();
 
   /*
    * Enumarate available capture device.
@@ -404,7 +402,7 @@ public:
   INT32  image_stride;
   UINT32 image_length;
   UINT32 image_width, image_height;
-  IplImage *image_buf;
+  cv::Mat image_buf;
 
   /*
    *  List of VideoFormat

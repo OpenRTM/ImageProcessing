@@ -115,12 +115,7 @@ RTC::ReturnCode_t Histogram::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Histogram::onActivated(RTC::UniqueId ec_id)
 {
-  /* イメージ用メモリの初期化 */
-  imageBuff = NULL;
-  grayImage = NULL;
-  destinationImage = NULL;
-  histogramImage = NULL;
-  histogramBarImage = NULL;
+
 
   /* OutPort画面サイズの初期化 */
   m_image_histogram.width = 0;
@@ -129,22 +124,31 @@ RTC::ReturnCode_t Histogram::onActivated(RTC::UniqueId ec_id)
   m_image_histogramImage.height = 0;
 
   /* ヒストグラムに描画される縦棒の数 */
+  //histogramSize = 128;
+  /* ヒストグラムの範囲 */
+  //range_0[0] = 0;
+  //range_0[1] = 256;
+
+  /* ヒストグラム各次元の範囲を示す配列のポインタ */
+  //ranges[0] = range_0 ;
+
+  /* ヒストグラムに描画される縦棒の数 */
   histogramSize = 128;
   /* ヒストグラムの範囲 */
   range_0[0] = 0;
   range_0[1] = 256;
 
-  /* ヒストグラム各次元の範囲を示す配列のポインタ */
-  ranges[0] = range_0 ;
-
   /* ヒストグラムを生成 */
-  histogram = cvCreateHist( DIMENSIONS, &histogramSize, CV_HIST_ARRAY, ranges, UNIFORM );
+  //histogram = cvCreateHist( DIMENSIONS, &histogramSize, CV_HIST_ARRAY, ranges, UNIFORM );
 
   /* 行列を生成 */
-  lookUpTableMatrix = cvCreateMatHeader( 1, 256, CV_8UC1 );
+  lookUpTableMatrix.create(cv::Size(1, 256), CV_8UC1);
+  //lookUpTableMatrix = cvCreateMatHeader( 1, 256, CV_8UC1 );
 
   /* 濃度対応行列に濃度対応表をセット */
-  cvSetData( lookUpTableMatrix, lookUpTable, 0 );
+  //lookUpTableMatrix.setTo(lookUpTable);
+
+  //cv::setData( lookUpTableMatrix, lookUpTable, 0 );
   
   return RTC::RTC_OK;
 }
@@ -152,15 +156,30 @@ RTC::ReturnCode_t Histogram::onActivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Histogram::onDeactivated(RTC::UniqueId ec_id)
 {
-  if( imageBuff != NULL )
+  
+  
+
+  if (!imageBuff.empty())
   {
-    /* イメージ用メモリの解放 */
-    cvReleaseImage(&imageBuff);
-    cvReleaseImage(&grayImage);
-    cvReleaseImage(&destinationImage);
-    cvReleaseImage(&histogramImage);
-    cvReleaseImage(&histogramBarImage);
+	  imageBuff.release();
   }
+  if (!grayImage.empty())
+  {
+	  grayImage.release();
+  }
+  if (!destinationImage.empty())
+  {
+	  destinationImage.release();
+  }
+  if (!histogramImage.empty())
+  {
+	  histogramImage.release();
+  }
+  if (!histogramBarImage.empty())
+  {
+	  histogramBarImage.release();
+  }
+
 
   return RTC::RTC_OK;
 }
@@ -180,32 +199,24 @@ RTC::ReturnCode_t Histogram::onExecute(RTC::UniqueId ec_id)
       m_image_histogram.width = m_image_histogramImage.width = m_image_orig.width;
       m_image_histogram.height = m_image_histogramImage.height = m_image_orig.height;
 
-      /* InPortのイメージサイズが変更された場合 */
-      if( imageBuff != NULL )
-      {
-        cvReleaseImage(&imageBuff);
-        cvReleaseImage(&grayImage);
-        cvReleaseImage(&destinationImage);
-        cvReleaseImage(&histogramImage);
-        cvReleaseImage(&histogramBarImage);
-      }
+
 
       /* イメージ用メモリの確保 */
-      imageBuff = cvCreateImage( cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_8U, 3 );
-      grayImage = cvCreateImage( cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_8U, 1 );
-      destinationImage = cvCreateImage( cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_8U, 1 );
-      histogramImage = cvCreateImage( cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_8U, 3 );
-      histogramBarImage = cvCreateImage( cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_8U, 3 );
-
+	  imageBuff.create(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3);
+	  grayImage.create(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC1);
+	  destinationImage.create(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC1);
+	  histogramBarImage.create(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3);
+	  imageBuff.create(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3);
       /* ヒストグラムの縦棒の横幅を計算する */
-      bin_w = cvRound( ( double )histogramBarImage->width / histogramSize );
+      bin_w = cvRound( ( double )histogramBarImage.size().width / histogramSize );
+	  
     }
 
     /* InPortの画面データをコピー */
-    memcpy(imageBuff->imageData,(void *)&(m_image_orig.pixels[0]),m_image_orig.pixels.length());
+    memcpy(imageBuff.data,(void *)&(m_image_orig.pixels[0]),m_image_orig.pixels.length());
 
     /* RGBからグレースケールに変換 */
-    cvCvtColor( imageBuff, grayImage, CV_RGB2GRAY);
+    cv::cvtColor( imageBuff, grayImage, CV_RGB2GRAY);
 
     int brightness = m_brightness - TRACKBAR_MAX_VALUE / 2;	//	輝度値
     int contrast = m_contrast - TRACKBAR_MAX_VALUE / 2;		//	コントラスト
@@ -225,7 +236,7 @@ RTC::ReturnCode_t Histogram::onExecute(RTC::UniqueId ec_id)
         if( v > 255 ){
           v = 255;
         }
-        lookUpTable[i] = ( unsigned char )v;
+		lookUpTableMatrix.at<uchar>(i) = (unsigned char)v;
       }
     } else {
       double delta = -128.0 * contrast / 100.0;
@@ -240,47 +251,65 @@ RTC::ReturnCode_t Histogram::onExecute(RTC::UniqueId ec_id)
         if( v > 255 ){
           v = 255;
         }
-        lookUpTable[i] = ( unsigned char )v;
+		lookUpTableMatrix.at<uchar>(i) = (unsigned char)v;
       }
     }
-	  
+	
     /* 濃度対応行列を用いた濃度階調変換を行う */
-    cvLUT( grayImage, destinationImage, lookUpTableMatrix );
+	cv::LUT(grayImage, lookUpTableMatrix, destinationImage);
 
     /* グレースケールからRGBに変換 */
-    cvCvtColor( destinationImage, histogramImage, CV_GRAY2RGB );
+    cv::cvtColor( destinationImage, histogramImage, CV_GRAY2RGB );
 
     /* 画像データのサイズ取得 */
-    int len = histogramImage->nChannels * histogramImage->width * histogramImage->height;
+	int len = histogramImage.channels() * histogramImage.size().width * histogramImage.size().height;
     m_image_histogramImage.pixels.length(len);
 
     /* 変転した画像データをOutPortにコピー */
-    memcpy((void *)&(m_image_histogramImage.pixels[0]), histogramImage->imageData,len);
+    memcpy((void *)&(m_image_histogramImage.pixels[0]), histogramImage.data,len);
 
     /* 変転した画像データをOutPortから出力 */
     m_image_histogramImageOut.write();
 
     /* 画像のヒストグラムを計算する */
-    cvCalcHist( &destinationImage, histogram, ACCUMULATE, NULL );
+	int image_num = 1;
+	int channels[] = { 0 };
+	
+	
+	
+	const float *ranges[] = { range_0 };
 
+	
+	
+	
+
+	/* ヒストグラム各次元の範囲を示す配列のポインタ */
+	
+	
+	
+	cv::calcHist(&destinationImage, image_num, channels, cv::Mat(), histogram, DIMENSIONS, &histogramSize, ranges);
+	
     float max_value = 0;
     /* ヒストグラム値の最大値を得る */
-    cvGetMinMaxHistValue( histogram, NULL, &max_value, NULL, NULL );
+    //cvGetMinMaxHistValue( histogram, NULL, &max_value, NULL, NULL );
 
     /* ヒストグラムを最大値によって正規化する */
-    cvConvertScale( histogram->bins, histogram->bins, 
-    ( ( double )histogramBarImage->height ) / max_value, SCALE_SHIFT );
+	//histogram.convertTo(histogram, CV_32F, (double)histogramBarImage.size().height);
+	cv::normalize(histogram, histogram, (double)histogramBarImage.size().height);
+    //cvConvertScale( histogram->bins, histogram->bins, 
+    //( ( double )histogramBarImage->height ) / max_value, SCALE_SHIFT );
 
     /* ヒストグラム画像を白で初期化する */
-    cvSet( histogramBarImage, cvScalarAll( 255 ), NULL );
-
+	histogramBarImage.setTo(cv::Scalar::all(255));
+	
+	
     /* ヒストグラムの縦棒を描画する */
     for ( int i = 0; i < histogramSize; i++ ) {
-      cvRectangle(
+      cv::rectangle(
         histogramBarImage,
-        cvPoint( i * bin_w, histogramBarImage->height ),
-        cvPoint( ( i + 1 ) * bin_w,histogramBarImage->height - cvRound( cvGetReal1D( histogram->bins, i) ) ),
-        cvScalarAll( 0 ),
+        cvPoint( i * bin_w, histogramBarImage.size().height ),
+		cvPoint((i + 1) * bin_w, histogramBarImage.size().height - cvRound(histogram.at<float>(i))),
+		cv::Scalar::all(0),
         LINE_THICKNESS,
         LINE_TYPE,
         SHIFT
@@ -288,11 +317,11 @@ RTC::ReturnCode_t Histogram::onExecute(RTC::UniqueId ec_id)
     }
 
     /* 画像データのサイズ取得 */
-    len = histogramBarImage->nChannels * histogramBarImage->width * histogramBarImage->height;
+	len = histogramBarImage.channels() * histogramBarImage.size().width * histogramBarImage.size().height;
     m_image_histogram.pixels.length(len);
 
     /* 変転した画像データをOutPortにコピー */
-    memcpy((void *)&(m_image_histogram.pixels[0]), histogramBarImage->imageData,len);
+    memcpy((void *)&(m_image_histogram.pixels[0]), histogramBarImage.data,len);
 
     /* 変転した画像データをOutPortから出力 */
     m_image_histogramOut.write();

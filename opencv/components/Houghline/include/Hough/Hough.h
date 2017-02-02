@@ -21,9 +21,7 @@
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
 //OpenCV header file include
-#include <cv.h>
-#include <cxcore.h>
-#include <highgui.h>
+#include <opencv2/imgproc/imgproc.hpp>
 
 /* cvCanny用定数 */
 #define	APERTURE_SIZE   3   /* Sobelオペレータのサイズ (リファレンス参照) */
@@ -350,13 +348,13 @@ class Hough
   // <rtc-template block="private_operation">
   
   // </rtc-template>
-  IplImage* imageBuff;
-  IplImage* grayImage;
-  IplImage* edgeImage;
-  IplImage* hough;
-  IplImage* houghImage;
+	 cv::Mat imageBuff;
+	 cv::Mat grayImage;
+	 cv::Mat edgeImage;
+	 cv::Mat hough;
+	 cv::Mat houghImage;
   int len;
-  CvSeq *lines;
+  
   
   int debug_method;   /* configuration切り替え時の確認用 */
   int debug_type;     /* configuration切り替え時の確認用 */

@@ -34,13 +34,15 @@ int g_temp_w = 0;
 int g_temp_h = 0;
 int SubStractCaptureImage_count = 0;
 
-void showFlipImage( char *windowName, IplImage *image ) {
+/*
+void showFlipImage(char *windowName, cv::Mat image) {
 	if ( image->origin == 0 ) {
 		//cvFlip( image, image, 0 );
 		cvShowImage( windowName, image );
 		//cvFlip( image, image, 0 );
 	}
 }
+*/
 
 /*!
  * @brief constructor
@@ -125,34 +127,7 @@ RTC::ReturnCode_t SubStractCaptureImage::onActivated(RTC::UniqueId ec_id)
   g_temp_h = 0;
   SubStractCaptureImage_count = 0;
 
-  inputImage = NULL;
-  backgroundAverageImage = NULL;
-  backgroundThresholdImage = NULL;
-  stillObjectAverageImage = NULL;
-  stillObjectThresholdImage = NULL;
-  stillObjectCounterImage = NULL;
-  backgroundDifferenceImage = NULL;
-  stillObjectDifferenceImage = NULL;
-  thresholdImage32 = NULL;
-  thresholdImage = NULL;
-  resultImage = NULL;
-  backgroundMaskImage = NULL;
-  foregroundMaskImage = NULL;
-  stillObjectMaskImage = NULL;
-  movingObjectMask = NULL;
-  backgroundCopyMaskImage = NULL;
-  tmpMaskImage = NULL;
-  tmp2MaskImage = NULL;
-  frameImage32 = NULL;
-  backgroundImage = NULL;
-  stillObjectImage = NULL;
-  outputImage = NULL;
 
-  foreGroundMaskBuff = NULL;
-  stillObjectMaskBuff = NULL;
-  backGroundBuff = NULL;
-  stillObjectImageBuff = NULL;
-  stillObjectCounterBuff = NULL;
 
   return RTC::RTC_OK;
 }
@@ -160,89 +135,88 @@ RTC::ReturnCode_t SubStractCaptureImage::onActivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t SubStractCaptureImage::onDeactivated(RTC::UniqueId ec_id)
 {	
-	if(inputImage != NULL){
-		cvReleaseImage( &inputImage );
+
+	
+
+
+	if (!inputImage.empty())
+	{
+		inputImage.release();
 	}
-	if(backgroundAverageImage != NULL){
-		cvReleaseImage( &backgroundAverageImage );
+	if (!backgroundAverageImage.empty())
+	{
+		backgroundAverageImage.release();
 	}
-	if(backgroundThresholdImage != NULL){
-		cvReleaseImage( &backgroundThresholdImage);
+	if (!backgroundThresholdImage.empty())
+	{
+		backgroundThresholdImage.release();
 	}
-	if(stillObjectAverageImage != NULL){
-		cvReleaseImage( &stillObjectAverageImage );
+	if (!stillObjectAverageImage.empty())
+	{
+		stillObjectAverageImage.release();
 	}
-	if(stillObjectThresholdImage != NULL){
-		cvReleaseImage( &stillObjectThresholdImage );
+	if (!stillObjectThresholdImage.empty())
+	{
+		stillObjectThresholdImage.release();
 	}
-	if(stillObjectCounterImage != NULL){
-		cvReleaseImage( &stillObjectCounterImage );
+	if (!backgroundDifferenceImage.empty())
+	{
+		backgroundDifferenceImage.release();
 	}
-	if(backgroundDifferenceImage != NULL){
-		cvReleaseImage( &backgroundDifferenceImage );
+	if (!stillObjectDifferenceImage.empty())
+	{
+		stillObjectDifferenceImage.release();
 	}
-	if(stillObjectDifferenceImage != NULL){
-		cvReleaseImage( &stillObjectDifferenceImage );
+	if (!backgroundCopyMaskImage.empty())
+	{
+		backgroundCopyMaskImage.release();
 	}
-	if(thresholdImage32 != NULL){
-		cvReleaseImage( &thresholdImage32 );
+	if (!tmpMaskImage.empty())
+	{
+		tmpMaskImage.release();
 	}
-	if(thresholdImage != NULL){
-		cvReleaseImage( &thresholdImage );
+	if (!tmp2MaskImage.empty())
+	{
+		tmp2MaskImage.release();
 	}
-	if(resultImage != NULL){
-		cvReleaseImage( &resultImage );
+	if (!frameImage32.empty())
+	{
+		frameImage32.release();
 	}
-	if(backgroundMaskImage != NULL){
-		cvReleaseImage( &backgroundMaskImage );
+	if (!backgroundImage.empty())
+	{
+		backgroundImage.release();
 	}
-	if(foregroundMaskImage != NULL){
-		cvReleaseImage( &foregroundMaskImage );
+	if (!stillObjectImage.empty())
+	{
+		stillObjectImage.release();
 	}
-	if(stillObjectMaskImage != NULL){
-		cvReleaseImage( &stillObjectMaskImage );
+	if (!outputImage.empty())
+	{
+		outputImage.release();
 	}
-	if(movingObjectMask != NULL){
-		cvReleaseImage( &movingObjectMask );
+	if (!foreGroundMaskBuff.empty())
+	{
+		foreGroundMaskBuff.release();
 	}
-	if(backgroundCopyMaskImage != NULL){
-		cvReleaseImage( &backgroundCopyMaskImage );
+	if (!stillObjectMaskBuff.empty())
+	{
+		stillObjectMaskBuff.release();
 	}
-	if(tmpMaskImage != NULL){
-		cvReleaseImage( &tmpMaskImage );
+	if (!backGroundBuff.empty())
+	{
+		backGroundBuff.release();
 	}
-	if(tmp2MaskImage != NULL){
-		cvReleaseImage( &tmp2MaskImage );
+	if (!stillObjectImageBuff.empty())
+	{
+		stillObjectImageBuff.release();
 	}
-	if(frameImage32 != NULL){
-		cvReleaseImage( &frameImage32 );
-	}
-	if(backgroundImage != NULL){
-		cvReleaseImage( &backgroundImage );
-	}
-	if(stillObjectImage != NULL){
-		cvReleaseImage( &stillObjectImage );
-	}
-	if(outputImage != NULL){
-		cvReleaseImage( &outputImage );
+	if (!stillObjectCounterBuff.empty())
+	{
+		stillObjectCounterBuff.release();
 	}
 	
-	if(foreGroundMaskBuff != NULL){
-		cvReleaseImage( &foreGroundMaskBuff);
-	}
-	if(stillObjectMaskBuff != NULL){
-		cvReleaseImage( &stillObjectMaskBuff);
-	}
-	if(backGroundBuff != NULL){
-		cvReleaseImage( &backGroundBuff);
-	}
-	if(stillObjectImageBuff != NULL){
-		cvReleaseImage( &stillObjectImageBuff);
-	}
-	if(stillObjectCounterBuff != NULL){
-		cvReleaseImage( &stillObjectCounterBuff);
-	}
-	
+
 	return RTC::RTC_OK;
 }
 
@@ -256,46 +230,50 @@ RTC::ReturnCode_t SubStractCaptureImage::onExecute(RTC::UniqueId ec_id)
     if(g_temp_w != m_image_orig.width || g_temp_h != m_image_orig.height)
     {
       /* 画像サイズを保存 */
-      imageSize = cvSize(m_image_orig.width, m_image_orig.height);
+      imageSize = cv::Size(m_image_orig.width, m_image_orig.height);
 
       /* 画像を生成する */
-      inputImage = cvCreateImage(imageSize, IPL_DEPTH_8U, 3);
-      backgroundAverageImage = cvCreateImage( imageSize, IPL_DEPTH_32F, 3 );     /* 背景の平均値保存用IplImage */
-      backgroundThresholdImage = cvCreateImage( imageSize, IPL_DEPTH_32F, 3 );   /* 背景の閾値保存用IplImage */
-      stillObjectAverageImage = cvCreateImage( imageSize, IPL_DEPTH_32F, 3 );    /* 静止物体の平均値保存用IplImage */
-      stillObjectThresholdImage = cvCreateImage( imageSize, IPL_DEPTH_32F, 3 );    /* 静止物体の閾値保存用IplImage */
-      stillObjectCounterImage = cvCreateImage( imageSize, IPL_DEPTH_8U, 1 );    /* 静止物体のカウンタ用IplImage */
-      backgroundDifferenceImage = cvCreateImage( imageSize, IPL_DEPTH_32F, 3 );    /* 背景差分画像用IplImage */
-      stillObjectDifferenceImage = cvCreateImage( imageSize, IPL_DEPTH_32F, 3 );    /* 静止物体差分画像用IplIMage */
-      thresholdImage32 = cvCreateImage( imageSize, IPL_DEPTH_32F, 3 );    /* 32bitの閾値画像用IplImage */
-      thresholdImage = cvCreateImage( imageSize, IPL_DEPTH_8U, 3 );    /* 閾値画像用IplImage */
-      resultImage = cvCreateImage( imageSize, IPL_DEPTH_8U, 1 );    /* 結果画像用IplImage */
-      backgroundMaskImage = cvCreateImage( imageSize, IPL_DEPTH_8U, 1 );    /* 背景マスク画像用IplImage */
-      foregroundMaskImage = cvCreateImage( imageSize, IPL_DEPTH_8U, 1 );    /* 前景マスク用IplImage */
-      stillObjectMaskImage = cvCreateImage( imageSize, IPL_DEPTH_8U, 1 );    /* 静止物体マスク用IplImage */
-      movingObjectMask = cvCreateImage( imageSize, IPL_DEPTH_8U, 1 );    /* 動物体マスク用IplImage */
-      backgroundCopyMaskImage = cvCreateImage( imageSize, IPL_DEPTH_8U, 1 );    /* 背景にコピーする際に使用するマスク用IplImage */
-      tmpMaskImage = cvCreateImage( imageSize, IPL_DEPTH_8U, 1 );    /* テンポラリ用IplImage */
-      tmp2MaskImage = cvCreateImage( imageSize, IPL_DEPTH_8U, 1 );    /* テンポラリ用IplImage(その2) */
-      frameImage32 = cvCreateImage( imageSize, IPL_DEPTH_32F, 3 );    /* 32bitのキャプチャした画像用IplImage */
-      backgroundImage = cvCreateImage( imageSize, IPL_DEPTH_8U, 3 );    /* 背景画像用IplImage */
-      stillObjectImage = cvCreateImage( imageSize, IPL_DEPTH_8U, 3 );
-      outputImage = cvCreateImage(imageSize, IPL_DEPTH_8U, 3);
 
-      foreGroundMaskBuff = cvCreateImage(imageSize, IPL_DEPTH_8U, 3);
-      stillObjectMaskBuff  = cvCreateImage(imageSize, IPL_DEPTH_8U, 3);
-      backGroundBuff = cvCreateImage(imageSize, IPL_DEPTH_8U, 3);
-      stillObjectImageBuff = cvCreateImage(imageSize, IPL_DEPTH_8U, 3);
-      stillObjectCounterBuff = cvCreateImage(imageSize, IPL_DEPTH_8U, 3);
+	  
+	  inputImage.create(imageSize, CV_8UC3);				 /* 背景の平均値保存用IplImage */
+	  backgroundAverageImage.create(imageSize, CV_32FC3);	 /* 背景の閾値保存用IplImage */
+	  backgroundThresholdImage.create(imageSize, CV_32FC3);	 /* 静止物体の平均値保存用IplImage */
+	  stillObjectAverageImage.create(imageSize, CV_32FC3);	   /* 静止物体の閾値保存用IplImage */
+	  stillObjectCounterImage.create(imageSize, CV_8UC1);/* 静止物体のカウンタ用IplImage */
+	  stillObjectThresholdImage.create(imageSize, CV_32FC3);/* 背景差分画像用IplImage */
+	  stillObjectCounterImage.create(imageSize, CV_32FC3);	    /* 静止物体差分画像用IplIMage */
+	  backgroundDifferenceImage.create(imageSize, CV_32FC3);	  /* 32bitの閾値画像用IplImage */ 
+	  stillObjectDifferenceImage.create(imageSize, CV_32FC3);		/* 閾値画像用IplImage */
+	  thresholdImage32.create(imageSize, CV_32FC3);/* 結果画像用IplImage */
+	  thresholdImage.create(imageSize, CV_8UC3);	/* 背景マスク画像用IplImage */
+	  resultImage.create(imageSize, CV_8UC1);		/* 前景マスク用IplImage */	
+	  backgroundMaskImage.create(imageSize, CV_8UC1);	/* 静止物体マスク用IplImage */
+	  foregroundMaskImage.create(imageSize, CV_8UC1);	/* 動物体マスク用IplImage */ 
+	  stillObjectMaskImage.create(imageSize, CV_8UC1);	/* 背景にコピーする際に使用するマスク用IplImage */
+	  movingObjectMask.create(imageSize, CV_8UC1);	/* テンポラリ用IplImage */
+	  backgroundCopyMaskImage.create(imageSize, CV_8UC1); /* テンポラリ用IplImage(その2) */
+	  tmpMaskImage.create(imageSize, CV_8UC1);		 /* 32bitのキャプチャした画像用IplImage */	 
+	  tmp2MaskImage.create(imageSize, CV_8UC1);	/* 背景画像用IplImage */		 
+	  frameImage32.create(imageSize, CV_32FC3);			    
+	  backgroundImage.create(imageSize, CV_8UC3);
+	  stillObjectImage.create(imageSize, CV_8UC3);
+	  outputImage.create(imageSize, CV_8UC3);
+	  foreGroundMaskBuff.create(imageSize, CV_8UC3);
+	  stillObjectMaskBuff.create(imageSize, CV_8UC3);
+	  backGroundBuff.create(imageSize, CV_8UC3);
+	  stillObjectImageBuff.create(imageSize, CV_8UC3);
+	  stillObjectCounterBuff.create(imageSize, CV_8UC3);
 
-      memcpy(inputImage->imageData,(void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length());
+      memcpy(inputImage.data,(void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length());
 
       /* 初期化する */
-      cvConvert( inputImage, backgroundAverageImage );
-      cvSet( backgroundThresholdImage, cvScalarAll( BACKGROUND_INITIAL_THRESHOLD ) );
-      cvSetZero( stillObjectAverageImage );
-      cvSetZero( stillObjectThresholdImage );
-      cvSetZero( stillObjectCounterImage );
+	  inputImage.convertTo(backgroundAverageImage, CV_32F);
+      
+	  backgroundThresholdImage.setTo(cv::Scalar::all(BACKGROUND_INITIAL_THRESHOLD));
+	  stillObjectAverageImage = cv::Mat::zeros(imageSize, CV_32FC3);
+	  stillObjectThresholdImage = cv::Mat::zeros(imageSize, CV_32FC3);
+	  stillObjectCounterImage = cv::Mat::zeros(imageSize, CV_8UC1);
+
 
       g_temp_w = m_image_orig.width;
       g_temp_h = m_image_orig.height;
@@ -310,37 +288,42 @@ RTC::ReturnCode_t SubStractCaptureImage::onExecute(RTC::UniqueId ec_id)
 
     if(g_temp_w == m_image_orig.width && g_temp_h == m_image_orig.height)
     {
-      memcpy(inputImage->imageData,(void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length());
+		
+      memcpy(inputImage.data,(void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length());
 
       /* float 32bitに変換する */
-      cvConvert( inputImage, frameImage32 );
+	  
+	  inputImage.convertTo(frameImage32, CV_32F);
+	  
 
       // 背景との差 /////////////////////////////////////////////////////////
 
       /* 現在の背景との差の絶対値を成分ごとに取る */
-      cvAbsDiff( frameImage32, backgroundAverageImage, backgroundDifferenceImage );
-
+      cv::absdiff( frameImage32, backgroundAverageImage, backgroundDifferenceImage );
+	  
       /* 閾値の値を引く */
-      cvAddWeighted( backgroundDifferenceImage, 1.0, backgroundThresholdImage, -THRESHOLD_COEFFICIENT, 0.0, thresholdImage32 );
+      cv::addWeighted( backgroundDifferenceImage, 1.0, backgroundThresholdImage, -THRESHOLD_COEFFICIENT, 0.0, thresholdImage32 );
 
       /* thresholdImage の要素が1つでも0以上だったら背景ではない */
-      cvConvert( thresholdImage32, thresholdImage );
-      cvCvtColor( thresholdImage, resultImage, CV_BGR2GRAY );
-      cvThreshold( resultImage, backgroundMaskImage, MASK_THRESHOLD, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY_INV );
+	  thresholdImage32.convertTo(thresholdImage, CV_8U);
+	  cv::cvtColor(thresholdImage, resultImage, cv::COLOR_BGR2GRAY);
+      cv::threshold( resultImage, backgroundMaskImage, MASK_THRESHOLD, THRESHOLD_MAX_VALUE, cv::THRESH_BINARY_INV );
 
       // 背景候補との差 /////////////////////////////////////////////////////
 
       /* 現在の背景候補との差の絶対値を成分ごとに取る */
-      cvAbsDiff( frameImage32, stillObjectAverageImage, stillObjectDifferenceImage );
+      cv::absdiff( frameImage32, stillObjectAverageImage, stillObjectDifferenceImage );
 
       /* 閾値の値を引く */
-      cvAddWeighted( stillObjectDifferenceImage, 1.0, stillObjectThresholdImage, -THRESHOLD_COEFFICIENT, 0.0, thresholdImage32 );
+      cv::addWeighted( stillObjectDifferenceImage, 1.0, stillObjectThresholdImage, -THRESHOLD_COEFFICIENT, 0.0, thresholdImage32 );
 
       /* thresholdImage の要素が1つでも0以上だったら背景候補ではない */
-      cvConvert( thresholdImage32, thresholdImage );
-      cvCvtColor( thresholdImage, resultImage, CV_BGR2GRAY );
-      cvThreshold( resultImage, stillObjectMaskImage, MASK_THRESHOLD, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY_INV );
-
+	  thresholdImage32.convertTo(thresholdImage, CV_8U);
+	  
+	  cv::cvtColor(thresholdImage, resultImage, cv::COLOR_BGR2GRAY);
+	  
+      cv::threshold( resultImage, stillObjectMaskImage, MASK_THRESHOLD, THRESHOLD_MAX_VALUE, cv::THRESH_BINARY_INV );
+	  
       /* ここまでで、
        * backgroundDifferenceImage, backgroundMaskImage
        * stillObjectDifferenceImage, stillObjectMaskImage
@@ -350,92 +333,129 @@ RTC::ReturnCode_t SubStractCaptureImage::onExecute(RTC::UniqueId ec_id)
       // 各種情報を更新する /////////////////////////////////////////////////
 
       /* 背景に同化する場合 (backgroundMaskImage=1の場合) */
-      cvRunningAvg( frameImage32, backgroundAverageImage, BACKGROUND_ALPHA, backgroundMaskImage );
-      cvRunningAvg( backgroundDifferenceImage, backgroundThresholdImage, BACKGROUND_ALPHA, backgroundMaskImage );
+	  
+	  
+	  cv::accumulateWeighted(backgroundAverageImage, frameImage32, BACKGROUND_ALPHA, backgroundMaskImage);
 
+	  cv::accumulateWeighted(backgroundThresholdImage, backgroundDifferenceImage, BACKGROUND_ALPHA, backgroundMaskImage);
+	  
       /* 背景候補に同化する場合 (backgroundMaskImage=0 && stillObjectMaskImage=1) */
-      cvNot( backgroundMaskImage, foregroundMaskImage );
-      cvAnd( foregroundMaskImage, stillObjectMaskImage, tmpMaskImage ); /*  */
+	  cv::bitwise_not(backgroundMaskImage, foregroundMaskImage);
+	  //foregroundMaskImage.convertTo(foregroundMaskImage, CV_32F);
+	  
+	  cv::bitwise_and(foregroundMaskImage, stillObjectMaskImage, tmpMaskImage); /*  */
 
-      cvRunningAvg( frameImage32, stillObjectAverageImage, STILL_OBJECT_ALPHA, tmpMaskImage );
-      cvRunningAvg( stillObjectDifferenceImage, stillObjectThresholdImage, STILL_OBJECT_ALPHA, tmpMaskImage );
+	  //tmpMaskImage.convertTo(tmpMaskImage, CV_8U);
+
+	  cv::accumulateWeighted(frameImage32, stillObjectAverageImage, STILL_OBJECT_ALPHA, tmpMaskImage);
+	  cv::accumulateWeighted(stillObjectDifferenceImage, stillObjectThresholdImage, STILL_OBJECT_ALPHA, tmpMaskImage);
 
       /* 背景候補カウンタを増やす */
-      cvAddS( stillObjectCounterImage, cvScalar( 1 ), stillObjectCounterImage, tmpMaskImage );
-
+	  
+	  //backgroundMaskImage.convertTo(stillObjectCounterImage, CV_8U);
+	  
+	  
+	  cv::add(stillObjectCounterImage, cv::Scalar::all(1), stillObjectCounterImage, tmpMaskImage);
+	  
       /* カウンタが閾値以上になったら、背景候補を背景として採用する */
-      cvThreshold( stillObjectCounterImage, tmp2MaskImage, STILL_OBJECT_TO_BACKGROUND, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY );
-      cvAnd( tmpMaskImage, tmp2MaskImage, backgroundCopyMaskImage );
-      cvCopy( stillObjectAverageImage, backgroundAverageImage, backgroundCopyMaskImage );
-      cvCopy( stillObjectThresholdImage, backgroundThresholdImage, backgroundCopyMaskImage );
+	  
+	  cv::threshold(stillObjectCounterImage, tmp2MaskImage, STILL_OBJECT_TO_BACKGROUND, THRESHOLD_MAX_VALUE, cv::THRESH_BINARY);
+	  
+	  //cv::cvtColor(tmp2MaskImage, tmp2MaskImage, cv::COLOR_BGR2GRAY);
+	  
+	  
+	  
+	  cv::bitwise_and(tmpMaskImage, tmp2MaskImage, backgroundCopyMaskImage);
+	  
+	  //backgroundCopyMaskImage.convertTo(tmpMaskImage, CV_8U);
+	  stillObjectAverageImage.copyTo(backgroundAverageImage, backgroundCopyMaskImage);
+	  
+	  stillObjectThresholdImage.copyTo(backgroundThresholdImage, backgroundCopyMaskImage);
+      
 
       /* この backgroundCopyMaskImage は、後で背景候補を0に初期化する際に使用 */
-      cvSet( stillObjectCounterImage, cvScalarAll( 0 ), backgroundCopyMaskImage );
-
+	  stillObjectCounterImage.setTo(cv::Scalar::all(0), backgroundCopyMaskImage);
+	  
       /* 背景候補でもなく、背景でもない場合 */
       /* (foregroundMaskImage = 1 && stillObjectMaskImage = 0) */
-      cvNot( stillObjectMaskImage, movingObjectMask );
+	  //stillObjectMaskImage.convertTo(stillObjectMaskImage, CV_8U);
+	  
+	  cv::bitwise_not(stillObjectMaskImage, movingObjectMask);
+	  
 
       /* カウンタを減らす(短時,間ノイズ対応)
        * これは、背景に分類されたピクセルに対しても行う。すなわち、
        * movingObjectMask == 1 || backgroundMaskImage == 1
        */
-      cvOr( backgroundMaskImage, movingObjectMask, tmpMaskImage );
-      cvSubS( stillObjectCounterImage, cvScalarAll( NOT_STILL_DEC_STEP ), stillObjectCounterImage, tmpMaskImage );
-
+	  cv::bitwise_or(backgroundMaskImage, movingObjectMask, tmpMaskImage);
+	  
+	  cv::subtract(stillObjectCounterImage, cv::Scalar::all(NOT_STILL_DEC_STEP), stillObjectCounterImage, tmpMaskImage);
+	  
       /* カウンタが0になったら背景候補を初期化する */
-      cvNot( stillObjectCounterImage, tmp2MaskImage );	/* tmp2 = 1 なら初期化 */
+	  cv::bitwise_not(stillObjectCounterImage, tmp2MaskImage);	/* tmp2 = 1 なら初期化 */
 
       /* 初期化する値の候補は2種類ある。
        * (1)現在の画像で初期化 --- 背景でもなく背景候補でもない場合
        * (2)登録なし状態で初期化 --- 背景もしくは背景候補をコピーした場合
        * ここでは(1)で初期化しておく
        */
-      cvOr( tmpMaskImage, backgroundCopyMaskImage, tmpMaskImage );
-      cvAnd( tmpMaskImage, tmp2MaskImage, tmpMaskImage );
+	  cv::bitwise_or(tmpMaskImage, backgroundCopyMaskImage, tmpMaskImage);
+	  
+	  cv::bitwise_and(tmpMaskImage, tmp2MaskImage, tmpMaskImage);
 
-      cvCopy( frameImage32, stillObjectAverageImage, tmpMaskImage );
-      cvSet( stillObjectThresholdImage, cvScalarAll( STILL_OBJECT_INITIAL_THRESHOLD ), tmpMaskImage );
+	  frameImage32.copyTo(stillObjectAverageImage, tmpMaskImage);
+	  stillObjectThresholdImage.setTo(cv::Scalar::all(STILL_OBJECT_INITIAL_THRESHOLD), tmpMaskImage);
+	  
 
       /* ノイズを除去する */
-      cvSmooth( foregroundMaskImage, foregroundMaskImage, CV_MEDIAN );
+	  cv::medianBlur(foregroundMaskImage, foregroundMaskImage, 7);
 
-      cvConvert( backgroundAverageImage, backgroundImage );
-      cvConvert( stillObjectAverageImage, stillObjectImage );
+	  backgroundAverageImage.convertTo(backgroundImage, CV_32F);
+	  stillObjectAverageImage.convertTo(stillObjectImage, CV_32F);
+
 
       cvWaitKey( 1 );
 
       /* 画像データのサイズ取得 */
       double len;
-      len = (outputImage->nChannels * outputImage->width * outputImage->height);
+	  len = (outputImage.channels() * outputImage.size().width * outputImage.size().height);
       m_image_out.pixels.length(len);
 
-      memcpy((void *)&(m_image_out.pixels[0]), inputImage->imageData, len);
+      memcpy((void *)&(m_image_out.pixels[0]), inputImage.data, len);
 
       m_image_out.width = m_image_orig.width;
       m_image_out.height = m_image_orig.height;
 
       m_image_outOut.write();
 
-      cvMerge( foregroundMaskImage, foregroundMaskImage, foregroundMaskImage, NULL, foreGroundMaskBuff);
+	  std::vector<cv::Mat> tmp;
+	  tmp.push_back(foregroundMaskImage);
+	  tmp.push_back(foregroundMaskImage);
+	  tmp.push_back(foregroundMaskImage);
 
-      len = (foreGroundMaskBuff->nChannels * foreGroundMaskBuff->width * foreGroundMaskBuff->height);
+	  cv::merge(tmp, foreGroundMaskBuff);
+
+	  len = (foreGroundMaskBuff.channels() * foreGroundMaskBuff.size().width * foreGroundMaskBuff.size().height);
       m_foreMaskImg.pixels.length(len);
 
-      memcpy((void *)&(m_foreMaskImg.pixels[0]), foreGroundMaskBuff->imageData, len);
+      memcpy((void *)&(m_foreMaskImg.pixels[0]), foreGroundMaskBuff.data, len);
 
       m_foreMaskImg.width = m_image_orig.width;
       m_foreMaskImg.height = m_image_orig.height;
 
       m_foreMaskImgOut.write();
+	  
+	  tmp.clear();
+	  tmp.push_back(stillObjectMaskImage);
+	  tmp.push_back(stillObjectMaskImage);
+	  tmp.push_back(stillObjectMaskImage);
 
-
-      cvMerge( stillObjectMaskImage, stillObjectMaskImage, stillObjectMaskImage, NULL, stillObjectMaskBuff );
-
-      len = (stillObjectMaskBuff->nChannels * stillObjectMaskBuff->width * stillObjectMaskBuff->height);
+	  cv::merge(tmp, stillObjectMaskBuff);
+      
+	  len = (stillObjectMaskBuff.channels() * stillObjectMaskBuff.size().width * stillObjectMaskBuff.size().height);
       m_stillMaskImg.pixels.length(len);
 
-      memcpy((void *)&(m_stillMaskImg.pixels[0]), stillObjectMaskBuff->imageData, len);
+      memcpy((void *)&(m_stillMaskImg.pixels[0]), stillObjectMaskBuff.data, len);
 
       m_stillMaskImg.width = m_image_orig.width;
       m_stillMaskImg.height = m_image_orig.height;
@@ -443,10 +463,10 @@ RTC::ReturnCode_t SubStractCaptureImage::onExecute(RTC::UniqueId ec_id)
       m_stillMaskImgOut.write();
 
 
-      len = (backgroundImage->nChannels * backgroundImage->width * backgroundImage->height);
+	  len = (backgroundImage.channels() * backgroundImage.size().width * backgroundImage.size().height);
       m_backGroundImg.pixels.length(len);
 
-      memcpy((void *)&(m_backGroundImg.pixels[0]), backgroundImage->imageData, len);
+      memcpy((void *)&(m_backGroundImg.pixels[0]), backgroundImage.data, len);
 
       m_backGroundImg.width = m_image_orig.width;
       m_backGroundImg.height = m_image_orig.height;
@@ -454,10 +474,10 @@ RTC::ReturnCode_t SubStractCaptureImage::onExecute(RTC::UniqueId ec_id)
       m_backGroundImgOut.write();
 
 
-      len = (stillObjectImage->nChannels * stillObjectImage->width * stillObjectImage->height);
+	  len = (stillObjectImage.channels() * stillObjectImage.size().width * stillObjectImage.size().height);
       m_stillImg.pixels.length(len);
 
-      memcpy((void *)&(m_stillImg.pixels[0]), stillObjectImage->imageData, len);
+      memcpy((void *)&(m_stillImg.pixels[0]), stillObjectImage.data, len);
 
       m_stillImg.width = m_image_orig.width;
       m_stillImg.height = m_image_orig.height;
@@ -486,37 +506,6 @@ RTC::ReturnCode_t SubStractCaptureImage::onExecute(RTC::UniqueId ec_id)
 
   if(g_temp_w != m_image_orig.width || g_temp_h != m_image_orig.height)
   {
-    cvReleaseImage( &inputImage );
-    cvReleaseImage( &backgroundAverageImage );
-    cvReleaseImage( &backgroundThresholdImage);
-    cvReleaseImage( &stillObjectAverageImage );
-    cvReleaseImage( &stillObjectThresholdImage );
-    cvReleaseImage( &stillObjectCounterImage );
-    cvReleaseImage( &backgroundDifferenceImage );
-    cvReleaseImage( &stillObjectDifferenceImage );
-    cvReleaseImage( &thresholdImage32 );
-    cvReleaseImage( &thresholdImage );
-    cvReleaseImage( &resultImage );
-    cvReleaseImage( &backgroundMaskImage );
-    cvReleaseImage( &foregroundMaskImage );
-    cvReleaseImage( &stillObjectMaskImage );
-    cvReleaseImage( &movingObjectMask );
-    cvReleaseImage( &backgroundCopyMaskImage );
-    cvReleaseImage( &tmpMaskImage );
-    cvReleaseImage( &tmp2MaskImage );
-    cvReleaseImage( &frameImage32 );
-    cvReleaseImage( &backgroundImage );
-    cvReleaseImage( &stillObjectImage );
-    cvReleaseImage( &outputImage );
-
-    cvReleaseImage( &foreGroundMaskBuff);
-    cvReleaseImage( &stillObjectMaskBuff);
-    cvReleaseImage( &backGroundBuff);
-    cvReleaseImage( &stillObjectImageBuff);
-    cvReleaseImage( &stillObjectCounterBuff);
-
-    //g_temp_w = m_image_orig.width;
-    //g_temp_h = m_image_orig.height;
 
     SubStractCaptureImage_count = 0;
   }

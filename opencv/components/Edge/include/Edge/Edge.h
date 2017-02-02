@@ -20,9 +20,7 @@
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
 //OpenCV header file include
-#include <cv.h>
-#include <cxcore.h>
-#include <highgui.h>
+#include <opencv2/imgproc/imgproc.hpp>
 
 //	cvConvertScaleAbs用定数
 #define SCALE   1   /* ScaleAbs係数 */
@@ -303,13 +301,13 @@ class Edge
   // <rtc-template block="private_operation">
   
   // </rtc-template>
-  IplImage* imageBuff;
-  IplImage* grayImage;
-  IplImage* destinationImage_x;
-  IplImage* destinationImage_y;
-  IplImage* destinationImage_LAPLACIAN;
-  IplImage* destinationEdge;
-  IplImage* edgeImage;
+  cv::Mat imageBuff;
+  cv::Mat grayImage;
+  cv::Mat destinationImage_x;
+  cv::Mat destinationImage_y;
+  cv::Mat destinationImage_LAPLACIAN;
+  cv::Mat destinationEdge;
+  cv::Mat edgeImage;
   int len;
 };
 

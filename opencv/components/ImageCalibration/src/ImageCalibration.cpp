@@ -134,7 +134,7 @@ RTC::ReturnCode_t ImageCalibration::onDeactivated(RTC::UniqueId ec_id)
 RTC::ReturnCode_t ImageCalibration::onExecute(RTC::UniqueId ec_id)
 {
   cv::Mat image, gray;
-  cv::vector<cv::Point2f>	imagePoints;  /* チェッカー交点座標を格納する行列 */
+  std::vector<cv::Point2f>	imagePoints;  /* チェッカー交点座標を格納する行列 */
   
   /* コーナー位置高精度化のための繰り返し処理の停止基準
    * 「反復回数が20回に達する」または「イプシロンが0.001に達する」どちらかの条件を満たした時に終了する 
@@ -157,7 +157,7 @@ RTC::ReturnCode_t ImageCalibration::onExecute(RTC::UniqueId ec_id)
     memcpy(image.data,(void *)&(m_img_orig.pixels[0]), m_img_orig.pixels.length());
     
     /* グレースケールに変換 */
-    cv::cvtColor(image, gray, CV_BGR2GRAY);
+	cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
     
     /* プロバイダクラスへデータを渡す */
     RTC::CameraImage currentImg;

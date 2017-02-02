@@ -109,9 +109,7 @@ RTC::ReturnCode_t Flip::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Flip::onActivated(RTC::UniqueId ec_id)
 {
-  /* イメージ用メモリの初期化 */
-  m_image_buff = NULL;
-  m_flip_image_buff = NULL;
+
 
   /* OutPortの画面サイズの初期化 */
   m_image_flip.width = 0;
@@ -123,12 +121,12 @@ RTC::ReturnCode_t Flip::onActivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Flip::onDeactivated(RTC::UniqueId ec_id)
 {
-  if(m_image_buff != NULL)
-  {
-    /* イメージ用メモリの解放 */
-    cvReleaseImage(&m_image_buff);
-    cvReleaseImage(&m_flip_image_buff);
-  }
+	if (!m_imageBuff.empty())
+	{
+		// 画像用メモリの解放
+		m_imageBuff.release();
+		m_flipImageBuff.release();
+	}
 
   return RTC::RTC_OK;
 }
@@ -136,47 +134,41 @@ RTC::ReturnCode_t Flip::onDeactivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Flip::onExecute(RTC::UniqueId ec_id)
 {
-  /* 新しいデータのチェック */
-  if (m_image_origIn.isNew()) {
-    /* InPortデータの読み込み */
-    m_image_origIn.read();
+	// 新しいデータのチェック
+	if (m_image_origIn.isNew()) {
+		// InPortデータの読み込み
+		m_image_origIn.read();
 
-  /* InPortとOutPortの画面サイズ処理およびイメージ用メモリの確保 */
-  if( m_image_orig.width != m_image_flip.width || m_image_orig.height != m_image_flip.height)
-  {
-    m_image_flip.width = m_image_orig.width;
-    m_image_flip.height = m_image_orig.height;
+		// InPortとOutPortの画面サイズ処理およびイメージ用メモリの確保
+		if (m_image_orig.width != m_image_flip.width || m_image_orig.height != m_image_flip.height)
+		{
+			m_image_flip.width = m_image_orig.width;
+			m_image_flip.height = m_image_orig.height;
 
-    /* InPortのイメージサイズが変更された場合 */
-    if(m_image_buff != NULL)
-    {
-      cvReleaseImage(&m_image_buff);
-      cvReleaseImage(&m_flip_image_buff);
-    }
+			m_imageBuff.create(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3);
+			m_flipImageBuff.create(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3);
 
-    /* イメージ用メモリの確保 */
-    m_image_buff = cvCreateImage(cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_8U, 3);
-    m_flip_image_buff = cvCreateImage(cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_8U, 3);
-  }
 
-    /* InPortの画像データをIplImageのimageDataにコピー */
-    memcpy(m_image_buff->imageData,(void *)&(m_image_orig.pixels[0]),m_image_orig.pixels.length());
+		}
 
-    /* InPortからの画像データを反転する。 m_flip_mode 0: X軸周り, 1: Y軸周り, -1: 両方の軸周り */
-    cvFlip(m_image_buff, m_flip_image_buff, m_flip_mode);
+		// InPortの画像データをm_imageBuffにコピー
+		memcpy(m_imageBuff.data, (void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length());
 
-    /* 画像データのサイズ取得 */
-    int len = m_flip_image_buff->nChannels * m_flip_image_buff->width * m_flip_image_buff->height;
-    m_image_flip.pixels.length(len);
+		// InPortからの画像データを反転する。 m_flipMode 0: X軸周り, 1: Y軸周り, -1: 両方の軸周り
+		cv::flip(m_imageBuff, m_flipImageBuff, m_flip_mode);
 
-    /* 反転した画像データをOutPortにコピー */
-    memcpy((void *)&(m_image_flip.pixels[0]),m_flip_image_buff->imageData,len);
+		// 画像データのサイズ取得
+		int len = m_flipImageBuff.channels() * m_flipImageBuff.cols * m_flipImageBuff.rows;
+		m_image_flip.pixels.length(len);
 
-    /* 反転した画像データをOutPortから出力する。 */
-    m_image_flipOut.write();
-  }
+		// 反転した画像データをOutPortにコピー
+		memcpy((void *)&(m_image_flip.pixels[0]), m_flipImageBuff.data, len);
 
-  return RTC::RTC_OK;
+		// 反転した画像データをOutPortから出力する。
+		m_image_flipOut.write();
+	}
+
+	return RTC::RTC_OK;
 }
 
 /*

@@ -155,27 +155,30 @@ RTC::ReturnCode_t BackGroundSubtractionSimple::onActivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t BackGroundSubtractionSimple::onDeactivated(RTC::UniqueId ec_id)
 {
-  if(m_originalImage != NULL){
-    cvReleaseImage(&m_originalImage);
+
+
+  if (!m_originalImage.empty())
+  {
+	  m_originalImage.release();
   }
-  if(m_currentImage != NULL){
-    cvReleaseImage(&m_currentImage);
+  if (!m_currentImage.empty())
+  {
+	  m_currentImage.release();
   }
-  if(m_resultImage != NULL){
-    cvReleaseImage(&m_resultImage);
+  if (!m_resultImage.empty())
+  {
+	  m_resultImage.release();
   }
-  if(m_outputImage != NULL){
-    cvReleaseImage(&m_outputImage);
+  if (!m_outputImage.empty())
+  {
+	  m_outputImage.release();
   }
-  if(m_backgroundImage != NULL){
-    cvReleaseImage(&m_backgroundImage);
+  if (!m_backgroundImage.empty())
+  {
+	  m_backgroundImage.release();
   }
 
-  m_originalImage = NULL;
-  m_currentImage = NULL;
-  m_backgroundImage = NULL;
-  m_resultImage = NULL;
-  m_outputImage = NULL;
+
 
   return RTC::RTC_OK;
 }
@@ -189,31 +192,37 @@ RTC::ReturnCode_t BackGroundSubtractionSimple::onExecute(RTC::UniqueId ec_id)
   /* イメージRead */
   m_img_origIn.read();
 
-  if(m_originalImage == NULL){
-    m_originalImage = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 3);
+  if (m_originalImage.empty())
+  {
+	  m_originalImage.create(cv::Size(m_img_orig.width, m_img_orig.height), CV_8UC3);
   }
-  if(m_currentImage == NULL){
-    m_currentImage = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 3);
+  if (m_currentImage.empty())
+  {
+	  m_currentImage.create(cv::Size(m_img_orig.width, m_img_orig.height), CV_8UC3);
   }
 
   if(m_img_orig.width != m_temp_w || m_img_orig.height != m_temp_h){
-
-    if(m_backgroundImage != NULL){
-      cvReleaseImage(&m_backgroundImage);
-    }
-    m_backgroundImage = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 3);
+	if (m_backgroundImage.empty())
+	{
+		m_backgroundImage.create(cv::Size(m_img_orig.width, m_img_orig.height), CV_8UC3);
+	}
   }
 
-  if(m_resultImage == NULL){
-    m_resultImage =  cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 1);
+
+
+  if (m_resultImage.empty())
+  {
+	  m_resultImage.create(cv::Size(m_img_orig.width, m_img_orig.height), CV_8UC1);
   }
-  if(m_outputImage == NULL){
-    m_outputImage = cvCreateImage(cvSize(m_img_orig.width, m_img_orig.height), IPL_DEPTH_8U, 3);
+
+  if (m_outputImage.empty())
+  {
+	  m_outputImage.create(cv::Size(m_img_orig.width, m_img_orig.height), CV_8UC3);
   }
 
   /* InPortの映像の取得 */
-  memcpy(m_originalImage->imageData,(void *)&(m_img_orig.pixels[0]),m_img_orig.pixels.length());
-  m_currentImage = cvCloneImage( m_originalImage );
+  memcpy(m_originalImage.data,(void *)&(m_img_orig.pixels[0]),m_img_orig.pixels.length());
+  m_currentImage = m_originalImage.clone();
 		
   /* 差の計算方法の切り替え */
   if( m_differenceMode == COLOR_DIFFERENCE ){	
@@ -229,36 +238,41 @@ RTC::ReturnCode_t BackGroundSubtractionSimple::onExecute(RTC::UniqueId ec_id)
 
   /* ノイズ除去 */
   if( m_noiseMode == NOISE_MORPHOLOGY ){
-    cvErode( m_resultImage, m_resultImage );
-    cvDilate( m_resultImage, m_resultImage );
+	  //cv::Mat tmp();
+	  erode(m_currentImage, m_backgroundImage, cv::Mat(), cv::Point(-1, -1), 1);
+	  dilate(m_backgroundImage, m_resultImage, cv::Mat(), cv::Point(-1, -1), 1);
   }else if ( m_noiseMode == NOISE_MEDIAN ){
-    cvSmooth( m_resultImage, m_resultImage, CV_MEDIAN );
+	  GaussianBlur(m_currentImage, m_resultImage, m_currentImage.size(), 0,0);
   }
 
-  cvMerge( m_resultImage, m_resultImage, m_resultImage, NULL, m_outputImage );
+  std::vector<cv::Mat> tmp;
+  tmp.push_back(m_resultImage);
+  tmp.push_back(m_resultImage);
+  tmp.push_back(m_resultImage);
+  merge(tmp, m_outputImage);
 
   /* 画像データのサイズ取得 */
-  int len1 = (m_currentImage->nChannels * m_currentImage->width * m_currentImage->height);
-  int len2 = (m_outputImage->nChannels * m_outputImage->width * m_outputImage->height);
-  int len3 = (m_backgroundImage->nChannels * m_backgroundImage->width * m_backgroundImage->height);
+  int len1 = (m_currentImage.channels() * m_currentImage.size().width * m_currentImage.size().height);
+  int len2 = (m_outputImage.channels() * m_outputImage.size().width * m_outputImage.size().height);
+  int len3 = (m_backgroundImage.channels() * m_backgroundImage.size().width * m_backgroundImage.size().height);
 
   m_img_curr.pixels.length(len1);
   m_img_resu.pixels.length(len2);
   m_img_back.pixels.length(len3);
 
   /* 該当のイメージをMemCopyする */
-  memcpy((void *)&(m_img_curr.pixels[0]), m_currentImage->imageData, len1);
-  memcpy((void *)&(m_img_resu.pixels[0]), m_outputImage->imageData, len2);
-  memcpy((void *)&(m_img_back.pixels[0]), m_backgroundImage->imageData, len3);
+  memcpy((void *)&(m_img_curr.pixels[0]), m_currentImage.data, len1);
+  memcpy((void *)&(m_img_resu.pixels[0]), m_outputImage.data, len2);
+  memcpy((void *)&(m_img_back.pixels[0]), m_backgroundImage.data, len3);
 
-  m_img_curr.width = m_originalImage->width;
-  m_img_curr.height = m_originalImage->height;
+  m_img_curr.width = m_originalImage.size().width;
+  m_img_curr.height = m_originalImage.size().height;
 
-  m_img_resu.width = m_originalImage->width;
-  m_img_resu.height = m_originalImage->height;
+  m_img_resu.width = m_originalImage.size().width;
+  m_img_resu.height = m_originalImage.size().height;
 
-  m_img_back.width = m_originalImage->width;
-  m_img_back.height = m_originalImage->height;
+  m_img_back.width = m_originalImage.size().width;
+  m_img_back.height = m_originalImage.size().height;
 
   m_img_currOut.write();
   m_img_resuOut.write();
@@ -271,10 +285,8 @@ RTC::ReturnCode_t BackGroundSubtractionSimple::onExecute(RTC::UniqueId ec_id)
     if(m_cont_mode == 'b')
     {
       /* 背景画像更新 */
-      if(m_backgroundImage != NULL) {
-        cvReleaseImage(&m_backgroundImage);
-      }
-      m_backgroundImage = cvCloneImage(m_originalImage);
+
+		m_backgroundImage = m_originalImage.clone();
       printf( "Background image update( %s : %s )\n", 
               differenceMethod[m_differenceMode].c_str(), noiseMethod[m_noiseMode].c_str() );   
 
@@ -288,18 +300,7 @@ RTC::ReturnCode_t BackGroundSubtractionSimple::onExecute(RTC::UniqueId ec_id)
     }
   }
 		
-  if(m_originalImage != NULL){
-    cvReleaseImage(&m_originalImage);
-  }
-  if(m_currentImage != NULL){
-    cvReleaseImage(&m_currentImage);
-  }
-  if(m_resultImage != NULL){
-    cvReleaseImage(&m_resultImage);
-  }
-  if(m_outputImage != NULL){
-    cvReleaseImage(&m_outputImage);
-  }
+  
   //if(backgroundImage != NULL){
   //	cvReleaseImage(&backgroundImage);
   //}
@@ -354,29 +355,34 @@ void BackGroundSubtractionSimple::colorDifference( void )
 {
 	
 	/* 画像を生成する */
-  IplImage *differenceImage = cvCreateImage(cvSize(m_currentImage->width, m_currentImage->height), IPL_DEPTH_8U, 3);	//	差分画像用IplImage
-  IplImage *differenceRImage = cvCreateImage(cvSize(m_currentImage->width, m_currentImage->height), IPL_DEPTH_8U, 1);	//	R値の差分用IplImage
-  IplImage *differenceGImage = cvCreateImage(cvSize(m_currentImage->width, m_currentImage->height), IPL_DEPTH_8U, 1);	//	G値の差分用IplImage
-  IplImage *differenceBImage = cvCreateImage(cvSize(m_currentImage->width, m_currentImage->height), IPL_DEPTH_8U, 1);	//	B値の差分用IplImage
+	cv::Mat differenceImage;
+	cv::Mat differenceRImage;
+	cv::Mat differenceGImage;
+	cv::Mat differenceBImage;
+
+	differenceImage.create(m_currentImage.size(), CV_8UC3);
+	differenceRImage.create(m_currentImage.size(), CV_8UC1);
+	differenceGImage.create(m_currentImage.size(), CV_8UC1);
+	differenceBImage.create(m_currentImage.size(), CV_8UC1);
 
   /* 現在の背景との差の絶対値を成分ごとに取る */
-  cvAbsDiff( m_currentImage, m_backgroundImage, differenceImage );
+  absdiff( m_currentImage, m_backgroundImage, differenceImage );
 
   /* 閾値処理を行う */
-  cvThreshold( differenceImage, differenceImage, m_nThresholdLv, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY );
+  threshold( differenceImage, differenceImage, m_nThresholdLv, THRESHOLD_MAX_VALUE, cv::THRESH_BINARY );
 
   /* 成分ごとの画像に分割する */
-  cvSplit( differenceImage, differenceBImage, differenceGImage, differenceRImage, NULL );
+  std::vector<cv::Mat> tmp;
+  tmp.push_back(differenceBImage);
+  tmp.push_back(differenceGImage);
+  tmp.push_back(differenceRImage);
+  split(differenceImage, tmp);
 
   /* ORで合成する */
-  cvOr( differenceRImage, differenceGImage, m_resultImage );
-  cvOr( differenceBImage, m_resultImage, m_resultImage );
+  cv::bitwise_or(differenceRImage, differenceGImage, m_resultImage);
+  cv::bitwise_or(differenceBImage, m_resultImage, m_resultImage);
 
-  /* メモリを解放する */
-  cvReleaseImage( &differenceImage );
-  cvReleaseImage( &differenceRImage );
-  cvReleaseImage( &differenceGImage );
-  cvReleaseImage( &differenceBImage );
+
 
 }
 
@@ -386,42 +392,49 @@ void BackGroundSubtractionSimple::colorDifference( void )
 void BackGroundSubtractionSimple::labDifference( void )
 {
   /* 画像を生成する */
-  IplImage *currentLabImage = cvCreateImage( cvSize(m_currentImage->width, m_currentImage->height),IPL_DEPTH_32F, 3 );		/* 現在の画像をL*a*b*に変換した画像用IplImage */
-  IplImage *backgroundLabImage = cvCreateImage( cvSize(m_currentImage->width, m_currentImage->height), IPL_DEPTH_32F, 3 );	/* 背景をL*a*b*に変換した画像用IplImage */
-  IplImage *differenceLabImage = cvCreateImage( cvSize(m_currentImage->width, m_currentImage->height), IPL_DEPTH_32F, 3 );	/* 差分画像用IplImage */
-  IplImage *differenceLImage = cvCreateImage( cvSize(m_currentImage->width, m_currentImage->height), IPL_DEPTH_32F, 1 );		/* L*値の差分用IplImage */
-  IplImage *differenceAImage = cvCreateImage( cvSize(m_currentImage->width, m_currentImage->height), IPL_DEPTH_32F, 1 );		/* a*値の差分用IplImage */
-  IplImage *differenceBImage = cvCreateImage( cvSize(m_currentImage->width, m_currentImage->height), IPL_DEPTH_32F, 1 );		/* b*値の差分用IplImage */
-  IplImage *sqrDifferenceImage = cvCreateImage( cvSize(m_currentImage->width, m_currentImage->height), IPL_DEPTH_32F, 1 );	/* 距離算出用IplImage */
+	cv::Mat currentLabImage;
+	cv::Mat backgroundLabImage;
+	cv::Mat differenceLabImage;
+	cv::Mat differenceLImage;
+	cv::Mat differenceAImage;
+	cv::Mat differenceBImage;
+	cv::Mat sqrDifferenceImage;
+
+
+	currentLabImage.create(m_currentImage.size(), CV_8UC3);   /* 現在の画像をL*a*b*に変換した画像用IplImage */
+	backgroundLabImage.create(m_currentImage.size(), CV_8UC3);/* 背景をL*a*b*に変換した画像用IplImage */
+	differenceLabImage.create(m_currentImage.size(), CV_8UC3);/* 差分画像用IplImage */
+	differenceLImage.create(m_currentImage.size(), CV_8UC1);  /* L*値の差分用IplImage */
+	differenceAImage.create(m_currentImage.size(), CV_8UC1);  /* a*値の差分用IplImage */
+	differenceBImage.create(m_currentImage.size(), CV_8UC1);  /* b*値の差分用IplImage */
+	sqrDifferenceImage.create(m_currentImage.size(), CV_8UC1);/* 距離算出用IplImage */
 
   /* 現在の画像と背景を共に CIE L*a*b* に変換 */
-  cvConvertScale( m_currentImage, currentLabImage, SCALE );
-  cvConvertScale( m_backgroundImage, backgroundLabImage, SCALE );
-  cvCvtColor( currentLabImage, currentLabImage, CV_BGR2Lab );
-  cvCvtColor( backgroundLabImage, backgroundLabImage, CV_BGR2Lab );
+	currentLabImage.convertTo(m_currentImage, CV_32F, SCALE);
+	backgroundLabImage.convertTo(m_backgroundImage, CV_32F, SCALE);
+
+	cv::cvtColor(currentLabImage, currentLabImage, CV_BGR2Lab);
+	cv::cvtColor(backgroundLabImage, backgroundLabImage, CV_BGR2Lab);
 
   /* 距離の二乗を計算する */
-  cvSub( currentLabImage, backgroundLabImage, differenceLabImage );
-  cvPow( differenceLabImage, differenceLabImage, 2 );
+	subtract(currentLabImage, backgroundLabImage, differenceLabImage);
+	cv::pow(differenceLabImage,2, differenceLabImage);
 
   /* 成分ごとの画像に分割する */
-  cvSplit( differenceLabImage, differenceLImage, differenceAImage, differenceBImage, NULL );
+	std::vector<cv::Mat> tmp;
+	tmp.push_back(differenceLImage);
+	tmp.push_back(differenceAImage);
+	tmp.push_back(differenceBImage);
+	cv::split(differenceLabImage, tmp);
 
-  cvCopy( differenceLImage, sqrDifferenceImage );
-  cvAdd( differenceAImage, sqrDifferenceImage, sqrDifferenceImage );
-  cvAdd( differenceBImage, sqrDifferenceImage, sqrDifferenceImage );
+	sqrDifferenceImage = differenceLImage;
+	//sqrDifferenceImage.copyTo(differenceLImage);
+  cv::add( differenceAImage, sqrDifferenceImage, sqrDifferenceImage );
+  cv::add(differenceBImage, sqrDifferenceImage, sqrDifferenceImage);
 
   /* 閾値処理を行う */
-  cvThreshold( sqrDifferenceImage, m_resultImage, m_nThresholdLv * m_nThresholdLv, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY );
+  threshold(sqrDifferenceImage, m_resultImage, m_nThresholdLv, THRESHOLD_MAX_VALUE, cv::THRESH_BINARY);
 
-  /* メモリを解放する */
-  cvReleaseImage( &currentLabImage );
-  cvReleaseImage( &backgroundLabImage );
-  cvReleaseImage( &differenceLabImage );
-  cvReleaseImage( &differenceLImage );
-  cvReleaseImage( &differenceAImage );
-  cvReleaseImage( &differenceBImage );
-  cvReleaseImage( &sqrDifferenceImage );
 }
 
 //
@@ -430,19 +443,22 @@ void BackGroundSubtractionSimple::labDifference( void )
 void BackGroundSubtractionSimple::grayScaleDifference( void )
 {
   /* 画像を生成する */
-  IplImage *differenceImage = cvCreateImage( cvSize(m_currentImage->width, m_currentImage->height), IPL_DEPTH_8U, 3 );	/* 差分画像用IplImage */
+  cv::Mat differenceImage;	/* 差分画像用IplImage */
+
+
+  differenceImage.create(m_currentImage.size(), CV_8UC3);
+
 
   /* 現在の背景との差の絶対値を成分ごとに取る */
-  cvAbsDiff( m_currentImage, m_backgroundImage, differenceImage );
+  absdiff( m_currentImage, m_backgroundImage, differenceImage );
 
   /* BGRからグレースケールに変換する */
-  cvCvtColor( differenceImage, m_resultImage, CV_BGR2GRAY );
+  cvtColor(differenceImage, m_resultImage, cv::COLOR_BGR2GRAY);
 
   /* グレースケールから2値に変換する */
-  cvThreshold( m_resultImage, m_resultImage, m_nThresholdLv, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY );
+  threshold( m_resultImage, m_resultImage, m_nThresholdLv, THRESHOLD_MAX_VALUE, cv::THRESH_BINARY );
 
-  /* メモリを解放する */
-  cvReleaseImage( &differenceImage );
+
 }
 
 extern "C"

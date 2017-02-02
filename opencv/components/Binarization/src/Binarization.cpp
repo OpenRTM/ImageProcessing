@@ -109,11 +109,7 @@ RTC::ReturnCode_t Binarization::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Binarization::onActivated(RTC::UniqueId ec_id)
 {
-  /* イメージ用メモリの確保 */
-  m_image_buff       = NULL;
-  m_image_binary     = NULL;
-  m_image_gray       = NULL;
-  m_image_dest       = NULL;
+
 
   m_in_height        = 0;
   m_in_width         = 0;
@@ -124,14 +120,23 @@ RTC::ReturnCode_t Binarization::onActivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Binarization::onDeactivated(RTC::UniqueId ec_id)
 {
-  if(m_image_buff       != NULL)
-      cvReleaseImage(&m_image_buff);
-  if(m_image_binary     != NULL)
-      cvReleaseImage(&m_image_binary);
-  if(m_image_gray       != NULL)
-      cvReleaseImage(&m_image_gray);
-  if(m_image_dest       != NULL)
-      cvReleaseImage(&m_image_dest);
+	if (!m_image_buff.empty())
+	{
+		m_image_buff.release();
+	}
+	if (!m_image_binary.empty())
+	{
+		m_image_binary.release();
+	}
+	if (!m_image_gray.empty())
+	{
+		m_image_gray.release();
+	}
+	if (!m_image_dest.empty())
+	{
+		m_image_dest.release();
+	}
+  
 
   return RTC::RTC_OK;
 }
@@ -154,46 +159,44 @@ RTC::ReturnCode_t Binarization::onExecute(RTC::UniqueId ec_id)
       m_in_height = m_image_orig.height;
       m_in_width  = m_image_orig.width;
 
-      if(m_image_buff       != NULL)
-        cvReleaseImage(&m_image_buff);
-      if(m_image_binary     != NULL)
-        cvReleaseImage(&m_image_binary);
-      if(m_image_gray       != NULL)
-        cvReleaseImage(&m_image_gray);
-      if(m_image_dest       != NULL)
-        cvReleaseImage(&m_image_dest);
+	  /* サイズ変換のためTempメモリーをよいする */
+	  m_image_buff.create(cv::Size(m_in_width, m_in_height), CV_8UC3);
+	  m_image_binary.create(cv::Size(m_in_width, m_in_height), CV_8UC1);
+	  m_image_gray.create(cv::Size(m_in_width, m_in_height), CV_8UC1);
+	  m_image_dest.create(cv::Size(m_in_width, m_in_height), CV_8UC3);
+	  
+      
 
-      /* サイズ変換のためTempメモリーをよいする */
-      m_image_buff   = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3);
-      m_image_binary = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 1);
-      m_image_gray   = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 1);
-      m_image_dest   = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3);
     }
 
     /* InPortの画像データをIplImageのimageDataにコピー */
-    memcpy(m_image_buff->imageData,(void *)&(m_image_orig.pixels[0]),m_image_orig.pixels.length());
+    memcpy(m_image_buff.data,(void *)&(m_image_orig.pixels[0]),m_image_orig.pixels.length());
 
     /* Anternative process */
     /* BGRからグレースケールに変換する */
-    cvCvtColor( m_image_buff, m_image_gray, CV_BGR2GRAY );
+	cv::cvtColor(m_image_buff, m_image_gray, cv::COLOR_BGR2GRAY);
 
     /* グレースケールから2値に変換する */
-    cvThreshold( m_image_gray, m_image_binary, m_nThresholdLv, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY );
+	cv::threshold(m_image_gray, m_image_binary, m_nThresholdLv, THRESHOLD_MAX_VALUE, cv::THRESH_BINARY);
 
+	std::vector<cv::Mat> tmp;
+	tmp.push_back(m_image_binary);
+	tmp.push_back(m_image_binary);
+	tmp.push_back(m_image_binary);
     /* Convert to 3channel image */
-    cvMerge(m_image_binary, m_image_binary, m_image_binary, NULL, m_image_dest);
+	cv::merge(tmp, m_image_dest);
 
     /* Common process */
     /* 画像データのサイズ取得 */
-    int len = m_image_dest->nChannels * m_image_dest->width * m_image_dest->height;
+	int len = m_image_dest.channels() * m_image_dest.size().width * m_image_dest.size().height;
           
     /* 画面のサイズ情報を入れる */
     m_image_output.pixels.length(len);        
-    m_image_output.width  = m_image_dest->width;
-    m_image_output.height = m_image_dest->height;
+	m_image_output.width = m_image_dest.size().width;
+	m_image_output.height = m_image_dest.size().height;
 
     /* 反転した画像データをOutPortにコピー */
-    memcpy((void *)&(m_image_output.pixels[0]), m_image_dest->imageData,len);
+    memcpy((void *)&(m_image_output.pixels[0]), m_image_dest.data,len);
 
     /* 反転した画像データをOutPortから出力する */
     m_image_outputOut.write();

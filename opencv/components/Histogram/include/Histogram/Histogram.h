@@ -20,9 +20,7 @@
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
 //OpenCV header file include
-#include <cv.h>
-#include <cxcore.h>
-#include <highgui.h>
+#include <opencv2/imgproc/imgproc.hpp>
 
 #define DIMENSIONS  1     /* ヒストグラムの次元数 */
 #define UNIFORM     1     /* 一様性に関するフラグ */
@@ -299,14 +297,14 @@ class Histogram
   // <rtc-template block="private_operation">
   
   // </rtc-template>
-  IplImage* imageBuff;        /* カメラのイメージ */
-  IplImage* grayImage;				
-  IplImage* destinationImage;
-  IplImage* histogramImage;
-  IplImage* histogramBarImage;
+  cv::Mat imageBuff;        /* カメラのイメージ */
+  cv::Mat grayImage;
+  cv::Mat destinationImage;
+  cv::Mat histogramImage;
+  cv::Mat histogramBarImage;
 
-  CvHistogram *histogram;
-  CvMat* lookUpTableMatrix;   /* 濃度対応行列 */
+  cv::MatND histogram;
+  cv::Mat lookUpTableMatrix;   /* 濃度対応行列 */
 
   int histogramSize;
   int bin_w;

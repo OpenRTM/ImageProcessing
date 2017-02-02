@@ -19,9 +19,7 @@
 #include <rtm/idl/ExtendedDataTypesSkel.h>
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
-#include <cv.h>
-#include <cxcore.h>
-#include <highgui.h>
+#include <opencv2/imgproc/imgproc.hpp>
 
 #define THRESHOLD_MAX_VALUE	255				/* 2値化の際に使用する最大値 */
 #define	SCALE				( 1.0 / 255.0 )	/* L*a*b*に変換するために必要なスケールファクタ */
@@ -323,11 +321,11 @@ class BackGroundSubtractionSimple
 	void labDifference( void );
 	void grayScaleDifference( void );
 
-	IplImage *m_originalImage;
-	IplImage *m_currentImage;
-	IplImage *m_backgroundImage;
-	IplImage *m_resultImage;
-	IplImage *m_outputImage;
+	cv::Mat m_originalImage;
+	cv::Mat m_currentImage;
+	cv::Mat m_backgroundImage;
+	cv::Mat m_resultImage;
+	cv::Mat m_outputImage;
 	
 	int	m_differenceMode;   /* 差分の計算モード */
 	int	m_noiseMode;        /* ノイズを除去するモード */

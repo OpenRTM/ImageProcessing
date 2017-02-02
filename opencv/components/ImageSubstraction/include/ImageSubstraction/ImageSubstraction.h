@@ -19,9 +19,7 @@
 #include <rtm/idl/ExtendedDataTypesSkel.h>
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
-#include <cv.h>
-#include <cxcore.h>
-#include <highgui.h>
+#include <opencv2/imgproc/imgproc.hpp>
 
 #define	NUM_OF_BACKGROUND_FRAMES	50	/* 背景モデルを生成するのに使用する画像の枚数 */
 
@@ -314,8 +312,23 @@ class ImageSubstraction
   // <rtc-template block="consumer_declare">
   
   // </rtc-template>
+  void initializeBackgroundModel(int num, cv::Size size, double thre_coefficient);
 
  private:
+	 cv::Mat backgroundAverageImage;	/* 背景の平均値保存用IplImage */
+	 cv::Mat backgroundThresholdImage;	/* 背景の閾値保存用IplImage */
+
+	 cv::Mat originalImage;		/* キャプチャ画像用IplImage */
+	 cv::Mat differenceImage;	/* 差分画像用IplImage */
+	 cv::Mat resultImage;
+	 cv::Mat outputImage;
+
+	 int ImageSubstraction_count = 0;
+	 int	mode = DYNAMIC_MODE;
+	 int g_temp_w = 0;
+	 int g_temp_h = 0;
+
+	 static const char* mode_str[2];
   // <rtc-template block="private_attribute">
   
   // </rtc-template>
@@ -325,6 +338,7 @@ class ImageSubstraction
   // </rtc-template>
 
 };
+
 
 
 extern "C"

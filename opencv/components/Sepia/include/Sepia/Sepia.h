@@ -20,9 +20,7 @@
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
 /* OpenCV用インクルードファイルのインクルード */
-#include<cv.h>
-#include<cxcore.h>
-#include<highgui.h>
+#include <opencv2/imgproc/imgproc.hpp>
 
 // Service implementation headers
 // <rtc-template block="service_impl_h">
@@ -289,15 +287,15 @@ class Sepia
   int m_in_height;              /* 入力イメージのHeight */
   int m_in_width;               /* 入力イメージのWidth */
 
-  IplImage* m_image_buff;       /* Original Image */
+  cv::Mat m_image_buff;       /* Original Image */
 
-  IplImage* m_hsvImage;         /* HSV画像用IplImage */
-  IplImage* m_hueImage;         /* 色相(H)情報用IplImage */
-  IplImage* m_saturationImage;  /* 彩度(S)情報用IplImage */
-  IplImage* m_valueImage;       /* 明度(V)情報用IplImage */
+  cv::Mat m_hsvImage;         /* HSV画像用IplImage */
+  cv::Mat m_hueImage;         /* 色相(H)情報用IplImage */
+  cv::Mat m_saturationImage;  /* 彩度(S)情報用IplImage */
+  cv::Mat m_valueImage;       /* 明度(V)情報用IplImage */
 
-  IplImage* m_mergeImage;       /* マージ用IplImage */
-  IplImage* m_destinationImage; /* 結果出力用IplImage */
+  cv::Mat m_mergeImage;       /* マージ用IplImage */
+  cv::Mat m_destinationImage; /* 結果出力用IplImage */
 };
 
 

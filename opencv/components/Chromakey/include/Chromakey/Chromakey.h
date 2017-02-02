@@ -20,9 +20,7 @@
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
 /* OpenCV用 */
-#include<cv.h>
-#include<cxcore.h>
-#include<highgui.h>
+#include <opencv2/imgproc/imgproc.hpp>
 
 // Service implementation headers
 // <rtc-template block="service_impl_h">
@@ -320,18 +318,18 @@ class Chromakey
   int m_in2_height;               // Background入力イメージのHeight
   int m_in2_width;                // Background入力イメージのWidth
 
-  IplImage* m_image_buff;         // Original Image
+  cv::Mat m_image_buff;         // Original Image
   
-  IplImage* m_image_extracted;    // Extracted Image
+  cv::Mat m_image_extracted;    // Extracted Image
 
-  IplImage* m_image_mask;         // Mask Image
-  IplImage* m_image_inverseMask;  // Inverse Mask Image
+  cv::Mat m_image_mask;         // Mask Image
+  cv::Mat m_image_inverseMask;  // Inverse Mask Image
   
-  IplImage* m_image_BG_in;         // Background Input image
-  IplImage* m_image_BG;            // Background Converted Image(Resized to Camera Image)
-  IplImage* m_image_extractedBG;   // Extracted Background Image
+  cv::Mat m_image_BG_in;         // Background Input image
+  cv::Mat m_image_BG;            // Background Converted Image(Resized to Camera Image)
+  cv::Mat m_image_extractedBG;   // Extracted Background Image
 
-  IplImage* m_image_destination;	 // 結果出力用IplImage
+  cv::Mat m_image_destination;	 // 結果出力用IplImage
   
 };
 

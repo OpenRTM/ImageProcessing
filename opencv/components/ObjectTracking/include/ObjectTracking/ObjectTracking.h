@@ -19,9 +19,10 @@
 #include <rtm/idl/ExtendedDataTypesSkel.h>
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
-#include <cv.h>
-#include <cvaux.h>
-#include <highgui.h>
+#include <opencv2/video/tracking.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
+
 
 #define		SEGMENT				150		/* cvSnakeImageで用いる制御点の数 */
 #define		WINDOW_WIDTH		17		/* cvSnakeImageで最小値を探索する近傍領域の幅 */
@@ -302,8 +303,48 @@ class ObjectTracking
   // <rtc-template block="consumer_declare">
   
   // </rtc-template>
+  void on_mouse(int event, int x, int y, int flags, void* param);
+  cv::Scalar hsv2rgb(float hue);
+  void CalculateHist(cv::MatND &hist, cv::Mat &hsvImage, cv::Mat &maskImage, cv::Rect &selection);
 
  private:
+	 cv::Mat inputImage;			/* 入力されたIplImage */
+	 cv::Mat resultImage;			/* 処理結果表示用IplImage */
+	 cv::Mat hsvImage;			/* HSV表色系用IplImage */
+	 cv::Mat hueImage;			/* HSV表色系のHチャンネル用IplImage */
+	 cv::Mat maskImage;			/* マスク画像用IplImage */
+	 cv::Mat backprojectImage;	/* バックプロジェクション画像用IplImage */
+	 cv::Mat histImage;			/* ヒストグラム描画用IplImage */
+	 cv::Mat grayImage;			/* グレースケール画像用IplImage */
+
+	 cv::MatND	hist;				/* ヒストグラム処理用構造体 */
+
+	 cv::Mat frameImage;	/* キャプチャ画像用IplImage */
+	 cv::VideoCapture	capture;		/* キー入力結果を格納する変数 */
+	 int count = 0;
+	 int g_temp_w = 0;
+	 int g_temp_h = 0;
+
+	 /* 処理モード選択用フラグ */
+	 int	backprojectMode = HIDDEN_BACKPROJECTION;
+	 int	selectObject = SELECT_OFF;
+	 int	trackObject = TRACKING_STOP;
+	 int showHist = SHOW_HISTOGRAM;
+
+	 /* CamShiftトラッキング用変数 */
+	 cv::Point			origin;
+	 cv::Rect			selection;
+	 cv::Rect			trackWindow;
+	 cv::RotatedRect		trackRegion;
+	 cv::TermCriteria	trackComp;
+
+	 /* ヒストグラム用変数 */
+	 int		hdims = H_DIMENSION;		/* ヒストグラムの次元数 */
+	 static const float	hRangesArray[2];	/* ヒストグラムのレンジ */
+	 
+	 int		vmin = V_MIN;
+	 int		vmax = V_MAX;
+
   // <rtc-template block="private_attribute">
   
   // </rtc-template>

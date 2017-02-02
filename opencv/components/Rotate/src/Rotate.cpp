@@ -117,7 +117,7 @@ RTC::ReturnCode_t Rotate::onActivated(RTC::UniqueId ec_id)
   m_in_width   = 0;
 
   /* 行列を生成する */
-  m_transformMatrix = cvCreateMat( 2, 3, CV_32FC1);
+  m_transformMatrix.create( 2, 3, CV_32FC1);
 
   return RTC::RTC_OK;
 }
@@ -125,12 +125,21 @@ RTC::ReturnCode_t Rotate::onActivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Rotate::onDeactivated(RTC::UniqueId ec_id)
 {
-  if(m_image_buff       != NULL)
-    cvReleaseImage(&m_image_buff);
-  if(m_image_dest       != NULL)
-    cvReleaseImage(&m_image_dest);
 
-  cvReleaseMat(&m_transformMatrix);
+  if (!m_image_buff.empty())
+  {
+	  m_image_buff.release();
+  }
+  if (!m_image_dest.empty())
+  {
+	  m_image_dest.release();
+  }
+  if (!m_transformMatrix.empty())
+  {
+	  m_transformMatrix.release();
+  }
+
+  
 
   return RTC::RTC_OK;
 }
@@ -153,39 +162,36 @@ RTC::ReturnCode_t Rotate::onExecute(RTC::UniqueId ec_id)
       m_in_height = m_image_orig.height;
       m_in_width  = m_image_orig.width;
 
-      if(m_image_buff != NULL)
-        cvReleaseImage(&m_image_buff);
-      if(m_image_dest != NULL)
-        cvReleaseImage(&m_image_dest);
 
       /* サイズ変換のためTempメモリーを用意する */
-      m_image_buff = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3);
-      m_image_dest = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3);
+	  m_image_buff.create(cv::Size(m_in_width, m_in_height), CV_8UC3);
+	  m_image_dest.create(cv::Size(m_in_width, m_in_height), CV_8UC3);
+
     }
 
-    memcpy(m_image_buff->imageData,(void *)&(m_image_orig.pixels[0]),m_image_orig.pixels.length());
+    memcpy(m_image_buff.data,(void *)&(m_image_orig.pixels[0]),m_image_orig.pixels.length());
 
     /* Anternative process */
     /* 回転中心 */
-    CvPoint2D32f center = cvPoint2D32f( m_image_buff->width / 2.0, m_image_buff->height / 2.0);
+	CvPoint2D32f center = cvPoint2D32f(m_image_buff.size().width / 2.0, m_image_buff.size().height / 2.0);
 
     /* 変換行列を求める */
-    cv2DRotationMatrix( center, m_dbRotate, m_dbScale, m_transformMatrix);
+	m_transformMatrix = cv::getRotationMatrix2D(center, m_dbRotate, m_dbScale);
 
     /* 画像の拡大、縮小、回転を行う */
-    cvWarpAffine( m_image_buff, m_image_dest, m_transformMatrix, CV_INTER_LINEAR | CV_WARP_FILL_OUTLIERS, cvScalarAll( 0 ) );
+	cv:warpAffine(m_image_buff, m_image_dest, m_transformMatrix, m_image_dest.size(), cv::INTER_LINEAR, cv::BORDER_CONSTANT, cv::Scalar::all(255));
 
     /* Common process */
     /* 画像データのサイズ取得 */
-    int len = m_image_dest->nChannels * m_image_dest->width * m_image_dest->height;
+	int len = m_image_dest.channels() * m_image_dest.size().width * m_image_dest.size().height;
 
     /* 画面のサイズ情報を入れる */
     m_image_output.pixels.length(len);        
-    m_image_output.width  = m_image_dest->width;
-    m_image_output.height = m_image_dest->height;
+	m_image_output.width = m_image_dest.size().width;
+	m_image_output.height = m_image_dest.size().height;
 
     /* 反転した画像データをOutPortにコピー */
-    memcpy((void *)&(m_image_output.pixels[0]), m_image_dest->imageData,len);
+    memcpy((void *)&(m_image_output.pixels[0]), m_image_dest.data,len);
 
     m_image_outputOut.write();
   }

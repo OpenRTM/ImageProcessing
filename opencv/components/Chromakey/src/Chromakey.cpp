@@ -129,18 +129,6 @@ RTC::ReturnCode_t Chromakey::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Chromakey::onActivated(RTC::UniqueId ec_id)
 {
-  m_image_buff        = NULL;
-
-  m_image_extracted   = NULL;
-
-  m_image_mask        = NULL;
-  m_image_inverseMask = NULL;
-
-  m_image_BG_in       = NULL;
-  m_image_BG          = NULL;
-  m_image_extractedBG = NULL;
-
-  m_image_destination = NULL;
 
   m_in_height         = 0;
   m_in_width          = 0;
@@ -154,22 +142,39 @@ RTC::ReturnCode_t Chromakey::onActivated(RTC::UniqueId ec_id)
 RTC::ReturnCode_t Chromakey::onDeactivated(RTC::UniqueId ec_id)
 {
   /* イメージ用メモリの解放 */
-  if(m_image_buff        != NULL)
-    cvReleaseImage(&m_image_buff);
-  if(m_image_extracted   != NULL)
-    cvReleaseImage(&m_image_extracted);
-  if(m_image_mask        != NULL)
-    cvReleaseImage(&m_image_mask);
-  if(m_image_inverseMask != NULL)
-    cvReleaseImage(&m_image_inverseMask);
-  if(m_image_BG_in       != NULL)
-    cvReleaseImage(&m_image_BG_in);
-  if(m_image_BG          != NULL)
-    cvReleaseImage(&m_image_BG);
-  if(m_image_extractedBG != NULL)
-    cvReleaseImage(&m_image_extractedBG);
-  if(m_image_destination != NULL)
-    cvReleaseImage(&m_image_destination);
+	if (!m_image_buff.empty())
+	{
+		m_image_buff.release();
+	}
+	if (!m_image_extracted.empty())
+	{
+		m_image_extracted.release();
+	}
+	if (!m_image_mask.empty())
+	{
+		m_image_mask.release();
+	}
+	if (!m_image_inverseMask.empty())
+	{
+		m_image_inverseMask.release();
+	}
+	if (!m_image_BG_in.empty())
+	{
+		m_image_BG_in.release();
+	}
+	if (!m_image_BG.empty())
+	{
+		m_image_BG.release();
+	}
+	if (!m_image_extractedBG.empty())
+	{
+		m_image_extractedBG.release();
+	}
+	if (!m_image_destination.empty())
+	{
+		m_image_destination.release();
+	}
+
 
   return RTC::RTC_OK;
 }
@@ -192,15 +197,15 @@ RTC::ReturnCode_t Chromakey::onExecute(RTC::UniqueId ec_id)
       m_in2_height = m_image_back.height;
       m_in2_width  = m_image_back.width;
 
-      if(m_image_BG_in != NULL)
-        cvReleaseImage(&m_image_BG_in);
+
 
       /* サイズ変換のためTempメモリーを用意する */
-      m_image_BG_in = cvCreateImage(cvSize(m_in2_width, m_in2_height), IPL_DEPTH_8U, 3);
+	  m_image_BG_in.create(cv::Size(m_in2_width, m_in2_height), CV_8UC3);
+
     }
 
     /* InPortの画像データをIplImageのimageDataにコピー */
-    memcpy(m_image_BG_in->imageData,(void *)&(m_image_back.pixels[0]), m_image_back.pixels.length());
+    memcpy(m_image_BG_in.data,(void *)&(m_image_back.pixels[0]), m_image_back.pixels.length());
   }
 
   /* 新しいデータのチェック */
@@ -216,64 +221,57 @@ RTC::ReturnCode_t Chromakey::onExecute(RTC::UniqueId ec_id)
       m_in_height = m_image_original.height;
       m_in_width  = m_image_original.width;
 
-      if(m_image_buff        != NULL)
-          cvReleaseImage(&m_image_buff);
-      if(m_image_extracted   != NULL)
-          cvReleaseImage(&m_image_extracted);
-      if(m_image_mask        != NULL)
-          cvReleaseImage(&m_image_mask);
-      if(m_image_inverseMask != NULL)
-          cvReleaseImage(&m_image_inverseMask);
-      if(m_image_BG          != NULL)
-          cvReleaseImage(&m_image_BG);
-      if(m_image_extractedBG != NULL)
-          cvReleaseImage(&m_image_extractedBG);
-      if(m_image_destination != NULL)
-          cvReleaseImage(&m_image_destination);
 
-      m_image_buff        = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3 );
-      m_image_extracted   = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3 );
-      m_image_mask        = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 1 );
-      m_image_inverseMask = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 1 );
-      m_image_BG          = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3 );
-      m_image_extractedBG = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3 );
-      m_image_destination = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3 );
+
+
+
+	  m_image_buff.create(cv::Size(m_in_width, m_in_height), CV_8UC3);
+	  m_image_extracted.create(cv::Size(m_in_width, m_in_height), CV_8UC3);
+	  m_image_mask.create(cv::Size(m_in_width, m_in_height), CV_8UC1);
+	  m_image_inverseMask.create(cv::Size(m_in_width, m_in_height), CV_8UC1);
+	  m_image_BG.create(cv::Size(m_in_width, m_in_height), CV_8UC3);
+	  m_image_extractedBG.create(cv::Size(m_in_width, m_in_height), CV_8UC3);
+	  m_image_destination.create(cv::Size(m_in_width, m_in_height), CV_8UC3);
     }
 
     // Resize background image to fit Camera image
-    if(m_image_BG_in != NULL)
-      cvResize(m_image_BG_in, m_image_BG, CV_INTER_LINEAR);
+    if(!m_image_BG_in.empty())
+		cv::resize(m_image_BG_in, m_image_BG, m_image_BG.size());
 
-    memcpy(m_image_buff->imageData,(void *)&(m_image_original.pixels[0]),m_image_original.pixels.length());
+    memcpy(m_image_buff.data,(void *)&(m_image_original.pixels[0]),m_image_original.pixels.length());
 
     // Anternative actions
-	CvScalar lowerValue = cvScalar(m_nLowerBlue, m_nLowerGreen, m_nLowerRed);
-	CvScalar upperValue = cvScalar(m_nUpperBlue + 1, m_nUpperGreen + 1, m_nUpperRed + 1);
+	cv::Scalar lowerValue = cv::Scalar(m_nLowerBlue, m_nLowerGreen, m_nLowerRed);
+	cv::Scalar upperValue = cv::Scalar(m_nUpperBlue + 1, m_nUpperGreen + 1, m_nUpperRed + 1);
 
     /* RGB各チャンネルごとに範囲内の値以外の画素をマスクに設定する */
-    cvInRangeS( m_image_buff, lowerValue, upperValue, m_image_mask );
+	cv::inRange(m_image_buff, lowerValue, upperValue, m_image_mask);
 
     /* 背景画像のうち合成する物体部分の画素値を0にする */
-    cvSetZero( m_image_extractedBG );
-    cvCopy( m_image_BG, m_image_extractedBG, m_image_mask );
+
+	m_image_extractedBG = cv::Mat::zeros(m_image_extractedBG.size(), CV_8UC3);
+	m_image_extractedBG.copyTo(m_image_BG, m_image_mask);
+    
 
     /* マスク画像の0と1を反転する */
-    cvNot( m_image_mask, m_image_inverseMask );
+	cv::bitwise_not(m_image_mask, m_image_inverseMask);
+    
 
-    /* トラックバーの条件を満たす合成物体が抽出された画像を作成 */ 
-    cvSetZero( m_image_extracted );
-    cvCopy( m_image_buff, m_image_extracted, m_image_inverseMask );
+    /* トラックバーの条件を満たす合成物体が抽出された画像を作成 */
+	m_image_extracted = cv::Mat::zeros(m_image_extractedBG.size(), CV_8UC3);
+	m_image_extracted.copyTo(m_image_buff, m_image_inverseMask);
+    
 
     /* 背景画像と合成物体画像の合成 */
-    cvAdd( m_image_extractedBG, m_image_extracted, m_image_destination, NULL);
+    cv::add( m_image_extractedBG, m_image_extracted, m_image_destination);
        
     // Prepare to out data
-    int len = m_image_destination->nChannels * m_image_destination->width * m_image_destination->height;
+	int len = m_image_destination.channels() * m_image_destination.size().width * m_image_destination.size().height;
             
     m_image_output.pixels.length(len);        
-    m_image_output.width  = m_image_destination->width;
-    m_image_output.height = m_image_destination->height;
-    memcpy((void *)&(m_image_output.pixels[0]), m_image_destination->imageData,len);
+	m_image_output.width = m_image_destination.size().width;
+	m_image_output.height = m_image_destination.size().height;
+    memcpy((void *)&(m_image_output.pixels[0]), m_image_destination.data,len);
 
     m_image_outputOut.write();
   }

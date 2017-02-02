@@ -113,18 +113,12 @@ RTC::ReturnCode_t Template::onActivated(RTC::UniqueId ec_id)
 {
 
   /* 対象画像用メモリの初期化 */
-  templateID = -1;
+  templateID = "";
   templateWidth = 0;
   templateHeight = 0;
-  templateImage = NULL;
-  templateGrayImage = NULL;
-  templateBinaryImage = NULL;
 
-  /* イメージ用メモリの初期化 */
-  imageBuff = NULL;
-  sourceGrayImage = NULL;
-  sourceBinaryImage = NULL;
-  differenceMapImage = NULL;
+
+
 
   /* OutPort１の画面サイズの初期化 */
   m_image_template.width = 0;
@@ -140,21 +134,36 @@ RTC::ReturnCode_t Template::onActivated(RTC::UniqueId ec_id)
 RTC::ReturnCode_t Template::onDeactivated(RTC::UniqueId ec_id)
 {
 
-  if(imageBuff != NULL)
+  if (!imageBuff.empty())
   {
-    /* イメージ用メモリの解放 */
-    cvReleaseImage(&imageBuff);
-    cvReleaseImage(&sourceGrayImage);
-    cvReleaseImage(&sourceBinaryImage);
-    cvReleaseImage(&differenceMapImage);
+	  imageBuff.release();
+  }
+  if (!sourceGrayImage.empty())
+  {
+	  sourceGrayImage.release();
+  }
+  if (!sourceBinaryImage.empty())
+  {
+	  sourceBinaryImage.release();
+  }
+  if (!differenceMapImage.empty())
+  {
+	  differenceMapImage.release();
   }
 
-  if( templateImage != NULL )
+  if (!templateImage.empty())
   {
-    cvReleaseImage(&templateImage);
-    cvReleaseImage(&templateGrayImage);
-    cvReleaseImage(&templateBinaryImage);
+	  templateImage.release();
   }
+  if (!templateGrayImage.empty())
+  {
+	  templateGrayImage.release();
+  }
+  if (!templateBinaryImage.empty())
+  {
+	  templateBinaryImage.release();
+  }
+
 
   return RTC::RTC_OK;
 }
@@ -168,48 +177,49 @@ RTC::ReturnCode_t Template::onExecute(RTC::UniqueId ec_id)
     /* InPortデータの読み込み */
     m_image_origIn.read();
 
-    /* 対象画像を読み込む */
-    templateImage = cvLoadImage( m_img_path, CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_ANYCOLOR );
+	if (templateID != m_img_path)
+	{
+		/* 対象画像を読み込む */
+		templateImage = cv::imread(m_img_path, CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_ANYCOLOR);
+	}
 
-    if( templateImage == NULL )
+    if( templateImage.empty() )
     {
-      templateID = -1 ;
+      templateID = "";
       templateWidth = templateHeight = 0;
     }
 
     /* 対象画像チェック */
     /* 対象画像のPathとか名が無い場合テンプレートマッチングしなくて入力されたイメージをそのまま出力 */
-    if( templateImage != NULL && templateID != templateImage->ID )
+	if (!templateImage.empty() && templateID != m_img_path)
     {
+
       /* フラッグ設定(正しい対象画像が入力） */
       flag = 1;
-      templateID = templateImage->ID;
-      templateWidth = templateImage->width;
-      templateHeight = templateImage->height;
+	  templateID = m_img_path;
+      templateWidth = templateImage.size().width;
+	  templateHeight = templateImage.size().height;
 
-      if(templateGrayImage != NULL)
-      {
-        cvReleaseImage(&templateGrayImage);
-        cvReleaseImage(&templateBinaryImage);
-      }
+      
 
       /* 対象画像用のメモリ確保 */
-      templateGrayImage = cvCreateImage( cvGetSize(templateImage), IPL_DEPTH_8U, 1 );
-      templateBinaryImage = cvCreateImage( cvGetSize(templateImage), IPL_DEPTH_8U, 1 );
+
+	  templateGrayImage.create(templateImage.size(), CV_8UC1);
+	  templateBinaryImage.create(templateImage.size(), CV_8UC1);
 
       cout << "templateID : "<<templateID<<endl;
       cout << "template - width :"<<templateWidth<<endl;
       cout << "template - height :"<<templateHeight<<endl;
 
       /* RGBからグレースケールに変換する */
-      cvCvtColor( templateImage, templateGrayImage, CV_RGB2GRAY );
+      cv::cvtColor( templateImage, templateGrayImage, CV_RGB2GRAY );
 
       /* グレースケールから2値に変換する */
-      cvThreshold( templateGrayImage, templateBinaryImage, THRESHOLD, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY );
+      cv::threshold( templateGrayImage, templateBinaryImage, THRESHOLD, THRESHOLD_MAX_VALUE, cv::THRESH_BINARY );
 
       /* OutPort２用の画面サイズ初期化 */
-      m_image_picture.width = templateImage->width;
-      m_image_picture.height = templateImage->height;
+      m_image_picture.width = templateImage.size().width;
+	  m_image_picture.height = templateImage.size().height;
     }
 
     /* InPortとOutPortの画面サイズ処理およびイメージ用メモリの確保(正しい対象画像が入れるとdifferenceMapImageが変換される-フラッグを見て判断） */
@@ -219,44 +229,36 @@ RTC::ReturnCode_t Template::onExecute(RTC::UniqueId ec_id)
       m_image_template.width = m_image_orig.width;
       m_image_template.height = m_image_orig.height;
 
-      /* InPortのイメージサイズが変更された場合 */
-      if(imageBuff != NULL)
-      {
-        cvReleaseImage(&imageBuff);
-        cvReleaseImage(&sourceGrayImage);
-        cvReleaseImage(&sourceBinaryImage);
-        cvReleaseImage(&differenceMapImage);
-      }
+
       /* イメージ用メモリの確保 */
-      imageBuff = cvCreateImage( cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_8U, 3 );
-      sourceGrayImage = cvCreateImage( cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_8U, 1 );
-      sourceBinaryImage = cvCreateImage( cvSize(m_image_orig.width, m_image_orig.height), IPL_DEPTH_8U, 1 );
-      differenceMapImage = cvCreateImage( cvSize( m_image_orig.width - templateWidth + 1, 
-                                m_image_orig.height - templateHeight + 1 ), IPL_DEPTH_32F, 1 );
+	  imageBuff.create(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3);
+	  sourceGrayImage.create(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC1);
+	  sourceBinaryImage.create(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC1);
+	  differenceMapImage.create(cv::Size(m_image_orig.width - templateWidth + 1, m_image_orig.height - templateHeight + 1), CV_8UC1);
     }
 
     /* InPortの画像データをコピー */
-    memcpy( imageBuff->imageData, (void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length() );
+    memcpy( imageBuff.data, (void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length() );
 
-    if( templateImage != NULL )
+    if( templateImage.empty() )
     {
       /* RGBからグレースケールに変換する */
-      cvCvtColor( imageBuff, sourceGrayImage, CV_RGB2GRAY );
+      cv::cvtColor( imageBuff, sourceGrayImage, CV_RGB2GRAY );
 
       /* グレースケールから2値に変換する */
-      cvThreshold( sourceGrayImage, sourceBinaryImage, THRESHOLD, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY );
+      cv::threshold( sourceGrayImage, sourceBinaryImage, THRESHOLD, THRESHOLD_MAX_VALUE, cv::THRESH_BINARY );
 
       /* テンプレートマッチングを行う */
-      cvMatchTemplate( sourceBinaryImage, templateBinaryImage, differenceMapImage, CV_TM_SQDIFF );
+      cv::matchTemplate( sourceBinaryImage, templateBinaryImage, differenceMapImage, CV_TM_SQDIFF );
 
       /* テンプレートが元画像のどの部分にあるのかという情報を得る */
-      cvMinMaxLoc( differenceMapImage, NULL, NULL, &minLocation, NULL, NULL );
+      cv::minMaxLoc( differenceMapImage, NULL, NULL, &minLocation, NULL, NULL );
 
       /* 一致する場所を元画像に四角で描く */
-      cvRectangle(
+      cv::rectangle(
       imageBuff,
       minLocation,
-      cvPoint( minLocation.x + templateImage->width, minLocation.y + templateImage->height ),
+	  cv::Point(minLocation.x + templateImage.size().width, minLocation.y + templateImage.size().height),
                   CV_RGB( 255, 0, 0 ),
                   LINE_THICKNESS,
                   LINE_TYPE,
@@ -264,38 +266,37 @@ RTC::ReturnCode_t Template::onExecute(RTC::UniqueId ec_id)
       );
 
       /* 画像データのサイズ取得 */
-      len = imageBuff->nChannels * imageBuff->width * imageBuff->height;
+	  len = imageBuff.channels() * imageBuff.size().width * imageBuff.size().height;
       m_image_template.pixels.length(len);
 
       /* 反転した画像データをOutPortにコピー */
-      memcpy( (void *)&(m_image_template.pixels[0]), imageBuff->imageData, len );
+      memcpy( (void *)&(m_image_template.pixels[0]), imageBuff.data, len );
 
       /* 反転した画像データをOutPortから出力 */
       m_image_templateOut.write();
 
       /* 対象画像データのサイズ取得 */
-      len = templateImage->nChannels * templateImage->width * templateImage->height;
+	  len = templateImage.channels() * templateImage.size().width * templateImage.size().height;
       m_image_picture.pixels.length(len);
 
       /* 反転した対象画像データをOutPortにコピー */
-      memcpy( (void *)&(m_image_picture.pixels[0]), templateImage->imageData, len );
+      memcpy( (void *)&(m_image_picture.pixels[0]), templateImage.data, len );
 
       m_image_pictureOut.write();
 
     }else{
 
       /* 画像データのサイズ取得 */
-      len = imageBuff->nChannels * imageBuff->width * imageBuff->height;
+		len = imageBuff.channels() * imageBuff.size().width * imageBuff.size().height;
       m_image_template.pixels.length(len);
 
       /* 反転した画像データをOutPortにコピー */
-      memcpy( (void *)&(m_image_template.pixels[0]), imageBuff->imageData, len );
+      memcpy( (void *)&(m_image_template.pixels[0]), imageBuff.data, len );
 
       m_image_templateOut.write();
 
     }
 
-    cvReleaseImage(&templateImage);
   }
   return RTC::RTC_OK;
 }

@@ -20,9 +20,8 @@
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
 //OpenCV headr file include
-#include <cv.h>
-#include <cxcore.h>
-#include <highgui.h>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 #define THRESHOLD	50            /* 2値化の際の閾値 */
 #define THRESHOLD_MAX_VALUE	255 /* 2値化の際に使用する最大値 */
@@ -290,20 +289,20 @@ class Template
   // <rtc-template block="private_operation">
   
   // </rtc-template>
-  int templateID;
+  std::string templateID;
   int templateWidth, templateHeight;
   int flag;
-  IplImage* templateImage;
-  IplImage* templateGrayImage;
-  IplImage* templateBinaryImage;
+  cv::Mat templateImage;
+  cv::Mat templateGrayImage;
+  cv::Mat templateBinaryImage;
 
-  IplImage* imageBuff;
-  IplImage* sourceGrayImage;
-  IplImage* sourceBinaryImage;
+  cv::Mat imageBuff;
+  cv::Mat sourceGrayImage;
+  cv::Mat sourceBinaryImage;
   
-  IplImage* differenceMapImage;
+  cv::Mat differenceMapImage;
 
-  CvPoint minLocation;
+  cv::Point minLocation;
 
   int len;
 

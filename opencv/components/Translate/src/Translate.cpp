@@ -110,14 +110,12 @@ RTC::ReturnCode_t Translate::onShutdown(RTC::UniqueId ec_id)
 RTC::ReturnCode_t Translate::onActivated(RTC::UniqueId ec_id)
 {
   /* イメージ用メモリの確保 */
-  m_image_buff       = NULL;
-  m_image_dest       = NULL;
 
   m_in_height = 0;
   m_in_width  = 0;
 
   /* 行列を生成する */
-  m_transformMatrix = cvCreateMat( 2, 3, CV_32FC1);
+  m_transformMatrix.create( 2, 3, CV_32FC1);
 
   return RTC::RTC_OK;
 }
@@ -125,15 +123,22 @@ RTC::ReturnCode_t Translate::onActivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Translate::onDeactivated(RTC::UniqueId ec_id)
 {
-  if(m_image_buff       != NULL)
+  
+
+  if (!m_image_buff.empty())
   {
-    cvReleaseImage(&m_image_buff);
-  }  
-  if(m_image_dest       != NULL)
-  {
-    cvReleaseImage(&m_image_dest);
+	  m_image_buff.release();
   }
-  cvReleaseMat(&m_transformMatrix);
+  if (!m_image_dest.empty())
+  {
+	  m_image_dest.release();
+  }
+  if (!m_transformMatrix.empty())
+  {
+	  m_transformMatrix.release();
+  }
+
+  
 
   return RTC::RTC_OK;
 }
@@ -155,54 +160,46 @@ RTC::ReturnCode_t Translate::onExecute(RTC::UniqueId ec_id)
       m_in_height = m_image_orig.height;
       m_in_width  = m_image_orig.width;
 
-      if(m_image_buff       != NULL)
-      {
-        cvReleaseImage(&m_image_buff);
-      }
-      if(m_image_dest       != NULL)
-      {
-        cvReleaseImage(&m_image_dest);
-      }
+
       /* サイズ変換のためTempメモリーを用意する */
-      m_image_buff = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3);
-      m_image_dest = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3);
+	  m_image_buff.create(cv::Size(m_in_width, m_in_height), CV_8UC3);
+	  m_image_dest.create(cv::Size(m_in_width, m_in_height), CV_8UC3);
     }
 
     /* InPortの画像データをIplImageのimageDataにコピー */
-    memcpy(m_image_buff->imageData,(void *)&(m_image_orig.pixels[0]),m_image_orig.pixels.length());
+    memcpy(m_image_buff.data,(void *)&(m_image_orig.pixels[0]),m_image_orig.pixels.length());
 
     // Anternative process
-    CvPoint2D32f original[3];   /* 変換前座標 */
-    CvPoint2D32f Translate[3];  /* 変換後座標 */
+    cv::Point2f original[3];   /* 変換前座標 */
+    cv::Point2f Translate[3];  /* 変換後座標 */
 
     /* 変換前の座標を設定する */
-    original[0] = cvPoint2D32f( 0, 0 );
-    original[1] = cvPoint2D32f( m_image_buff->width, 0 );
-    original[2] = cvPoint2D32f( 0, m_image_buff->height );
+	original[0] = cv::Point2f(0, 0);
+	original[1] = cv::Point2f(m_image_buff.size().width, 0);
+	original[2] = cv::Point2f(0, m_image_buff.size().height);
 
     /* 変換後の座標を設定する */
-    Translate[0] = cvPoint2D32f( m_nTransX,                       m_nTransY );
-    Translate[1] = cvPoint2D32f( m_nTransX + m_image_buff->width, m_nTransY );
-    Translate[2] = cvPoint2D32f( m_nTransX,                       m_nTransY + m_image_buff->height );
+	Translate[0] = cv::Point2f(m_nTransX, m_nTransY);
+	Translate[1] = cv::Point2f(m_nTransX + m_image_buff.size().width, m_nTransY);
+	Translate[2] = cv::Point2f(m_nTransX, m_nTransY + m_image_buff.size().height);
 
     /* 変換行列を求める */
-    cvGetAffineTransform( original, Translate, m_transformMatrix );
+	m_transformMatrix = cv::getAffineTransform(original, Translate);
 
     /* 変換行列を反映させる */
-    cvWarpAffine( m_image_buff, m_image_dest, m_transformMatrix, 
-                CV_INTER_LINEAR | CV_WARP_FILL_OUTLIERS, cvScalarAll( 0 ) );
+	warpAffine(m_image_buff, m_image_dest, m_transformMatrix, m_image_dest.size(), cv::INTER_LINEAR, cv::BORDER_CONSTANT, cv::Scalar::all(0));
 
     // Common process
     /* 画像データのサイズ取得 */
-    int len = m_image_dest->nChannels * m_image_dest->width * m_image_dest->height;
+	int len = m_image_dest.channels() * m_image_dest.size().width * m_image_dest.size().height;
 
     /* 画面のサイズ情報を入れる */
     m_image_output.pixels.length(len);        
-    m_image_output.width  = m_image_dest->width;
-    m_image_output.height = m_image_dest->height;
+	m_image_output.width = m_image_dest.size().width;
+	m_image_output.height = m_image_dest.size().height;
 
     /* 反転した画像データをOutPortにコピー */
-    memcpy((void *)&(m_image_output.pixels[0]), m_image_dest->imageData,len);
+    memcpy((void *)&(m_image_output.pixels[0]), m_image_dest.data,len);
 
     /* 反転した画像データをOutPortから出力する */
     m_image_outputOut.write();

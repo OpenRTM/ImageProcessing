@@ -20,9 +20,7 @@
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
 /* OpenCV用インクルードファイルのインクルード */
-#include<cv.h>
-#include<cxcore.h>
-#include<highgui.h>
+#include <opencv2/imgproc/imgproc.hpp>
 
 // Service implementation headers
 // <rtc-template block="service_impl_h">
@@ -288,11 +286,11 @@ class Rotate
   int m_in_height;          /* 入力イメージのHeight */
   int m_in_width;           /* 入力イメージのWidth */
 
-  IplImage* m_image_buff;   /* Original Image */
+  cv::Mat m_image_buff;   /* Original Image */
 
-  IplImage* m_image_dest;   /* 結果出力用IplImage */
+  cv::Mat m_image_dest;   /* 結果出力用IplImage */
 
-  CvMat *m_transformMatrix;
+  cv::Mat m_transformMatrix;
 };
 
 

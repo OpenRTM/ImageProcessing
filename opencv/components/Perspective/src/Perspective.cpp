@@ -99,15 +99,13 @@ RTC::ReturnCode_t Perspective::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Perspective::onActivated(RTC::UniqueId ec_id)
 {
-  /* イメージ用メモリの確保 */
-  m_image_buff       = NULL;
-  m_image_dest       = NULL;
+
 
   m_in_height  = 0;
   m_in_width   = 0;
 
   /* 行列を生成する */
-  m_perspectiveMatrix = cvCreateMat( 3, 3, CV_32FC1);
+  m_perspectiveMatrix.create(cv::Size(3, 3), CV_8UC1);
 
   return RTC::RTC_OK;
 }
@@ -115,12 +113,21 @@ RTC::ReturnCode_t Perspective::onActivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Perspective::onDeactivated(RTC::UniqueId ec_id)
 {
-  if(m_image_buff       != NULL)
-    cvReleaseImage(&m_image_buff);
-  if(m_image_dest         != NULL)
-    cvReleaseImage(&m_image_dest);
 
-  cvReleaseMat(&m_perspectiveMatrix);
+
+  if (!m_image_buff.empty())
+  {
+	  m_image_buff.release();
+  }
+  if (!m_image_dest.empty())
+  {
+	  m_image_dest.release();
+  }
+  if (!m_perspectiveMatrix.empty())
+  {
+	  m_perspectiveMatrix.release();
+  }
+
 
   return RTC::RTC_OK;
 }
@@ -143,52 +150,67 @@ RTC::ReturnCode_t Perspective::onExecute(RTC::UniqueId ec_id)
       m_in_height = m_image_orig.height;
       m_in_width  = m_image_orig.width;
 
-      if(m_image_buff       != NULL)
-        cvReleaseImage(&m_image_buff);
-      if(m_image_dest         != NULL)
-        cvReleaseImage(&m_image_dest);
+
 
       /* サイズ変換のためTempメモリーを用意する */
-      m_image_buff = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3);
-      m_image_dest = cvCreateImage(cvSize(m_in_width, m_in_height), IPL_DEPTH_8U, 3);
+	  m_image_buff.create(cv::Size(m_in_width, m_in_height), CV_8UC3);
+	  m_image_dest.create(cv::Size(m_in_width, m_in_height), CV_8UC3);
     }
 
     /* InPortの画像データをIplImageのimageDataにコピー */
-    memcpy(m_image_buff->imageData,(void *)&(m_image_orig.pixels[0]),m_image_orig.pixels.length());
+    memcpy(m_image_buff.data,(void *)&(m_image_orig.pixels[0]),m_image_orig.pixels.length());
 
     // Anternative actions
-    CvPoint2D32f original[4];   /* 変換前座標 */
-    CvPoint2D32f translate[4];  /* 変換後座標 */
+	std::vector<cv::Point2f>  original;   /* 変換前座標 */
+	std::vector<cv::Point2f> translate;  /* 変換後座標 */
+	
 
     /* 変換前の座標を設定する */
-    original[0] = cvPoint2D32f( 0, 0 );
-    original[1] = cvPoint2D32f( m_image_buff->width, 0 );
-    original[2] = cvPoint2D32f( 0, m_image_buff->height );
-    original[3] = cvPoint2D32f( m_image_buff->width, m_image_buff->height );
+	original.push_back(cv::Point2f(0, 0));
+	original.push_back(cv::Point2f(m_image_buff.size().width, 0));
+	original.push_back(cv::Point2f(0, m_image_buff.size().height));
+	original.push_back(cv::Point2f(m_image_buff.size().width, m_image_buff.size().height));
+
 
     /* 変換後の座標を設定する */
-    translate[0] = cvPoint2D32f( m_image_buff->width / 5 * 1, m_image_buff->height / 5 * 2 );
-    translate[1] = cvPoint2D32f( m_image_buff->width / 5 * 4, m_image_buff->height / 5 * 2 );
-    translate[2] = cvPoint2D32f(                           0, m_image_buff->height / 5 * 4 );
-    translate[3] = cvPoint2D32f( m_image_buff->width        , m_image_buff->height / 5 * 4 );
+	translate.push_back(cv::Point2f(m_image_buff.size().width / 5 * 1, m_image_buff.size().height / 5 * 2));
+	translate.push_back(cv::Point2f(m_image_buff.size().width / 5 * 4, m_image_buff.size().height / 5 * 2));
+	translate.push_back(cv::Point2f(0, m_image_buff.size().height / 5 * 4));
+	translate.push_back(cv::Point2f(m_image_buff.size().width, m_image_buff.size().height / 5 * 4));
+
+	// 変換前の画像での座標
+	const cv::Point2f src_pt[] = {
+		cv::Point2f(88.0, 81.0),
+		cv::Point2f(111.0, 436.0),
+		cv::Point2f(420.0, 346.0),
+		cv::Point2f(424, 131) };
+
+	// 変換後の画像での座標
+	const cv::Point2f dst_pt[] = {
+		cv::Point2f(0.0, 0.0),
+		cv::Point2f(0, 0 - 1 - 200),
+		cv::Point2f(0 - 1, 0 - 1 - 200),
+		cv::Point2f(0 - 1, 0) };
+	
 
     /* 変換行列を求める */	
-    cvGetPerspectiveTransform( original, translate, m_perspectiveMatrix );
+	m_perspectiveMatrix = cv::getPerspectiveTransform(original, translate);
 
     /* 変換行列を反映させる */
-    cvWarpPerspective( m_image_buff, m_image_dest, m_perspectiveMatrix, 
-                        CV_INTER_LINEAR | CV_WARP_FILL_OUTLIERS, cvScalarAll( 0 ) );
+	cv::warpPerspective(m_image_buff, m_image_dest, m_perspectiveMatrix,
+						m_image_dest.size());
+                        //CV_INTER_LINEAR | CV_WARP_FILL_OUTLIERS, cv::Scalar::all(255) );
 
     /* 画像データのサイズ取得 */
-    int len = m_image_dest->nChannels * m_image_dest->width * m_image_dest->height;
+	int len = m_image_dest.channels() * m_image_dest.size().width * m_image_dest.size().height;
           
     /* 画面のサイズ情報を入れる */
     m_image_out.pixels.length(len);        
-    m_image_out.width  = m_image_dest->width;
-    m_image_out.height = m_image_dest->height;
+	m_image_out.width = m_image_dest.size().width;
+	m_image_out.height = m_image_dest.size().height;
 
     /* 反転した画像データをOutPortにコピー */
-    memcpy((void *)&(m_image_out.pixels[0]), m_image_dest->imageData,len);
+    memcpy((void *)&(m_image_out.pixels[0]), m_image_dest.data,len);
 
     /* 反転した画像データをOutPortから出力する */
     m_image_outOut.write();
