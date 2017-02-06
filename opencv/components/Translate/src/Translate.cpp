@@ -109,10 +109,6 @@ RTC::ReturnCode_t Translate::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Translate::onActivated(RTC::UniqueId ec_id)
 {
-  /* イメージ用メモリの確保 */
-
-  m_in_height = 0;
-  m_in_width  = 0;
 
   /* 行列を生成する */
   m_transformMatrix.create( 2, 3, CV_32FC1);
@@ -125,18 +121,7 @@ RTC::ReturnCode_t Translate::onDeactivated(RTC::UniqueId ec_id)
 {
   
 
-  if (!m_image_buff.empty())
-  {
-	  m_image_buff.release();
-  }
-  if (!m_image_dest.empty())
-  {
-	  m_image_dest.release();
-  }
-  if (!m_transformMatrix.empty())
-  {
-	  m_transformMatrix.release();
-  }
+
 
   
 
@@ -153,21 +138,15 @@ RTC::ReturnCode_t Translate::onExecute(RTC::UniqueId ec_id)
     /* InPortデータの読み込み */
     m_image_origIn.read();
 
-    /* サイズが変わったときだけ再生成する */
-    if(m_in_height != m_image_orig.height || m_in_width != m_image_orig.width)
-    {
-      printf("[onExecute] Size of input image is not match!\n");
-      m_in_height = m_image_orig.height;
-      m_in_width  = m_image_orig.width;
 
-
-      /* サイズ変換のためTempメモリーを用意する */
-	  m_image_buff.create(cv::Size(m_in_width, m_in_height), CV_8UC3);
-	  m_image_dest.create(cv::Size(m_in_width, m_in_height), CV_8UC3);
-    }
 
     /* InPortの画像データをIplImageのimageDataにコピー */
-    memcpy(m_image_buff.data,(void *)&(m_image_orig.pixels[0]),m_image_orig.pixels.length());
+	cv::Mat m_image_buff(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3, (void *)&(m_image_orig.pixels[0]));
+    //memcpy(m_image_buff.data,(void *)&(m_image_orig.pixels[0]),m_image_orig.pixels.length());
+	cv::Mat m_image_dest;   /* 結果出力用IplImage */
+
+	cv::Mat m_transformMatrix;
+
 
     // Anternative process
     cv::Point2f original[3];   /* 変換前座標 */

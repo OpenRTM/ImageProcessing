@@ -296,13 +296,7 @@ class Template
   cv::Mat templateGrayImage;
   cv::Mat templateBinaryImage;
 
-  cv::Mat imageBuff;
-  cv::Mat sourceGrayImage;
-  cv::Mat sourceBinaryImage;
-  
-  cv::Mat differenceMapImage;
 
-  cv::Point minLocation;
 
   int len;
 

@@ -283,14 +283,9 @@ class Scale
   // <rtc-template block="private_operation">
   
   // </rtc-template>
-	 cv::Mat m_image_buff;     /* Original Image */
-	 cv::Mat m_image_dest;     /* 結果出力用IplImage */
 
-  double m_currentScaleX;     /* 現在のX方向拡大比率 */
-  double m_currentScaleY;     /* 現在のY方向拡大比率 */
 
-  int m_in_height;      /* 入力イメージのHeight */
-  int m_in_width;       /* 入力イメージのWidth */
+
 };
 
 

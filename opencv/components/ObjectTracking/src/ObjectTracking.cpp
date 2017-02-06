@@ -490,16 +490,16 @@ RTC::ReturnCode_t ObjectTracking::onExecute(RTC::UniqueId ec_id)
 			trackRegion = cv::CamShift(backprojectImage,
 				trackWindow,
 				trackComp);
-			//cv::ellipse(resultImage, trackRegion, cv::Scalar(0, 0, 255), 3, cv::LINE_AA);
+			cv::ellipse(resultImage, trackRegion, cv::Scalar(0, 0, 255), 3, cv::LINE_AA);
 
 			//trackWindow = trackComp.rect;
 
 			/* SnakeImage用のグレースケール画像を作成する */
-			cv::cvtColor(resultImage, grayImage, cv::COLOR_BGR2GRAY);
+			/*cv::cvtColor(resultImage, grayImage, cv::COLOR_BGR2GRAY);
 
 			if (backprojectMode == SHOW_BACKPROJECTION){
 				cv::cvtColor(backprojectImage, resultImage, CV_GRAY2BGR);
-			}
+			}*/
 			//if (resultImage->origin == 1){
 			//	trackRegion.angle = -trackRegion.angle;
 			//}

@@ -304,6 +304,7 @@ class Chromakey
   // </rtc-template>
 
  private:
+	 cv::Mat m_image_BG_in;         // Background Input image
   // <rtc-template block="private_attribute">
   
   // </rtc-template>
@@ -312,24 +313,8 @@ class Chromakey
   
   // </rtc-template>
     // Configuration fileds
-  int m_in_height;                // 入力イメージのHeight
-  int m_in_width;                 // 入力イメージのWidth
 
-  int m_in2_height;               // Background入力イメージのHeight
-  int m_in2_width;                // Background入力イメージのWidth
 
-  cv::Mat m_image_buff;         // Original Image
-  
-  cv::Mat m_image_extracted;    // Extracted Image
-
-  cv::Mat m_image_mask;         // Mask Image
-  cv::Mat m_image_inverseMask;  // Inverse Mask Image
-  
-  cv::Mat m_image_BG_in;         // Background Input image
-  cv::Mat m_image_BG;            // Background Converted Image(Resized to Camera Image)
-  cv::Mat m_image_extractedBG;   // Extracted Background Image
-
-  cv::Mat m_image_destination;	 // 結果出力用IplImage
   
 };
 

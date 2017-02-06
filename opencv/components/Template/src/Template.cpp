@@ -134,22 +134,7 @@ RTC::ReturnCode_t Template::onActivated(RTC::UniqueId ec_id)
 RTC::ReturnCode_t Template::onDeactivated(RTC::UniqueId ec_id)
 {
 
-  if (!imageBuff.empty())
-  {
-	  imageBuff.release();
-  }
-  if (!sourceGrayImage.empty())
-  {
-	  sourceGrayImage.release();
-  }
-  if (!sourceBinaryImage.empty())
-  {
-	  sourceBinaryImage.release();
-  }
-  if (!differenceMapImage.empty())
-  {
-	  differenceMapImage.release();
-  }
+
 
   if (!templateImage.empty())
   {
@@ -204,8 +189,7 @@ RTC::ReturnCode_t Template::onExecute(RTC::UniqueId ec_id)
 
       /* 対象画像用のメモリ確保 */
 
-	  templateGrayImage.create(templateImage.size(), CV_8UC1);
-	  templateBinaryImage.create(templateImage.size(), CV_8UC1);
+
 
       cout << "templateID : "<<templateID<<endl;
       cout << "template - width :"<<templateWidth<<endl;
@@ -223,24 +207,21 @@ RTC::ReturnCode_t Template::onExecute(RTC::UniqueId ec_id)
     }
 
     /* InPortとOutPortの画面サイズ処理およびイメージ用メモリの確保(正しい対象画像が入れるとdifferenceMapImageが変換される-フラッグを見て判断） */
-    if(m_image_orig.width != m_image_template.width || m_image_orig.height != m_image_template.height || flag == 1)
-    {
-      flag = 0;
-      m_image_template.width = m_image_orig.width;
-      m_image_template.height = m_image_orig.height;
-
-
-      /* イメージ用メモリの確保 */
-	  imageBuff.create(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3);
-	  sourceGrayImage.create(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC1);
-	  sourceBinaryImage.create(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC1);
-	  differenceMapImage.create(cv::Size(m_image_orig.width - templateWidth + 1, m_image_orig.height - templateHeight + 1), CV_8UC1);
-    }
+	m_image_template.width = m_image_orig.width;
+	m_image_template.height = m_image_orig.height;
 
     /* InPortの画像データをコピー */
-    memcpy( imageBuff.data, (void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length() );
+	cv::Mat imageBuff(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3, (void *)&(m_image_orig.pixels[0]));
+	
+	cv::Mat sourceGrayImage;
+	cv::Mat sourceBinaryImage;
 
-    if( templateImage.empty() )
+	cv::Mat differenceMapImage;
+
+	cv::Point minLocation;
+    //memcpy( imageBuff.data, (void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length() );
+	
+    if( !templateImage.empty() )
     {
       /* RGBからグレースケールに変換する */
       cv::cvtColor( imageBuff, sourceGrayImage, CV_RGB2GRAY );
@@ -249,10 +230,13 @@ RTC::ReturnCode_t Template::onExecute(RTC::UniqueId ec_id)
       cv::threshold( sourceGrayImage, sourceBinaryImage, THRESHOLD, THRESHOLD_MAX_VALUE, cv::THRESH_BINARY );
 
       /* テンプレートマッチングを行う */
-      cv::matchTemplate( sourceBinaryImage, templateBinaryImage, differenceMapImage, CV_TM_SQDIFF );
+	  cv::matchTemplate(sourceBinaryImage, templateBinaryImage, differenceMapImage, CV_TM_SQDIFF);
 
       /* テンプレートが元画像のどの部分にあるのかという情報を得る */
-      cv::minMaxLoc( differenceMapImage, NULL, NULL, &minLocation, NULL, NULL );
+	  cv::Point max_pt;
+	  double maxVal;
+	  cv::minMaxLoc(differenceMapImage, NULL, NULL, &minLocation, NULL);
+      //cv::minMaxLoc( differenceMapImage, NULL, NULL, &minLocation, NULL, NULL );
 
       /* 一致する場所を元画像に四角で描く */
       cv::rectangle(
@@ -265,12 +249,13 @@ RTC::ReturnCode_t Template::onExecute(RTC::UniqueId ec_id)
                   SHIFT
       );
 
+
       /* 画像データのサイズ取得 */
 	  len = imageBuff.channels() * imageBuff.size().width * imageBuff.size().height;
       m_image_template.pixels.length(len);
 
       /* 反転した画像データをOutPortにコピー */
-      memcpy( (void *)&(m_image_template.pixels[0]), imageBuff.data, len );
+	  memcpy((void *)&(m_image_template.pixels[0]), imageBuff.data, len);
 
       /* 反転した画像データをOutPortから出力 */
       m_image_templateOut.write();

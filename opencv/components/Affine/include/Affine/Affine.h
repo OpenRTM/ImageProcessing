@@ -281,11 +281,11 @@ class Affine
 
 
 
-  cv::Mat m_image_buff;         // Original Image
-  cv::Mat m_image_dest;         // 結果出力用IplImage
+  //cv::Mat m_image_buff;         // Original Image
+  //cv::Mat m_image_dest;         // 結果出力用IplImage
 
-  int m_in_height;                // 入力イメージのHeight
-  int m_in_width;                 // 入力イメージのWidth
+  //int m_in_height;                // 入力イメージのHeight
+  //int m_in_width;                 // 入力イメージのWidth
 
   /* Configuration値が有効かをチェック */
   bool isConfigurationValidated();

@@ -278,8 +278,7 @@ class Flip
   // <rtc-template block="private_operation">
   
   // </rtc-template>
-	 cv::Mat m_imageBuff;
-	 cv::Mat m_flipImageBuff;
+
 };
 
 

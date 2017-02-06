@@ -118,10 +118,7 @@ RTC::ReturnCode_t Histogram::onActivated(RTC::UniqueId ec_id)
 
 
   /* OutPort画面サイズの初期化 */
-  m_image_histogram.width = 0;
-  m_image_histogram.height = 0;
-  m_image_histogramImage.width = 0;
-  m_image_histogramImage.height = 0;
+
 
   /* ヒストグラムに描画される縦棒の数 */
   //histogramSize = 128;
@@ -142,7 +139,8 @@ RTC::ReturnCode_t Histogram::onActivated(RTC::UniqueId ec_id)
   //histogram = cvCreateHist( DIMENSIONS, &histogramSize, CV_HIST_ARRAY, ranges, UNIFORM );
 
   /* 行列を生成 */
-  lookUpTableMatrix.create(cv::Size(1, 256), CV_8UC1);
+  lookUpTableMatrix.create(cv::Size(1, 256), CV_8UC1); /* 濃度対応行列 */
+  
   //lookUpTableMatrix = cvCreateMatHeader( 1, 256, CV_8UC1 );
 
   /* 濃度対応行列に濃度対応表をセット */
@@ -159,26 +157,7 @@ RTC::ReturnCode_t Histogram::onDeactivated(RTC::UniqueId ec_id)
   
   
 
-  if (!imageBuff.empty())
-  {
-	  imageBuff.release();
-  }
-  if (!grayImage.empty())
-  {
-	  grayImage.release();
-  }
-  if (!destinationImage.empty())
-  {
-	  destinationImage.release();
-  }
-  if (!histogramImage.empty())
-  {
-	  histogramImage.release();
-  }
-  if (!histogramBarImage.empty())
-  {
-	  histogramBarImage.release();
-  }
+
 
 
   return RTC::RTC_OK;
@@ -193,28 +172,27 @@ RTC::ReturnCode_t Histogram::onExecute(RTC::UniqueId ec_id)
     /* InPortデータの読み込み */
     m_image_origIn.read();
 
-    /* InPortとOutPortの画面サイズ処理およびイメージ用メモリ確保 */
-    if(m_image_orig.width != m_image_histogram.width || m_image_orig.height != m_image_histogram.height)
-    {
-      m_image_histogram.width = m_image_histogramImage.width = m_image_orig.width;
-      m_image_histogram.height = m_image_histogramImage.height = m_image_orig.height;
+	cv::Mat grayImage;
+	cv::Mat destinationImage;
+	cv::Mat histogramImage;
+	cv::Mat histogramBarImage(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3);
+	cv::MatND histogram;
+	
+	
 
-
-
-      /* イメージ用メモリの確保 */
-	  imageBuff.create(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3);
-	  grayImage.create(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC1);
-	  destinationImage.create(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC1);
-	  histogramBarImage.create(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3);
-	  imageBuff.create(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3);
-      /* ヒストグラムの縦棒の横幅を計算する */
-      bin_w = cvRound( ( double )histogramBarImage.size().width / histogramSize );
-	  
-    }
+    
+	m_image_histogram.width = m_image_histogramImage.width = m_image_orig.width;
+	m_image_histogram.height = m_image_histogramImage.height = m_image_orig.height;
+	bin_w = cvRound((double)histogramBarImage.size().width / histogramSize);
 
     /* InPortの画面データをコピー */
-    memcpy(imageBuff.data,(void *)&(m_image_orig.pixels[0]),m_image_orig.pixels.length());
 
+    //memcpy(imageBuff.data,(void *)&(m_image_orig.pixels[0]),m_image_orig.pixels.length());
+	cv::Mat imageBuff(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3, (void *)&(m_image_orig.pixels[0]));
+	
+	
+	
+	
     /* RGBからグレースケールに変換 */
     cv::cvtColor( imageBuff, grayImage, CV_RGB2GRAY);
 

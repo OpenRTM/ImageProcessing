@@ -303,7 +303,7 @@ class SubStractCaptureImage
   
   // </rtc-template>
 
-	 cv::Mat inputImage;
+	 //cv::Mat inputImage;
 	 cv::Mat backgroundAverageImage;     /* 背景の平均値保存用IplImage */
 	 cv::Mat backgroundThresholdImage;   /* 背景の閾値保存用IplImage */
 	 cv::Mat stillObjectAverageImage;    /* 静止物体の平均値保存用IplImage */

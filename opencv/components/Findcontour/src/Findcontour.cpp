@@ -120,13 +120,9 @@ RTC::ReturnCode_t Findcontour::onActivated(RTC::UniqueId ec_id)
 {
 
 
-  /* OutPort画面サイズの初期化 */
-  m_image_contour.width = 0;
-  m_image_contour.height = 0;
 
-  find_contour.clear();
-  red = cv::Scalar(255, 0, 0);
-  green = cv::Scalar(0, 255, 0);
+
+
 
   return RTC::RTC_OK;
 }
@@ -136,22 +132,7 @@ RTC::ReturnCode_t Findcontour::onDeactivated(RTC::UniqueId ec_id)
 {
 
 
-  if (!imageBuff.empty())
-  {
-	  imageBuff.release();
-  }
-  if (!grayImage.empty())
-  {
-	  grayImage.release();
-  }
-  if (!binaryImage.empty())
-  {
-	  binaryImage.release();
-  }
-  if (!contourImage.empty())
-  {
-	  contourImage.release();
-  }
+
 
 
   return RTC::RTC_OK;
@@ -160,6 +141,17 @@ RTC::ReturnCode_t Findcontour::onDeactivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Findcontour::onExecute(RTC::UniqueId ec_id)
 {
+	cv::Mat imageBuff;
+	cv::Mat grayImage;
+	cv::Mat binaryImage;
+	cv::Mat contourImage;
+	int find_contour_num;
+	std::vector<std::vector<cv::Point>> find_contour;
+	cv::Scalar red;
+	cv::Scalar green;
+	red = cv::Scalar(255, 0, 0);
+	green = cv::Scalar(0, 255, 0);
+
   /* 新しいデータのチェック */
   if(m_image_origIn.isNew())
   {
@@ -167,25 +159,14 @@ RTC::ReturnCode_t Findcontour::onExecute(RTC::UniqueId ec_id)
     m_image_origIn.read();
 
     /* InPortとOutPortの画面サイズ処理およびイメージ用メモリ確保 */
-    if( m_image_orig.width != m_image_contour.width || m_image_orig.height != m_image_contour.height)
-    {
-      m_image_contour.width = m_image_orig.width;
-      m_image_contour.height = m_image_orig.height;
 
-
-
-      /* イメージ用メモリの確保 */
-
-	  imageBuff.create(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3);
-	  grayImage.create(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC1);
-	  binaryImage.create(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC1);
-	  contourImage.create(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3);
-
-    }
+	m_image_contour.width = m_image_orig.width;
+	m_image_contour.height = m_image_orig.height;
 
     /* InPortの画面データをコピー */
-    memcpy( imageBuff.data, (void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length() );
-    memcpy( contourImage.data, (void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length() );
+	cv::Mat imageBuff(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3, (void *)&(m_image_orig.pixels[0]));
+	cv::Mat contourImage(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3, (void *)&(m_image_orig.pixels[0]));
+
 
     /* RGBからグレースケールに変換 */
     cv::cvtColor( imageBuff, grayImage, CV_RGB2GRAY);

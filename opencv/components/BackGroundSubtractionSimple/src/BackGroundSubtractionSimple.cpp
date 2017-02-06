@@ -110,11 +110,7 @@ RTC::ReturnCode_t BackGroundSubtractionSimple::onInitialize()
   bindParameter("threshold_level", m_nThresholdLv, "20");
   // </rtc-template>
 
-	m_originalImage = NULL;
-	m_currentImage = NULL;
-	m_backgroundImage = NULL;
-	m_resultImage = NULL;
-	m_outputImage = NULL;
+
   
   return RTC::RTC_OK;
 }
@@ -157,22 +153,7 @@ RTC::ReturnCode_t BackGroundSubtractionSimple::onDeactivated(RTC::UniqueId ec_id
 {
 
 
-  if (!m_originalImage.empty())
-  {
-	  m_originalImage.release();
-  }
-  if (!m_currentImage.empty())
-  {
-	  m_currentImage.release();
-  }
-  if (!m_resultImage.empty())
-  {
-	  m_resultImage.release();
-  }
-  if (!m_outputImage.empty())
-  {
-	  m_outputImage.release();
-  }
+
   if (!m_backgroundImage.empty())
   {
 	  m_backgroundImage.release();
@@ -192,14 +173,8 @@ RTC::ReturnCode_t BackGroundSubtractionSimple::onExecute(RTC::UniqueId ec_id)
   /* イメージRead */
   m_img_origIn.read();
 
-  if (m_originalImage.empty())
-  {
-	  m_originalImage.create(cv::Size(m_img_orig.width, m_img_orig.height), CV_8UC3);
-  }
-  if (m_currentImage.empty())
-  {
-	  m_currentImage.create(cv::Size(m_img_orig.width, m_img_orig.height), CV_8UC3);
-  }
+
+
 
   if(m_img_orig.width != m_temp_w || m_img_orig.height != m_temp_h){
 	if (m_backgroundImage.empty())
@@ -210,19 +185,15 @@ RTC::ReturnCode_t BackGroundSubtractionSimple::onExecute(RTC::UniqueId ec_id)
 
 
 
-  if (m_resultImage.empty())
-  {
-	  m_resultImage.create(cv::Size(m_img_orig.width, m_img_orig.height), CV_8UC1);
-  }
-
-  if (m_outputImage.empty())
-  {
-	  m_outputImage.create(cv::Size(m_img_orig.width, m_img_orig.height), CV_8UC3);
-  }
+  
 
   /* InPortの映像の取得 */
-  memcpy(m_originalImage.data,(void *)&(m_img_orig.pixels[0]),m_img_orig.pixels.length());
+  //memcpy(m_originalImage.data,(void *)&(m_img_orig.pixels[0]),m_img_orig.pixels.length());
+  cv::Mat m_originalImage(cv::Size(m_img_orig.width, m_img_orig.height), CV_8UC3, (void *)&(m_img_orig.pixels[0]));
+  
   m_currentImage = m_originalImage.clone();
+  
+  cv::Mat m_outputImage;
 		
   /* 差の計算方法の切り替え */
   if( m_differenceMode == COLOR_DIFFERENCE ){	

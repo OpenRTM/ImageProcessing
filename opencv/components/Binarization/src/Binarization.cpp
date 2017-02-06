@@ -111,8 +111,7 @@ RTC::ReturnCode_t Binarization::onActivated(RTC::UniqueId ec_id)
 {
 
 
-  m_in_height        = 0;
-  m_in_width         = 0;
+
 
   return RTC::RTC_OK;
 }
@@ -120,23 +119,7 @@ RTC::ReturnCode_t Binarization::onActivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Binarization::onDeactivated(RTC::UniqueId ec_id)
 {
-	if (!m_image_buff.empty())
-	{
-		m_image_buff.release();
-	}
-	if (!m_image_binary.empty())
-	{
-		m_image_binary.release();
-	}
-	if (!m_image_gray.empty())
-	{
-		m_image_gray.release();
-	}
-	if (!m_image_dest.empty())
-	{
-		m_image_dest.release();
-	}
-  
+
 
   return RTC::RTC_OK;
 }
@@ -151,26 +134,14 @@ RTC::ReturnCode_t Binarization::onExecute(RTC::UniqueId ec_id)
     /* InPortデータの読み込み */
     m_image_origIn.read();
 
-    /* サイズが変わったときだけ再生成する */
-    if(m_in_height != m_image_orig.height || m_in_width != m_image_orig.width)
-    {
-      printf("[onExecute] Size of input image is not match!\n");
 
-      m_in_height = m_image_orig.height;
-      m_in_width  = m_image_orig.width;
-
-	  /* サイズ変換のためTempメモリーをよいする */
-	  m_image_buff.create(cv::Size(m_in_width, m_in_height), CV_8UC3);
-	  m_image_binary.create(cv::Size(m_in_width, m_in_height), CV_8UC1);
-	  m_image_gray.create(cv::Size(m_in_width, m_in_height), CV_8UC1);
-	  m_image_dest.create(cv::Size(m_in_width, m_in_height), CV_8UC3);
-	  
-      
-
-    }
 
     /* InPortの画像データをIplImageのimageDataにコピー */
-    memcpy(m_image_buff.data,(void *)&(m_image_orig.pixels[0]),m_image_orig.pixels.length());
+    //memcpy(m_image_buff.data,(void *)&(m_image_orig.pixels[0]),m_image_orig.pixels.length());
+	cv::Mat m_image_buff(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3, (void *)&(m_image_orig.pixels[0]));
+	cv::Mat m_image_gray;         // Grayscale image
+	cv::Mat m_image_binary;       // Binary image
+	cv::Mat m_image_dest;         // 結果出力用IplImage
 
     /* Anternative process */
     /* BGRからグレースケールに変換する */

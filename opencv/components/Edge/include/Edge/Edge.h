@@ -301,13 +301,8 @@ class Edge
   // <rtc-template block="private_operation">
   
   // </rtc-template>
-  cv::Mat imageBuff;
-  cv::Mat grayImage;
-  cv::Mat destinationImage_x;
-  cv::Mat destinationImage_y;
-  cv::Mat destinationImage_LAPLACIAN;
-  cv::Mat destinationEdge;
-  cv::Mat edgeImage;
+  //cv::Mat imageBuff;
+  
   int len;
 };
 

@@ -188,23 +188,37 @@ RTC::ReturnCode_t DilationErosion::onExecute(RTC::UniqueId ec_id)
     m_img_origIn.read();
 
 
-	m_image_buff.create(cv::Size(m_img_orig.width, m_img_orig.height), CV_8UC3);
-	m_gray_buff.create(cv::Size(m_img_orig.width, m_img_orig.height), CV_8UC1);
-	m_binary_buff.create(cv::Size(m_img_orig.width, m_img_orig.height), CV_8UC1);
-	m_dilation_buff.create(cv::Size(m_img_orig.width, m_img_orig.height), CV_8UC1);
-	m_erosion_buff.create(cv::Size(m_img_orig.width, m_img_orig.height), CV_8UC1);
-	m_output_image_buff.create(cv::Size(m_img_orig.width, m_img_orig.height), CV_8UC3);
-	m_merge_Image.create(cv::Size(m_img_orig.width, m_img_orig.height), CV_8UC3);
-	m_dilation_image.create(cv::Size(m_img_orig.width, m_img_orig.height), CV_8UC1);
-	m_erosion_image.create(cv::Size(m_img_orig.width, m_img_orig.height), CV_8UC1);
-	m_dila_merge_img.create(cv::Size(m_img_orig.width, m_img_orig.height), CV_8UC3);
-	m_ero_merge_img.create(cv::Size(m_img_orig.width, m_img_orig.height), CV_8UC3);
-	m_noise_merge_img.create(cv::Size(m_img_orig.width, m_img_orig.height), CV_8UC3);
+	//m_image_buff.create(cv::Size(m_img_orig.width, m_img_orig.height), CV_8UC3);
+	//m_gray_buff.create(cv::Size(m_img_orig.width, m_img_orig.height), CV_8UC1);
+	//m_binary_buff.create(cv::Size(m_img_orig.width, m_img_orig.height), CV_8UC1);
+	//m_dilation_buff.create(cv::Size(m_img_orig.width, m_img_orig.height), CV_8UC1);
+	//m_erosion_buff.create(cv::Size(m_img_orig.width, m_img_orig.height), CV_8UC1);
+	
+	//m_merge_Image.create(cv::Size(m_img_orig.width, m_img_orig.height), CV_8UC3);
+	//m_dilation_image.create(cv::Size(m_img_orig.width, m_img_orig.height), CV_8UC1);
+	//m_erosion_image.create(cv::Size(m_img_orig.width, m_img_orig.height), CV_8UC1);
+	//m_dila_merge_img.create(cv::Size(m_img_orig.width, m_img_orig.height), CV_8UC3);
+	//m_ero_merge_img.create(cv::Size(m_img_orig.width, m_img_orig.height), CV_8UC3);
+	//m_noise_merge_img.create(cv::Size(m_img_orig.width, m_img_orig.height), CV_8UC3);
 
 
 
     /* InPortの映像データ */
-    memcpy(m_image_buff.data,(void *)&(m_img_orig.pixels[0]), m_img_orig.pixels.length());
+	cv::Mat m_image_buff(cv::Size(m_img_orig.width, m_img_orig.height), CV_8UC3, (void *)&(m_img_orig.pixels[0]));
+	
+	
+	cv::Mat m_gray_buff;
+	cv::Mat m_binary_buff;
+	cv::Mat m_dilation_buff;
+	cv::Mat m_erosion_buff;
+	cv::Mat m_merge_Image;
+	cv::Mat m_dilation_image;
+	cv::Mat m_erosion_image;
+	cv::Mat m_dila_merge_img;
+	cv::Mat m_ero_merge_img;
+	cv::Mat m_noise_merge_img;
+	cv::Mat m_output_image_buff(cv::Size(m_img_orig.width, m_img_orig.height), CV_8UC3);
+    //memcpy(m_image_buff.data,(void *)&(m_img_orig.pixels[0]), m_img_orig.pixels.length());
 
     /* BGRからグレースケールに変換する */
 	cvtColor(m_image_buff, m_gray_buff, cv::COLOR_BGR2GRAY);

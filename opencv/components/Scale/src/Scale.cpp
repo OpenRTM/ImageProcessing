@@ -80,8 +80,7 @@ RTC::ReturnCode_t Scale::onInitialize()
   // Bind variables and configuration variable
   bindParameter("output_scale_x", m_scale_x, "1.0");
   bindParameter("output_scale_y", m_scale_y, "1.0");
-  m_currentScaleX = 1.0;
-  m_currentScaleY = 1.0;
+
   // </rtc-template>
   
   return RTC::RTC_OK;
@@ -111,15 +110,6 @@ RTC::ReturnCode_t Scale::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Scale::onActivated(RTC::UniqueId ec_id)
 {
-  /* イメージ用メモリの確保 */
-  m_image_buff       = NULL;
-  m_image_dest       = NULL;
-
-  m_currentScaleX    = m_scale_x;
-  m_currentScaleY    = m_scale_y;
-
-  m_in_height        = 0;
-  m_in_width         = 0;
   
   return RTC::RTC_OK;
 }
@@ -128,14 +118,7 @@ RTC::ReturnCode_t Scale::onActivated(RTC::UniqueId ec_id)
 RTC::ReturnCode_t Scale::onDeactivated(RTC::UniqueId ec_id)
 {
 
-  if (!m_image_buff.empty())
-  {
-	  m_image_buff.release();
-  }
-  if (!m_image_dest.empty())
-  {
-	  m_image_dest.release();
-  }
+
   return RTC::RTC_OK;
 }
 
@@ -151,35 +134,12 @@ RTC::ReturnCode_t Scale::onExecute(RTC::UniqueId ec_id)
 
     // Anternative actions
 
-    /* サイズが変わったときだけ再生成する */
-    if(m_in_height != m_image_orig.height || m_in_width != m_image_orig.width)
-    {
-      printf("[onExecute] Size of input image is not match!\n");
-
-      m_in_height = m_image_orig.height;
-      m_in_width  = m_image_orig.width;
-
-
-	  m_image_buff.create(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3);
-    }
-
-    /* InPortの画像データをIplImageのimageDataにコピー */
-    memcpy(m_image_buff.data, (void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length());
-
-    /* 拡大比率が更新されたら出力イメージ用メモリを再確保する */
-    if(m_image_dest.empty() || m_currentScaleX != m_scale_x || m_currentScaleY != m_scale_y)
-    {
-      m_currentScaleX    = m_scale_x;
-      m_currentScaleY    = m_scale_y;
-
-      printf( "[onExecute] Sacle has been changed to (%f, %f)\n", m_scale_x, m_scale_y);
-      printf( "[onExecute] Realloc memory for output-image by (%d, %d)\n", (int)(m_in_width  * m_currentScaleX), 
-                                                                     (int)(m_in_height * m_currentScaleY));
-
-      /* 既存のメモリを解放する */
-	  m_image_dest.create(cv::Size(m_in_width  * m_currentScaleX, m_in_height * m_currentScaleY), CV_8UC3);
+    
+	cv::Mat m_image_buff(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3, (void *)&(m_image_orig.pixels[0]));
    
-    }        
+
+	cv::Mat m_image_dest(cv::Size(m_image_orig.width  * m_scale_x, m_image_orig.height * m_scale_y), CV_8UC3);     /* 結果出力用IplImage */
+          
 
     /* 画像の大きさを変換する */
 	cv::resize(m_image_buff, m_image_dest, m_image_dest.size(), CV_INTER_LINEAR);

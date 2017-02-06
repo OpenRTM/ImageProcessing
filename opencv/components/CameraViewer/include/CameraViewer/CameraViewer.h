@@ -301,13 +301,12 @@ class CameraViewer
 
 private:
   int dummy;
-  cv::Mat m_orig_img;
+  
 
   int m_nOldHeight;     /* CFG更新チェック用 */
   int m_nOldWidth;
 
-  int m_in_height;      /* 入力イメージのHeight */
-  int m_in_width;       /* 入力イメージのWidth */
+
   
   bool isCFGChanged();
   //void onMouse(int nEvent, int x, int y, int nFlags, void* param);

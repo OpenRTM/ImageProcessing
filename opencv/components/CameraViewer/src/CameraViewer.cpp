@@ -122,8 +122,7 @@ RTC::ReturnCode_t CameraViewer::onActivated(RTC::UniqueId ec_id)
 { 
 
 
-  m_in_height = 0;
-  m_in_width  = 0;
+
 
   /* 画像表示用ウィンドウの作成 */
   cv::namedWindow("CaptureImage", CV_WINDOW_AUTOSIZE);
@@ -136,10 +135,7 @@ RTC::ReturnCode_t CameraViewer::onActivated(RTC::UniqueId ec_id)
 RTC::ReturnCode_t CameraViewer::onDeactivated(RTC::UniqueId ec_id)
 {
 
-  if (!m_orig_img.empty())
-  {
-	  m_orig_img.release();
-  }
+
   cv::destroyWindow("CaptureImage");
 
 
@@ -175,22 +171,11 @@ RTC::ReturnCode_t CameraViewer::onExecute(RTC::UniqueId ec_id)
     return RTC::RTC_OK;
   }
 
-  /* サイズが変わったときだけ再生成する */
-  if(m_in_height != (int)m_in.height || m_in_width != (int)m_in.width)
-  {
-    printf("[onExecute] Size of input image is not match!\n");
 
-
-
-    m_in_height = m_in.height;
-    m_in_width  = m_in.width;
-
-    /* サイズ変換のためTempメモリーを用意する */
-	m_orig_img.create(cv::Size(m_in.width, m_in.height), CV_8UC3);
-  }
 
   /* データコピー */
-  memcpy(m_orig_img.data,(void *)&(m_in.pixels[0]), m_in.pixels.length());
+  cv::Mat m_orig_img(cv::Size(m_in.width, m_in.height), CV_8UC3, (void *)&(m_in.pixels[0]));
+  
 
 
   /* 画像表示 */

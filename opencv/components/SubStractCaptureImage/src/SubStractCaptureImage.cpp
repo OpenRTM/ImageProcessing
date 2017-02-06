@@ -139,82 +139,7 @@ RTC::ReturnCode_t SubStractCaptureImage::onDeactivated(RTC::UniqueId ec_id)
 	
 
 
-	if (!inputImage.empty())
-	{
-		inputImage.release();
-	}
-	if (!backgroundAverageImage.empty())
-	{
-		backgroundAverageImage.release();
-	}
-	if (!backgroundThresholdImage.empty())
-	{
-		backgroundThresholdImage.release();
-	}
-	if (!stillObjectAverageImage.empty())
-	{
-		stillObjectAverageImage.release();
-	}
-	if (!stillObjectThresholdImage.empty())
-	{
-		stillObjectThresholdImage.release();
-	}
-	if (!backgroundDifferenceImage.empty())
-	{
-		backgroundDifferenceImage.release();
-	}
-	if (!stillObjectDifferenceImage.empty())
-	{
-		stillObjectDifferenceImage.release();
-	}
-	if (!backgroundCopyMaskImage.empty())
-	{
-		backgroundCopyMaskImage.release();
-	}
-	if (!tmpMaskImage.empty())
-	{
-		tmpMaskImage.release();
-	}
-	if (!tmp2MaskImage.empty())
-	{
-		tmp2MaskImage.release();
-	}
-	if (!frameImage32.empty())
-	{
-		frameImage32.release();
-	}
-	if (!backgroundImage.empty())
-	{
-		backgroundImage.release();
-	}
-	if (!stillObjectImage.empty())
-	{
-		stillObjectImage.release();
-	}
-	if (!outputImage.empty())
-	{
-		outputImage.release();
-	}
-	if (!foreGroundMaskBuff.empty())
-	{
-		foreGroundMaskBuff.release();
-	}
-	if (!stillObjectMaskBuff.empty())
-	{
-		stillObjectMaskBuff.release();
-	}
-	if (!backGroundBuff.empty())
-	{
-		backGroundBuff.release();
-	}
-	if (!stillObjectImageBuff.empty())
-	{
-		stillObjectImageBuff.release();
-	}
-	if (!stillObjectCounterBuff.empty())
-	{
-		stillObjectCounterBuff.release();
-	}
+
 	
 
 	return RTC::RTC_OK;
@@ -235,7 +160,7 @@ RTC::ReturnCode_t SubStractCaptureImage::onExecute(RTC::UniqueId ec_id)
       /* 画像を生成する */
 
 	  
-	  inputImage.create(imageSize, CV_8UC3);				 /* 背景の平均値保存用IplImage */
+	  //inputImage.create(imageSize, CV_8UC3);				 /* 背景の平均値保存用IplImage */
 	  backgroundAverageImage.create(imageSize, CV_32FC3);	 /* 背景の閾値保存用IplImage */
 	  backgroundThresholdImage.create(imageSize, CV_32FC3);	 /* 静止物体の平均値保存用IplImage */
 	  stillObjectAverageImage.create(imageSize, CV_32FC3);	   /* 静止物体の閾値保存用IplImage */
@@ -264,7 +189,8 @@ RTC::ReturnCode_t SubStractCaptureImage::onExecute(RTC::UniqueId ec_id)
 	  stillObjectImageBuff.create(imageSize, CV_8UC3);
 	  stillObjectCounterBuff.create(imageSize, CV_8UC3);
 
-      memcpy(inputImage.data,(void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length());
+	  cv::Mat inputImage(imageSize, CV_8UC3, (void *)&(m_image_orig.pixels[0]));
+      //memcpy(inputImage.data,(void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length());
 
       /* 初期化する */
 	  inputImage.convertTo(backgroundAverageImage, CV_32F);
@@ -288,8 +214,8 @@ RTC::ReturnCode_t SubStractCaptureImage::onExecute(RTC::UniqueId ec_id)
 
     if(g_temp_w == m_image_orig.width && g_temp_h == m_image_orig.height)
     {
-		
-      memcpy(inputImage.data,(void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length());
+		cv::Mat inputImage(imageSize, CV_8UC3, (void *)&(m_image_orig.pixels[0]));
+      //memcpy(inputImage.data,(void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length());
 
       /* float 32bitに変換する */
 	  

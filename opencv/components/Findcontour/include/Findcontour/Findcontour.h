@@ -297,14 +297,7 @@ class Findcontour
   // <rtc-template block="private_operation">
   
   // </rtc-template>
-  cv::Mat imageBuff;
-  cv::Mat grayImage;
-  cv::Mat binaryImage;
-  cv::Mat contourImage;
-  int find_contour_num;
-  std::vector<std::vector<cv::Point>> find_contour;
-  cv::Scalar red;
-  cv::Scalar green;
+
 };
 
 

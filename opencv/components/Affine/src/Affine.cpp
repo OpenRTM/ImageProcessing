@@ -79,9 +79,7 @@ Affine::Affine(RTC::Manager* manager)
     // <rtc-template block="initializer">
   : RTC::DataFlowComponentBase(manager),
     m_image_origIn("original_image", m_image_orig),
-    m_image_affineOut("affined_image", m_image_affine),
-    m_in_height(0),
-    m_in_width(0)
+    m_image_affineOut("affined_image", m_image_affine)
 
     // </rtc-template>
 {
@@ -146,10 +144,7 @@ RTC::ReturnCode_t Affine::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Affine::onActivated(RTC::UniqueId ec_id)
 {
-  /* イメージ用メモリの確保 */
 
-  m_in_height  = 0;
-  m_in_width   = 0;
 
 
 
@@ -161,14 +156,7 @@ RTC::ReturnCode_t Affine::onDeactivated(RTC::UniqueId ec_id)
 {
 
 
-  if (!m_image_buff.empty())
-  {
-	  m_image_buff.release();
-  }
-  if (!m_image_dest.empty())
-  {
-	  m_image_dest.release();
-  }
+  
 
 
   return RTC::RTC_OK;
@@ -183,26 +171,13 @@ RTC::ReturnCode_t Affine::onExecute(RTC::UniqueId ec_id)
   {
     /* InPortデータの読み込み */
     m_image_origIn.read();
-
-    /* サイズが変わったときだけ再生成する */
-    if(m_in_height != m_image_orig.height || m_in_width != m_image_orig.width)
-    {
-      printf("[onExecute] Size of input image is not match!\n");
-
-      m_in_height = m_image_orig.height;
-      m_in_width  = m_image_orig.width;
+	
 
 
-
-      /* サイズ変換のためTempメモリーを用意する */
-	  m_image_buff.create(cv::Size(m_in_width, m_in_height), CV_8UC3);
-	  m_image_dest.create(cv::Size(m_in_width, m_in_height), CV_8UC3);
-
-    }
-
+	cv::Mat m_image_buff(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3, (void *)&(m_image_orig.pixels[0]));
     /* InPortの画像データをIplImageのimageDataにコピー */
-	memcpy(m_image_buff.data, (void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length());
-
+	//memcpy(m_image_buff.data, (void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length());
+	
 	cv::Mat_<double> m_affineMatrix(2, 3);
    	/* 変換後の座標を設定する */
 	
@@ -226,7 +201,7 @@ RTC::ReturnCode_t Affine::onExecute(RTC::UniqueId ec_id)
 
 	
 	
-        
+	cv::Mat m_image_dest;
     /* 変換行列を反映させる */
 	warpAffine(m_image_buff, m_image_dest, m_affineMatrix, m_image_dest.size());
 

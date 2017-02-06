@@ -284,18 +284,9 @@ class Sepia
   
   // </rtc-template>
 
-  int m_in_height;              /* 入力イメージのHeight */
-  int m_in_width;               /* 入力イメージのWidth */
 
-  cv::Mat m_image_buff;       /* Original Image */
 
-  cv::Mat m_hsvImage;         /* HSV画像用IplImage */
-  cv::Mat m_hueImage;         /* 色相(H)情報用IplImage */
-  cv::Mat m_saturationImage;  /* 彩度(S)情報用IplImage */
-  cv::Mat m_valueImage;       /* 明度(V)情報用IplImage */
 
-  cv::Mat m_mergeImage;       /* マージ用IplImage */
-  cv::Mat m_destinationImage; /* 結果出力用IplImage */
 };
 
 

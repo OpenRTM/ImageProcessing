@@ -121,12 +121,7 @@ RTC::ReturnCode_t Flip::onActivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Flip::onDeactivated(RTC::UniqueId ec_id)
 {
-	if (!m_imageBuff.empty())
-	{
-		// 画像用メモリの解放
-		m_imageBuff.release();
-		m_flipImageBuff.release();
-	}
+
 
   return RTC::RTC_OK;
 }
@@ -145,14 +140,16 @@ RTC::ReturnCode_t Flip::onExecute(RTC::UniqueId ec_id)
 			m_image_flip.width = m_image_orig.width;
 			m_image_flip.height = m_image_orig.height;
 
-			m_imageBuff.create(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3);
-			m_flipImageBuff.create(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3);
+
 
 
 		}
 
+		cv::Mat m_imageBuff(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3, (void *)&(m_image_orig.pixels[0]));
+		cv::Mat m_flipImageBuff;
+
 		// InPortの画像データをm_imageBuffにコピー
-		memcpy(m_imageBuff.data, (void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length());
+		//memcpy(m_imageBuff.data, (void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length());
 
 		// InPortからの画像データを反転する。 m_flipMode 0: X軸周り, 1: Y軸周り, -1: 両方の軸周り
 		cv::flip(m_imageBuff, m_flipImageBuff, m_flip_mode);

@@ -297,14 +297,8 @@ class Histogram
   // <rtc-template block="private_operation">
   
   // </rtc-template>
-  cv::Mat imageBuff;        /* カメラのイメージ */
-  cv::Mat grayImage;
-  cv::Mat destinationImage;
-  cv::Mat histogramImage;
-  cv::Mat histogramBarImage;
-
-  cv::MatND histogram;
-  cv::Mat lookUpTableMatrix;   /* 濃度対応行列 */
+  //cv::Mat imageBuff;        /* カメラのイメージ */
+	 cv::Mat lookUpTableMatrix; /* 濃度対応行列 */
 
   int histogramSize;
   int bin_w;

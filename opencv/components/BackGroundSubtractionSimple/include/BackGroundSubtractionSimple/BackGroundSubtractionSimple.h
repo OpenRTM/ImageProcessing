@@ -321,11 +321,11 @@ class BackGroundSubtractionSimple
 	void labDifference( void );
 	void grayScaleDifference( void );
 
-	cv::Mat m_originalImage;
+	
 	cv::Mat m_currentImage;
 	cv::Mat m_backgroundImage;
 	cv::Mat m_resultImage;
-	cv::Mat m_outputImage;
+
 	
 	int	m_differenceMode;   /* 差分の計算モード */
 	int	m_noiseMode;        /* ノイズを除去するモード */

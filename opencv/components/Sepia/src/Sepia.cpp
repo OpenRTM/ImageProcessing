@@ -111,8 +111,6 @@ RTC::ReturnCode_t Sepia::onActivated(RTC::UniqueId ec_id)
 {
 
 
-  m_in_height        = 0;
-  m_in_width         = 0;
 
   return RTC::RTC_OK;
 }
@@ -123,34 +121,7 @@ RTC::ReturnCode_t Sepia::onDeactivated(RTC::UniqueId ec_id)
   /* イメージ用メモリの解放 */
 
 
-  if (!m_image_buff.empty())
-  {
-	  m_image_buff.release();
-  }
-  if (!m_hsvImage.empty())
-  {
-	  m_hsvImage.release();
-  }
-  if (!m_hueImage.empty())
-  {
-	  m_hueImage.release();
-  }
-  if (!m_saturationImage.empty())
-  {
-	  m_saturationImage.release();
-  }
-  if (!m_valueImage.empty())
-  {
-	  m_valueImage.release();
-  }
-  if (!m_mergeImage.empty())
-  {
-	  m_mergeImage.release();
-  }
-  if (!m_destinationImage.empty())
-  {
-	  m_destinationImage.release();
-  }
+
 
   return RTC::RTC_OK;
 }
@@ -166,28 +137,21 @@ RTC::ReturnCode_t Sepia::onExecute(RTC::UniqueId ec_id)
     m_image_origIn.read();
 
     /* サイズが変わったときだけ再生成する */
-    if(m_in_height != m_image_orig.height || m_in_width != m_image_orig.width)
-    {
-      printf("[onExecute] Size of input image is not match!\n");
-
-      m_in_height = m_image_orig.height;
-      m_in_width  = m_image_orig.width;
+    
 
 
+	cv::Mat m_image_buff(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3, (void *)&(m_image_orig.pixels[0]));       /* Original Image */
 
-      
-      
-	  m_image_buff.create(cv::Size(m_in_width, m_in_height), CV_8UC3);
-	  m_hsvImage.create(cv::Size(m_in_width, m_in_height), CV_8UC3);
-	  m_hueImage.create(cv::Size(m_in_width, m_in_height), CV_8UC1);
-	  m_saturationImage.create(cv::Size(m_in_width, m_in_height), CV_8UC1);
-	  m_valueImage.create(cv::Size(m_in_width, m_in_height), CV_8UC1);
-	  m_mergeImage.create(cv::Size(m_in_width, m_in_height), CV_8UC3);
-	  m_destinationImage.create(cv::Size(m_in_width, m_in_height), CV_8UC3);
-    }
+	cv::Mat m_hsvImage;         /* HSV画像用IplImage */
+	cv::Mat m_hueImage;         /* 色相(H)情報用IplImage */
+	cv::Mat m_saturationImage;  /* 彩度(S)情報用IplImage */
+	cv::Mat m_valueImage;       /* 明度(V)情報用IplImage */
+
+	cv::Mat m_mergeImage;       /* マージ用IplImage */
+	cv::Mat m_destinationImage; /* 結果出力用IplImage */
 
     /* InPortの画像データをIplImageのimageDataにコピー */
-    memcpy(m_image_buff.data,(void *)&(m_image_orig.pixels[0]),m_image_orig.pixels.length());
+   // memcpy(m_image_buff.data,(void *)&(m_image_orig.pixels[0]),m_image_orig.pixels.length());
 
     // Anternative actions
 

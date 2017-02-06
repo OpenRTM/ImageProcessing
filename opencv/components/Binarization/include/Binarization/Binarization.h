@@ -277,15 +277,7 @@ class Binarization
   // <rtc-template block="private_operation">
   
   // </rtc-template>
-  int m_in_height;                // 入力イメージのHeight
-  int m_in_width;                 // 入力イメージのWidth
 
-  cv::Mat m_image_buff;			// Original Image
-
-  cv::Mat m_image_gray;         // Grayscale image
-  cv::Mat m_image_binary;       // Binary image
-
-  cv::Mat m_image_dest;         // 結果出力用IplImage
 };
 
 

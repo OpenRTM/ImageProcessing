@@ -143,10 +143,9 @@ RTC::ReturnCode_t Hough::onActivated(RTC::UniqueId ec_id)
 {
 
 
-  m_in_height        = 0;
-  m_in_width         = 0;
 
-  len=0;
+
+  
   
   debug_method = -1;
   debug_type = -1;
@@ -159,26 +158,8 @@ RTC::ReturnCode_t Hough::onDeactivated(RTC::UniqueId ec_id)
 {
 
 
-  if (!imageBuff.empty())
-  {
-	  imageBuff.release();
-  }
-  if (!grayImage.empty())
-  {
-	  grayImage.release();
-  }
-  if (!edgeImage.empty())
-  {
-	  edgeImage.release();
-  }
-  if (!hough.empty())
-  {
-	  hough.release();
-  }
-  if (!houghImage.empty())
-  {
-	  houghImage.release();
-  }
+  
+
 
 
   return RTC::RTC_OK;
@@ -193,26 +174,15 @@ RTC::ReturnCode_t Hough::onExecute(RTC::UniqueId ec_id)
     /* InPortデータの読み込み */
     m_image_origIn.read();
 
-    /* サイズが変わったときだけ再生成する */
-    if(m_image_orig.width != m_in_width || m_image_orig.height != m_in_height)
-    {
-      m_in_width = m_image_orig.width;
-      m_in_height = m_image_orig.height;
 
-
-
-      /* イメージ用メモリの確保 */
-
-	  imageBuff.create(cv::Size(m_in_width, m_in_height), CV_8UC3);
-	  grayImage.create(cv::Size(m_in_width, m_in_height), CV_8UC1);
-	  edgeImage.create(cv::Size(m_in_width, m_in_height), CV_8UC1);
-	  hough.create(cv::Size(m_in_width, m_in_height), CV_8UC3);
-	  houghImage.create(cv::Size(m_in_width, m_in_height), CV_8UC3);
-
-    }
-
-    /* InPortの画面データをコピー */
-    memcpy( imageBuff.data, (void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length() );
+	/* InPortの画面データをコピー */
+	cv::Mat imageBuff(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3, (void *)&(m_image_orig.pixels[0]));
+	cv::Mat grayImage;
+	cv::Mat edgeImage;
+	cv::Mat hough;
+	cv::Mat houghImage;
+    
+    
 
     /* RGBからグレースケールに変換 */
     cv::cvtColor( imageBuff, grayImage, CV_RGB2GRAY );
@@ -305,7 +275,7 @@ RTC::ReturnCode_t Hough::onExecute(RTC::UniqueId ec_id)
 	
 
     /* 画像データのサイズ取得 */
-	len = houghImage.channels() * houghImage.size().width * houghImage.size().height;
+	int len = houghImage.channels() * houghImage.size().width * houghImage.size().height;
     m_image_hough.pixels.length(len);
     m_image_hough.width  = houghImage.size().width;
 	m_image_hough.height = houghImage.size().height;

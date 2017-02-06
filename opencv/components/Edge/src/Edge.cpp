@@ -136,38 +136,7 @@ RTC::ReturnCode_t Edge::onActivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Edge::onDeactivated(RTC::UniqueId ec_id)
 {
-	if (!imageBuff.empty())
-	{
-		imageBuff.release();
-	}
-	if (!destinationImage_x.empty())
-	{
-		destinationImage_x.release();
-	}
-	if (!destinationImage_y.empty())
-	{
-		destinationImage_y.release();
-	}
-	if (!destinationImage_LAPLACIAN.empty())
-	{
-		destinationImage_LAPLACIAN.release();
-	}
-	if (!destinationEdge.empty())
-	{
-		destinationEdge.release();
-	}
-	if (!destinationEdge.empty())
-	{
-		destinationEdge.release();
-	}
-	if (!grayImage.empty())
-	{
-		grayImage.release();
-	}
-	if (!edgeImage.empty())
-	{
-		edgeImage.release();
-	}
+
 
 
   return RTC::RTC_OK;
@@ -181,28 +150,17 @@ RTC::ReturnCode_t Edge::onExecute(RTC::UniqueId ec_id)
     /* InPortデータの読み込み */
     m_image_origIn.read();
 
-    /* InPortとOutPortの画面サイズ処理およびイメージ用メモリの確保 */
-    if( m_image_orig.width != m_image_edge_sobel_x.width || m_image_orig.height != m_image_edge_sobel_x.height)
-    {
-      m_image_edge_sobel_x.width = m_image_edge_sobel_y.width = m_image_edge_LAPLACIAN.width = m_image_orig.width;
-      m_image_edge_sobel_x.height = m_image_edge_sobel_y.height = m_image_edge_LAPLACIAN.height = m_image_orig.height;
 
-
-
-      /* イメージ用メモリの確保 */
-	  imageBuff.create(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3);
-	  grayImage.create(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC1);
-	  destinationImage_x.create(cv::Size(m_image_orig.width, m_image_orig.height), CV_16UC1);
-	  destinationImage_y.create(cv::Size(m_image_orig.width, m_image_orig.height), CV_16UC1);
-	  destinationImage_LAPLACIAN.create(cv::Size(m_image_orig.width, m_image_orig.height), CV_16UC1);
-	  destinationEdge.create(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC1);
-	  edgeImage.create(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3);
-
-
-    }
 
     /* InPortの画面データをコピー */
-    memcpy( imageBuff.data, (void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length() );
+	cv::Mat imageBuff(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3, (void *)&(m_image_orig.pixels[0]));
+    //memcpy( imageBuff.data, (void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length() );
+	cv::Mat grayImage;
+	cv::Mat destinationImage_x;
+	cv::Mat destinationImage_y;
+	cv::Mat destinationImage_LAPLACIAN;
+	cv::Mat destinationEdge;
+	cv::Mat edgeImage;
 
     /* RGBからグレースケールに変換 */
     cv::cvtColor( imageBuff, grayImage, CV_RGB2GRAY );
@@ -220,6 +178,9 @@ RTC::ReturnCode_t Edge::onExecute(RTC::UniqueId ec_id)
     /* 画像データのサイズ取得 */
 	len = edgeImage.channels() * edgeImage.size().width * edgeImage.size().height;
 	
+	m_image_edge_sobel_x.width = m_image_edge_sobel_y.width = m_image_edge_LAPLACIAN.width = m_image_orig.width;
+	m_image_edge_sobel_x.height = m_image_edge_sobel_y.height = m_image_edge_LAPLACIAN.height = m_image_orig.height;
+
     m_image_edge_sobel_x.pixels.length(len);
 
     /* 反転した画像データをOutPortにコピー */

@@ -348,19 +348,15 @@ class Hough
   // <rtc-template block="private_operation">
   
   // </rtc-template>
-	 cv::Mat imageBuff;
-	 cv::Mat grayImage;
-	 cv::Mat edgeImage;
-	 cv::Mat hough;
-	 cv::Mat houghImage;
-  int len;
+	 //cv::Mat imageBuff;
+	 
+  
   
   
   int debug_method;   /* configuration切り替え時の確認用 */
   int debug_type;     /* configuration切り替え時の確認用 */
   
-  int m_in_height;    /* 入力イメージのHeight */
-  int m_in_width;     /* 入力イメージのWidth */
+
   
 };
 
