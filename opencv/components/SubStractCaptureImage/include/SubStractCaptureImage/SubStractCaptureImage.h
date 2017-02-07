@@ -19,8 +19,7 @@
 #include <rtm/idl/ExtendedDataTypesSkel.h>
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/opencv.hpp>
 
 #define	MASK_THRESHOLD		1       /* backgroundMaskImageやstillObjectMaskImageを生成するための閾値 */
 #define THRESHOLD_MAX_VALUE	255   /* 2値化の際に使用する最大値 */

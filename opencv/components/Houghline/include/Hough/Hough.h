@@ -21,7 +21,7 @@
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
 //OpenCV header file include
-#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/opencv.hpp>
 
 /* cvCanny用定数 */
 #define	APERTURE_SIZE   3   /* Sobelオペレータのサイズ (リファレンス参照) */

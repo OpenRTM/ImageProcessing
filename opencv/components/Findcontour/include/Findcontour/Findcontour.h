@@ -20,7 +20,7 @@
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
 //OpenCV header file include
-#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/opencv.hpp>
 
 #define THRESHOLD_MAX_VALUE	255	  /* 2値化の際に使用する最大値 */
 

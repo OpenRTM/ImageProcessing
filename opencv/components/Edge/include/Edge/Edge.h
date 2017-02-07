@@ -20,7 +20,7 @@
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
 //OpenCV header file include
-#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/opencv.hpp>
 
 //	cvConvertScaleAbs用定数
 #define SCALE   1   /* ScaleAbs係数 */

@@ -20,7 +20,7 @@
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
 //OpenCV header file include
-#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/opencv.hpp>
 
 #define DIMENSIONS  1     /* ヒストグラムの次元数 */
 #define UNIFORM     1     /* 一様性に関するフラグ */

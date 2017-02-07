@@ -18,9 +18,7 @@
 #include <coil/Mutex.h>
 
 /* OpenCVHeadファイルのIncluding */
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/imgcodecs/imgcodecs.hpp>
-#include <opencv2/calib3d/calib3d.hpp>
+#include <opencv2/opencv.hpp>
 
 /*!
  * @class CalibrationServiceSVC_impl

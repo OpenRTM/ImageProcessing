@@ -490,7 +490,7 @@ RTC::ReturnCode_t ObjectTracking::onExecute(RTC::UniqueId ec_id)
 			trackRegion = cv::CamShift(backprojectImage,
 				trackWindow,
 				trackComp);
-			cv::ellipse(resultImage, trackRegion, cv::Scalar(0, 0, 255), 3, cv::LINE_AA);
+			cv::ellipse(resultImage, trackRegion, cv::Scalar(0, 0, 255), 3);
 
 			//trackWindow = trackComp.rect;
 

@@ -7,7 +7,7 @@
 
 #include "MFUtils.h"
 
-#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/opencv.hpp>
 
 enum FMT_Values {
   FMT_RGB24, FMT_YUY2, FMT_UNKNOWN=256
