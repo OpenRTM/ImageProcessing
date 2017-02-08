@@ -146,7 +146,7 @@ RTC::ReturnCode_t Findcontour::onExecute(RTC::UniqueId ec_id)
 	cv::Mat binaryImage;
 	cv::Mat contourImage;
 	int find_contour_num;
-	std::vector<std::vector<cv::Point>> find_contour;
+	std::vector<std::vector<cv::Point> > find_contour;
 	cv::Scalar red;
 	cv::Scalar green;
 	red = cv::Scalar(255, 0, 0);

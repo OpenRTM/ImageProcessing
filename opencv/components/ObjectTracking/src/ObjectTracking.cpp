@@ -438,7 +438,7 @@ RTC::ReturnCode_t ObjectTracking::onExecute(RTC::UniqueId ec_id)
 
 		/* ヒストグラム構造体の使用を宣言 */
 		if (hist.empty()){
-			hist = cv::Mat::zeros(1, &hdims, CV_8UC1);
+			hist = cv::Mat::zeros(1, hdims, CV_8UC1);
 		}
 
 

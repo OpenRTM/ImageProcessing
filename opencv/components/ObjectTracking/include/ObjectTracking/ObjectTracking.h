@@ -316,7 +316,7 @@ class ObjectTracking
 	 cv::Mat histImage;			/* ヒストグラム描画用IplImage */
 	 cv::Mat grayImage;			/* グレースケール画像用IplImage */
 
-	 cv::MatND	hist;				/* ヒストグラム処理用構造体 */
+	 cv::Mat	hist;				/* ヒストグラム処理用構造体 */
 
 	 cv::Mat frameImage;	/* キャプチャ画像用IplImage */
 	 cv::VideoCapture	capture;		/* キー入力結果を格納する変数 */
