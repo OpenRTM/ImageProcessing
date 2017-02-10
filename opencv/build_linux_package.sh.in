@@ -10,7 +10,7 @@ if test "x${GENERATOR}" = "xDEB" ;then
 	newname=`ls *.deb`
 fi
 if test "x${GENERATOR}" = "xRPM" ;then
-	rename Translate Imageprocessing *.rpm
+	rename Translate ImageProcessing *.rpm
 	newname=`ls *.rpm`
 fi
 
