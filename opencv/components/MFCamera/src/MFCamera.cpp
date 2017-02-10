@@ -18,7 +18,7 @@ static const char* mfcamera_spec[] =
     "implementation_id", "MFCamera",
     "type_name",         "MFCamera",
     "description",       "USB Camera Acquire component",
-    "version",           "1.1.0",
+    "version",           "1.2.0",
     "vendor",            "AIST",
     "category",          "example",
     "activity_type",     "PERIODIC",

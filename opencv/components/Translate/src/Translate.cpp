@@ -16,7 +16,7 @@ static const char* translate_spec[] =
     "implementation_id", "Translate",
     "type_name",         "Translate",
     "description",       "Translate image component",
-    "version",           "1.1.0",
+    "version",           "1.2.0",
     "vendor",            "AIST",
     "category",          "Category",
     "activity_type",     "PERIODIC",

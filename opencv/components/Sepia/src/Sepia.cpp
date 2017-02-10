@@ -16,7 +16,7 @@ static const char* sepia_spec[] =
     "implementation_id", "Sepia",
     "type_name",         "Sepia",
     "description",       "Sepia component",
-    "version",           "1.1.0",
+    "version",           "1.2.0",
     "vendor",            "AIST",
     "category",          "Category",
     "activity_type",     "PERIODIC",

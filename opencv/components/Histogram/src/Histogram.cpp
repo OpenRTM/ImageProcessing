@@ -18,7 +18,7 @@ static const char* histogram_spec[] =
     "implementation_id", "Histogram",
     "type_name",         "Histogram",
     "description",       "Histogram image component",
-    "version",           "1.1.0",
+    "version",           "1.2.0",
     "vendor",            "AIST",
     "category",          "Category",
     "activity_type",     "PERIODIC",

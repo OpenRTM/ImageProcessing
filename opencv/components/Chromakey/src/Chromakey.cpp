@@ -16,7 +16,7 @@ static const char* chromakey_spec[] =
     "implementation_id", "Chromakey",
     "type_name",         "Chromakey",
     "description",       "Chromakey image component",
-    "version",           "1.1.0",
+    "version",           "1.2.0",
     "vendor",            "AIST",
     "category",          "Category",
     "activity_type",     "PERIODIC",

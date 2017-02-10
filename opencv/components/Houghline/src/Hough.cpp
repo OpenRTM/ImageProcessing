@@ -16,7 +16,7 @@ static const char* hough_spec[] =
     "implementation_id", "Hough",
     "type_name",         "Hough",
     "description",       "Hough line component",
-    "version",           "1.1.0",
+    "version",           "1.2.0",
     "vendor",            "AIST",
     "category",          "Category",
     "activity_type",     "PERIODIC",

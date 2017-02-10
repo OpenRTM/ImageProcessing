@@ -16,7 +16,7 @@ static const char* imagesubstraction_spec[] =
     "implementation_id", "ImageSubstraction",
     "type_name",         "ImageSubstraction",
     "description",       "Image substraction conponent",
-    "version",           "1.1.0",
+    "version",           "1.2.0",
     "vendor",            "AIST",
     "category",          "Category",
     "activity_type",     "PERIODIC",

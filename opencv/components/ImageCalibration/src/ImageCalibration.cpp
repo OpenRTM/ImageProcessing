@@ -16,7 +16,7 @@ static const char* imagecalibration_spec[] =
     "implementation_id", "ImageCalibration",
     "type_name",         "ImageCalibration",
     "description",       "Image Calibration",
-    "version",           "1.1.0",
+    "version",           "1.2.0",
     "vendor",            "AIST",
     "category",          "Category",
     "activity_type",     "PERIODIC",

@@ -330,7 +330,7 @@ YUY2_to_RGB(char *yuy2_image, char *rgb_image, int rgb_img_width, int rgb_img_he
       rgb_image[nCount++]=clip255((298*Y0+516*U0       +128) >> 8);
 
       rgb_image[nCount++]=clip255((298*Y1      + 409*V0+128) >> 8);
-      rgb_image[nCount++]=clip255((298*Y1-100*U0-208*V0+128) >> 8);
+      rgb_image[nCount++]=clip255((298*Y1.2.0*U0-208*V0+128) >> 8);
       rgb_image[nCount++]=clip255((298*Y1+516*U0       +128) >> 8);
 #endif
       }

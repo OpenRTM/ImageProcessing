@@ -121,7 +121,7 @@ import ImageCalibService, ImageCalibService__POA
 tkcalibgui_spec = ["implementation_id", "TkCalibGUI", 
 		 "type_name",         "TkCalibGUI", 
 		 "description",       "Image Calibration GUI", 
-		 "version",           "1.1.0", 
+		 "version",           "1.2.0", 
 		 "vendor",            "AIST", 
 		 "category",          "Category", 
 		 "activity_type",     "STATIC", 

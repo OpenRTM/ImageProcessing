@@ -16,7 +16,7 @@ static const char* perspective_spec[] =
     "implementation_id", "Perspective",
     "type_name",         "Perspective",
     "description",       "Perspective image component",
-    "version",           "1.1.0",
+    "version",           "1.2.0",
     "vendor",            "AIST",
     "category",          "Category",
     "activity_type",     "PERIODIC",
@@ -160,7 +160,7 @@ RTC::ReturnCode_t Perspective::onExecute(RTC::UniqueId ec_id)
 	// 変換前の画像での座標
 	const cv::Point2f src_pt[] = {
 		cv::Point2f(88.0, 81.0),
-		cv::Point2f(111.0, 436.0),
+		cv::Point2f(1.2.0, 436.0),
 		cv::Point2f(420.0, 346.0),
 		cv::Point2f(424, 131) };
 

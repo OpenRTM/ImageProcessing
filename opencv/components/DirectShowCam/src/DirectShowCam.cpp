@@ -45,7 +45,7 @@ static const char* directshowcam_spec[] =
     "implementation_id", "DirectShowCam",
     "type_name",         "DirectShowCam",
     "description",       "DirectShowCam Module",
-    "version",           "1.1.0",
+    "version",           "1.2.0",
     "vendor",            "AIST",
     "category",          "Category",
     "activity_type",     "PERIODIC",

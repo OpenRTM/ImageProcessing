@@ -18,7 +18,7 @@ static const char* pgrcamera_spec[] =
     "implementation_id", "PGRCamera",
     "type_name",         "PGRCamera",
     "description",       "PGRCamera",
-    "version",           "1.1.0",
+    "version",           "1.2.0",
     "vendor",            "AIST",
     "category",          "Category",
     "activity_type",     "PERIODIC",
