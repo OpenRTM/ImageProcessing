@@ -160,7 +160,7 @@ RTC::ReturnCode_t Perspective::onExecute(RTC::UniqueId ec_id)
 	// 変換前の画像での座標
 	const cv::Point2f src_pt[] = {
 		cv::Point2f(88.0, 81.0),
-		cv::Point2f(1.2.0, 436.0),
+		cv::Point2f(111.0, 436.0),
 		cv::Point2f(420.0, 346.0),
 		cv::Point2f(424, 131) };
 
