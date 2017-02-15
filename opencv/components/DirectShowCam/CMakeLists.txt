@@ -13,25 +13,57 @@ set(PROJECT_VENDOR "AIST")
 set(PROJECT_AUTHOR "AIST")
 set(PROJECT_AUTHOR_SHORT "AIST")
 
-if(NOT WIN32 AND NOT LINUX_PACKAGE_GENERATOR)
-  find_program(DPKG_CMD dpkg)
-  if(DPKG_CMD)
-    set(LINUX_PACKAGE_GENERATOR "DEB")
-    execute_process(COMMAND "${DPKG_CMD}" --print-architecture
+function(get_dist ARG0)
+  if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+    set(${ARG0} ${CMAKE_SYSTEM_NAME} PARENT_SCOPE)
+    return()
+  endif()
+  foreach(dist Debian Ubuntu RedHat Fedora CentOS)
+    execute_process(
+      COMMAND grep ${dist} -s /etc/issue /etc/os-release /etc/redhat-release /etc/system-release
+      OUTPUT_VARIABLE dist_name
+      )
+    if(${dist_name} MATCHES ${dist})
+      set(${ARG0} ${dist} PARENT_SCOPE)
+      return()
+    endif()
+  endforeach()
+endfunction(get_dist)
+
+function(get_pkgmgr ARG0)
+  get_dist(DIST_NAME)
+  if(${DIST_NAME} MATCHES "Debian" OR
+     ${DIST_NAME} MATCHES "Ubuntu")
+     set(${ARG0} "DEB" PARENT_SCOPE)
+     return()
+  endif()
+  if(${DIST_NAME} MATCHES "RedHat" OR
+     ${DIST_NAME} MATCHES "Fedora" OR
+     ${DIST_NAME} MATCHES "CentOS")
+     set(${ARG0} "RPM" PARENT_SCOPE)
+     return()
+  endif()
+endfunction(get_pkgmgr)
+
+get_dist(DIST_NAME)
+MESSAGE(STATUS "Distribution is ${DIST_NAME}")
+
+get_pkgmgr(PKGMGR)
+if(PKGMGR AND NOT LINUX_PACKAGE_GENERATOR)
+  set(LINUX_PACKAGE_GENERATOR ${PKGMGR})
+  if(${PKGMGR} MATCHES "DEB")    
+    execute_process(COMMAND dpkg --print-architecture
       OUTPUT_VARIABLE CPACK_DEBIAN_PACKAGE_ARCHITECTURE
       OUTPUT_STRIP_TRAILING_WHITESPACE)
-    message(STATUS "dpkg is found. arch = ${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}")
-  endif(DPKG_CMD)
-
-  find_program(RPM_CMD rpmbuild)
-  if(RPM_CMD)
-    set(LINUX_PACKAGE_GENERATOR "RPM")
+    message(STATUS "Package manager is ${PKGMGR}. Arch is ${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}.")   
+  endif()
+  if(${PKGMGR} MATCHES "RPM")
     execute_process(COMMAND uname "-m"
       OUTPUT_VARIABLE CPACK_RPM_PACKAGE_ARCHITECTURE
       OUTPUT_STRIP_TRAILING_WHITESPACE)
-    message(STATUS "rpmbuild is found. arch = ${CPACK_RPM_PACKAGE_ARCHITECTURE}")
-  endif(RPM_CMD)
-endif(NOT WIN32 AND NOT LINUX_PACKAGE_GENERATOR)
+    message(STATUS "Package manager is ${PKGMGR}. Arch is ${CPACK_RPM_PACKAGE_ARCHITECTURE}.")   
+  endif()    
+endif()
 
 set(PROJECT_MAINTAINER "Noriaki Ando <n-ando@aist.go.jp>")
 set(PROJECT_TYPE "c++/opencv-rtcs")
