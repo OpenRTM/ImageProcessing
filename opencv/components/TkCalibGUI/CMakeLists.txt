@@ -1,4 +1,7 @@
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
+if(POLICY CMP0053)
+  cmake_policy(SET CMP0053 OLD)
+endif()
 
 project(TkCalibGUI NONE)
 
