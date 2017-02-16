@@ -111,13 +111,6 @@ endif(WIN32)
 
 # Get necessary dependency information
 find_package(OpenRTM)
-if(${OpenRTM_FOUND})
-  MESSAGE(STATUS "OpenRTM configuration Found")
-else(${OpenRTM_FOUND})
-  message(STATUS "Use cmake/Modules/FindOpenRTM.cmake in the project")
-  list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
-  find_package(OpenRTM REQUIRED)
-endif(${OpenRTM_FOUND})
 
 # Universal settings
 #enable_testing()
