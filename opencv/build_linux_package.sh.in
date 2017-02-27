@@ -3,16 +3,11 @@
 GENERATOR=@LINUX_PACKAGE_GENERATOR@
 echo "Linux package generator:"  ${GENERATOR}
 
+grep -l 'translate' CPackConfig.cmake | xargs sed -i.bak -e 's/"translate/"imageprocessing/g'
+grep -l 'Translate' CPackConfig.cmake | xargs sed -i.bak -e 's/"Translate/"Imageprocessing/g'
+
+cp -f ../ip_cpack_options.cmake components/Translate/cpack_options.cmake
+
 cpack -C CPackConfig.cmake
 
-if test "x${GENERATOR}" = "xDEB" ;then
-	rename s/translate/imageprocessing/g *.deb
-	newname=`ls *.deb`
-fi
-if test "x${GENERATOR}" = "xRPM" ;then
-	rename Translate ImageProcessing *.rpm
-	newname=`ls *.rpm`
-fi
-
-echo "Rename package : "  ${newname}
 

@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
-project(ImageProcessing_opencv)
+project(ImageProcessing)
+set(TOP_PROJECT_NAME ${PROJECT_NAME})
+string(TOLOWER ${TOP_PROJECT_NAME} TOP_PROJECT_NAME_LOWER)
 SUBDIRS(components)
 set(SolutionDir ${PROJECT_SOURCE_DIR})
 
@@ -56,7 +58,30 @@ if(PKGMGR)
   endif()    
 endif()
 
-configure_file(${SolutionDir}/build_linux_package.sh.in
-  ${PROJECT_BINARY_DIR}/build_linux_package.sh
-  @ONLY
-)
+if(UNIX)
+	# build linux package script
+	configure_file(${SolutionDir}/build_linux_package.sh.in
+  	${PROJECT_BINARY_DIR}/build_linux_package.sh
+  	@ONLY
+	)	
+
+	# postinst, prerm settings
+	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/postinst.in
+		${CMAKE_CURRENT_SOURCE_DIR}/postinst @ONLY
+	)
+	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/prerm.in
+		${CMAKE_CURRENT_SOURCE_DIR}/prerm @ONLY
+	)
+endif()
+
+if(NOT WIN32)
+    if(CPACK_DEBIAN_PACKAGE_ARCHITECTURE)
+				set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${PROJECT_SOURCE_DIR}/components/TkCalibGUI/postinst;${PROJECT_SOURCE_DIR}/components/TkCalibGUI/prerm")
+    endif(CPACK_DEBIAN_PACKAGE_ARCHITECTURE)
+    if(CPACK_RPM_PACKAGE_ARCHITECTURE)
+        set(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${PROJECT_SOURCE_DIR}/components/TkCalibGUI/postinst")
+        set(CPACK_RPM_POST_UNINSTALL_SCRIPT_FILE "${PROJECT_SOURCE_DIR}/components/TkCalibGUI/prerm")
+    endif(CPACK_RPM_PACKAGE_ARCHITECTURE)
+endif()
+
+
