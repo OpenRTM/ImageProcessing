@@ -154,7 +154,7 @@ echo LIB: %LIB%
 
 vcbuild /M2 /rebuild components\DirectShowCam\BaseClasses\BaseClasses.sln "release|win32"
 vcbuild /M2 /rebuild components\ImageCalibration\idl\InterfaceDataTypes_TGT.vcproj "release|win32"
-vcbuild /M2 /build ImageProcessing_opencv.sln "release|win32"
+vcbuild /M2 /build ImageProcessing.sln "release|win32"
 goto MAKE_ZIP
 
 @rem ------------------------------------------------------------
@@ -164,13 +164,13 @@ goto MAKE_ZIP
 echo Visual Studio Dir: %VSINSTALLDIR%
 echo LIB: %LIB%
 set OPT=/M:4 /toolsversion:%VCTOOLSET% %PLATFORMTOOL% /p:platform=Win32
-set SLN=ImageProcessing_opencv.sln
+set SLN=ImageProcessing.sln
 set LOG=/fileLogger /flp:logfile=debug.log /v:diag 
 
 if %VC_VERSION% == 10  (
 	msbuild /t:rebuild /p:configuration=release %OPT% components\DirectShowCam\BaseClasses\BaseClasses.sln
 )
-
+msbuild /t:build /p:configuration=release %OPT% components\ImageCalibration\idl\ALL_IDL_TGT.vcxproj
 msbuild /t:build /p:configuration=release %OPT% %SLN%
 
 goto MAKE_ZIP
@@ -233,7 +233,7 @@ echo Visual Studio Dir: %VSINSTALLDIR%
 echo LIB: %LIB%
 set OPT=/M:4 /toolsversion:%VCTOOLSET% %PLATFORMTOOL% /p:platform=x64
 set LOG=/fileLogger /flp:logfile=debug.log /v:diag 
-set SLN=ImageProcessing_opencv.sln
+set SLN=ImageProcessing.sln
 
 if %VC_VERSION% == 10  (
 	msbuild /t:rebuild /p:configuration=release %OPT% components\DirectShowCam\BaseClasses\BaseClasses.sln
