@@ -4,9 +4,9 @@ GENERATOR=@LINUX_PACKAGE_GENERATOR@
 echo "Linux package generator:"  ${GENERATOR}
 
 grep -l 'translate' CPackConfig.cmake | xargs sed -i.bak -e 's/"translate/"imageprocessing/g'
-grep -l 'Translate' CPackConfig.cmake | xargs sed -i.bak -e 's/"Translate/"Imageprocessing/g'
+grep -l 'Translate' CPackConfig.cmake | xargs sed -i.bak -e 's/"Translate/"ImageProcessing/g'
 
-cp -f ../ip_cpack_options.cmake components/Translate/cpack_options.cmake
+rm -f components/Translate/cpack_options.cmake
 
 cpack -C CPackConfig.cmake
 
