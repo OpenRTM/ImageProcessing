@@ -320,9 +320,9 @@ class ObjectTracking
 
 	 cv::Mat frameImage;	/* キャプチャ画像用IplImage */
 	 cv::VideoCapture	capture;		/* キー入力結果を格納する変数 */
-	 int count = 0;
-	 int g_temp_w = 0;
-	 int g_temp_h = 0;
+	 int count;
+	 int g_temp_w;
+	 int g_temp_h;
 
 	 /* 処理モード選択用フラグ */
 	 int	backprojectMode = HIDDEN_BACKPROJECTION;

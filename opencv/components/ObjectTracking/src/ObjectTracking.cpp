@@ -124,7 +124,7 @@ cv::Scalar ObjectTracking::hsv2rgb(float hue){
 void ObjectTracking::CalculateHist(cv::MatND &hist, cv::Mat &hsvImage, cv::Mat &maskImage, cv::Rect &selection){
   int		i;
   int		binW;	/* ヒストグラムの各ビンの、画像上での幅 */
-  int		val;	/* ヒストグラムの頻度 */
+  //int		val;	/* ヒストグラムの頻度 */
   double	maxVal;	/* ヒストグラムの最大頻度 */
 
   /* hsv画像の各画素が値の範囲内に入っているかチェックし、 */
@@ -152,7 +152,7 @@ void ObjectTracking::CalculateHist(cv::MatND &hist, cv::Mat &hsvImage, cv::Mat &
 	
 
     /* ヒストグラムを計算し、最大値を求める */
-	int hbins = 30, sbins = 32;
+	//int hbins = 30, sbins = 32;
 	//int histSize[] = { hbins, sbins };
 	int histSize = 128;
 	float hranges[] = { 0, 180 };
@@ -230,7 +230,10 @@ ObjectTracking::ObjectTracking(RTC::Manager* manager)
     m_xIn("m_x", m_x),
     m_yIn("m_y", m_y),
     m_out_imgOut("img_output", m_out_img),
-    m_hist_imgOut("img_hist", m_hist_img)
+    m_hist_imgOut("img_hist", m_hist_img),
+    count(0),
+    g_temp_w(0),
+    g_temp_h(0)
 
     // </rtc-template>
 {
@@ -339,18 +342,18 @@ RTC::ReturnCode_t ObjectTracking::onDeactivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t ObjectTracking::onExecute(RTC::UniqueId ec_id)
 {
-	int		i;
-	int		j;
+	//int		i;
+	//int		j;
 
 	int x;
 	int y;
 	int mouse_event;
 
 	/* Snake用のパラメータ */
-	float alpha = 1.0;		/* 連続エネルギーの重みパラメータ */
-	float beta = 0.5;		/* 曲率の重みパラメータ */
-	float gamma = 1.5;		/* 画像エネルギーの重みパラメータ */
-	cv::Point pt[SEGMENT];	/* 制御点の座標 */
+	//float alpha = 1.0;		/* 連続エネルギーの重みパラメータ */
+	//float beta = 0.5;		/* 曲率の重みパラメータ */
+	//float gamma = 1.5;		/* 画像エネルギーの重みパラメータ */
+	//cv::Point pt[SEGMENT];	/* 制御点の座標 */
 	cv::Size window;			/* 最小値を探索する近傍サイズ */
 	window.width = WINDOW_WIDTH;
 	window.height = WINDOW_HEIGHT;
@@ -475,7 +478,7 @@ RTC::ReturnCode_t ObjectTracking::onExecute(RTC::UniqueId ec_id)
 			const float *ranges[] = { hRangesArray };
 			int image_num = 1;
 			int channels[] = { 0 };
-			int dnum = 1;
+			//int dnum = 1;
 			
 			
 			/* バックプロジェクションを計算する */
