@@ -325,10 +325,10 @@ class ObjectTracking
 	 int g_temp_h;
 
 	 /* 処理モード選択用フラグ */
-	 int	backprojectMode = HIDDEN_BACKPROJECTION;
-	 int	selectObject = SELECT_OFF;
-	 int	trackObject = TRACKING_STOP;
-	 int showHist = SHOW_HISTOGRAM;
+	 int	backprojectMode;
+	 int	selectObject;
+	 int	trackObject;
+	 int showHist;
 
 	 /* CamShiftトラッキング用変数 */
 	 cv::Point			origin;
@@ -338,11 +338,11 @@ class ObjectTracking
 	 cv::TermCriteria	trackComp;
 
 	 /* ヒストグラム用変数 */
-	 int		hdims = H_DIMENSION;		/* ヒストグラムの次元数 */
+	 int		hdims;		/* ヒストグラムの次元数 */
 	 static const float	hRangesArray[2];	/* ヒストグラムのレンジ */
 	 
-	 int		vmin = V_MIN;
-	 int		vmax = V_MAX;
+	 int		vmin;
+	 int		vmax;
 
   // <rtc-template block="private_attribute">
   

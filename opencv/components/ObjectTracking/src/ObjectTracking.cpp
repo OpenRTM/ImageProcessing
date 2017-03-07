@@ -233,7 +233,14 @@ ObjectTracking::ObjectTracking(RTC::Manager* manager)
     m_hist_imgOut("img_hist", m_hist_img),
     count(0),
     g_temp_w(0),
-    g_temp_h(0)
+    g_temp_h(0),
+    backprojectMode(HIDDEN_BACKPROJECTION),
+    selectObject(SELECT_OFF),
+    trackObject(TRACKING_STOP),
+    showHist(SHOW_HISTOGRAM),
+    hdims(H_DIMENSION),
+    vmin(V_MIN),
+    vmax(V_MAX)
 
     // </rtc-template>
 {
