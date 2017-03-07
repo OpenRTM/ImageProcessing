@@ -76,11 +76,11 @@ void ImageSubstraction::initializeBackgroundModel(int num, cv::Size size, double
   //IplImage *frameImage;
   for( i = 0; i < num; i++ ){
     //frameImage = cvQueryFrame( capture );
-	  std::cout << "f1" << "\t" << originalImage.size() << "\t" << acc.size() << std::endl;
+
 	  cv::accumulate(originalImage, acc, cv::noArray());
-	  std::cout << "f2" << std::endl;
+
 	  cv::accumulateSquare(originalImage, acc2, cv::noArray());
-	  std::cout << "f3" << std::endl;
+
     printf( "%d / %d image\n", i + 1, num );
   }
   printf( "Completion!\n" );
