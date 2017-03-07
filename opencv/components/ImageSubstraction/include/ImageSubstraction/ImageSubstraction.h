@@ -323,10 +323,10 @@ class ImageSubstraction
 	 cv::Mat resultImage;
 	 cv::Mat outputImage;
 
-	 int ImageSubstraction_count = 0;
-	 int	mode = DYNAMIC_MODE;
-	 int g_temp_w = 0;
-	 int g_temp_h = 0;
+	 int ImageSubstraction_count;
+	 int	mode;
+	 int g_temp_w;
+	 int g_temp_h;
 
 	 static const char* mode_str[2];
   // <rtc-template block="private_attribute">

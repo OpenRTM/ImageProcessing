@@ -136,7 +136,11 @@ ImageSubstraction::ImageSubstraction(RTC::Manager* manager)
     m_img_captureOut("capture_image", m_img_capture),
     m_img_resultOut("result_image", m_img_result),
     m_img_backOut("back_image", m_img_back),
-    m_img_thresholdOut("threshold_image", m_img_threshold)
+    m_img_thresholdOut("threshold_image", m_img_threshold),
+	ImageSubstraction_count(0),
+	mode(DYNAMIC_MODE),
+	g_temp_w(0),
+	g_temp_h(0)
 
     // </rtc-template>
 {
