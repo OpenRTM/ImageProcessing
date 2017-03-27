@@ -10,7 +10,8 @@ option = {
 
 setup(
   options = { "py2exe"	:{
-    "includes": ["OpenRTM_aist"] }
+    "includes": ["OpenRTM_aist"],
+    "dll_excludes": ["numpy-atlas.dll"] }
   },
   console = [
    {"script"	:	"TkCalibGUIComp.py" }
