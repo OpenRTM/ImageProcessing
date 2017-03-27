@@ -144,6 +144,12 @@ if %VC_VERSION% == 14 (
    set PLATFORMTOOL=/p:PlatformToolset=v140
    goto MSBUILDx86
    )
+if %VC_VERSION% == 15 (
+   call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" x86
+   set VCTOOLSET=15.0
+   set PLATFORMTOOL=/p:PlatformToolset=v141
+   goto MSBUILDx86
+   )
 
 @rem ------------------------------------------------------------
 @rem Build (VC2008 x86)
@@ -222,6 +228,12 @@ if /i %VC_VERSION% == 14 (
    call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
    set VCTOOLSET=14.0
    set PLATFORMTOOL=/p:PlatformToolset=v140
+   goto MSBUILDx64
+   )
+if /i %VC_VERSION% == 15 (
+   call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" amd64
+   set VCTOOLSET=15.0
+   set PLATFORMTOOL=/p:PlatformToolset=v141
    goto MSBUILDx64
    )
 
