@@ -3,6 +3,18 @@ set(standalone_srcs CameraViewerComp.cpp)
 
 find_package(OpenCV REQUIRED)
 
+
+
+if(UNIX)
+	find_package(PkgConfig)
+	if(PKG_CONFIG_FOUND)
+		PKG_CHECK_MODULES(GTK gtk+-2.0)
+		if(${GTK_VERSION} VERSION_EQUAL 2.24.30)
+			add_definitions(-DSTARTWINDOWTHREAD_DISABLE)
+		endif(${GTK_VERSION} VERSION_EQUAL 2.24.30)
+	endif(PKG_CONFIG_FOUND)
+endif(UNIX)
+
 if (DEFINED OPENRTM_INCLUDE_DIRS)
   string(REGEX REPLACE "-I" ";"
     OPENRTM_INCLUDE_DIRS "${OPENRTM_INCLUDE_DIRS}")

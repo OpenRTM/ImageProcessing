@@ -127,7 +127,10 @@ RTC::ReturnCode_t CameraViewer::onActivated(RTC::UniqueId ec_id)
   /* 画像表示用ウィンドウの作成 */
   cv::namedWindow("CaptureImage", CV_WINDOW_AUTOSIZE);
   cv::setMouseCallback("CaptureImage", onMouse, (void*)this);
-  
+
+#ifndef STARTWINDOWTHREAD_DISABLE
+  cv::startWindowThread();
+#endif
   return RTC::RTC_OK;
 }
 
@@ -179,9 +182,7 @@ RTC::ReturnCode_t CameraViewer::onExecute(RTC::UniqueId ec_id)
 
 
   /* 画像表示 */
-#if (!defined WIN32) || (!defined WIN64)
-  cv::startWindowThread();
-#endif
+
   cv::imshow("CaptureImage", m_orig_img);
 
   if (count > 100)
