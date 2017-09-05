@@ -97,6 +97,8 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
    SET(CMAKE_CXX_COMPILER "g++")
 endif (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
+# Get necessary dependency information
+find_package(OpenRTM)
 
 # Set up installation directories
 if(WIN32)
@@ -104,7 +106,7 @@ if(WIN32)
 #  set(LIB_INSTALL_DIR "components/lib")
   set(INSTALL_PREFIX "components/${PROJECT_TYPE}")
 else(WIN32)
-  set(OPENRTM_SHARE_PREFIX "share/openrtm-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}")
+  set(OPENRTM_SHARE_PREFIX "share/openrtm-${OPENRTM_VERSION_MAJOR}.${OPENRTM_VERSION_MINOR}")
   set(INSTALL_PREFIX "${OPENRTM_SHARE_PREFIX}/components/${PROJECT_TYPE}")
 endif(WIN32)
 
@@ -112,9 +114,6 @@ endif(WIN32)
 #    "components/include/${PROJECT_NAME_LOWER}-${PROJECT_VERSION_MAJOR}")
 #set(SHARE_INSTALL_DIR
 #    "components/share/${PROJECT_NAME_LOWER}-${PROJECT_VERSION_MAJOR}")
-
-# Get necessary dependency information
-find_package(OpenRTM)
 
 # Universal settings
 #enable_testing()
