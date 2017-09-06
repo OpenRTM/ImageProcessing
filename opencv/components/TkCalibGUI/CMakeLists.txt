@@ -92,12 +92,13 @@ endif()
 
 # check python installed
 find_package(PythonInterp)
-
+# Get necessary dependency information
+find_package(OpenRTM)
 
 if(WIN32)
     set(INSTALL_PREFIX "components/${RTC_LANG}/${PACKAGE_NAME}${PACKAGE_VERSION}")
 else()
-    set(OPENRTM_SHARE_PREFIX "share/openrtm-${RTC_VERSION_MAJOR}.${RTC_VERSION_MINOR}")
+    set(OPENRTM_SHARE_PREFIX "share/openrtm-${OPENRTM_VERSION_MAJOR}.${OPENRTM_VERSION_MINOR}")
     set(INSTALL_PREFIX "${OPENRTM_SHARE_PREFIX}/components/${RTC_LANG}/${RTC_NAME}")
 endif()
 
