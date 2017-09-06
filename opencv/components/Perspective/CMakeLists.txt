@@ -1,5 +1,11 @@
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 cmake_policy(SET CMP0002 OLD)
+if(POLICY CMP0046)
+  cmake_policy(SET CMP0046 OLD)
+endif()
+if(POLICY CMP0048)
+  cmake_policy(SET CMP0048 OLD)
+endif()
 
 project(Perspective)
 string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
@@ -109,13 +115,6 @@ endif(WIN32)
 
 # Get necessary dependency information
 find_package(OpenRTM)
-if(${OpenRTM_FOUND})
-  MESSAGE(STATUS "OpenRTM configuration Found")
-else(${OpenRTM_FOUND})
-  message(STATUS "Use cmake/Modules/FindOpenRTM.cmake in the project")
-  list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
-  find_package(OpenRTM REQUIRED)
-endif(${OpenRTM_FOUND})
 
 # Universal settings
 #enable_testing()

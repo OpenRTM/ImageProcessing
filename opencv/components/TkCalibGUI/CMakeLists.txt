@@ -1,9 +1,11 @@
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
+if(POLICY CMP0053)
+  cmake_policy(SET CMP0053 OLD)
+endif()
 
 project(TkCalibGUI NONE)
 
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
-set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake_modules")
 
 function(get_dist ARG0)
   if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
@@ -76,15 +78,11 @@ set(IDL_FILES ""
 )
 
 set(EXEC_FILES ""
-               TkCalibGUIComp.py tkcalibgui.py rtutil.py setup.py
+               TkCalibGUIComp.py tkcalibgui.py rtutil.py setup.py idlcompile.sh
 )
 
 set(OTHER_SRCS CMakeLists.txt
                RTC.xml TkCalibGUI.conf rtc.conf)
-
-
-# check OpenRTM installed
-find_package(OpenRTMPython REQUIRED)
 
 # check doxygen installed
 find_package(Doxygen)
@@ -94,24 +92,24 @@ endif()
 
 # check python installed
 find_package(PythonInterp)
-find_package(PythonLibs)
 
 
 if(WIN32)
-    # add command path
-#    set($ENV{PATH} $ENV{PATH} "${OPENRTM_DIR}/bin")
-    # set install path prefix
-#    set(CMAKE_INSTALL_PREFIX "${OPENRTM_DIR}")
     set(INSTALL_PREFIX "components/${RTC_LANG}/${PACKAGE_NAME}${PACKAGE_VERSION}")
 else()
-    # add command path
-#    set($ENV{PATH} $ENV{PATH} "${OPENRTM_DIR}/bin")
-    # set install path prefix
-#    set(CMAKE_INSTALL_PREFIX "${OPENRTM_DIR}")
     set(OPENRTM_SHARE_PREFIX "share/openrtm-${RTC_VERSION_MAJOR}.${RTC_VERSION_MINOR}")
     set(INSTALL_PREFIX "${OPENRTM_SHARE_PREFIX}/components/${RTC_LANG}/${RTC_NAME}")
 endif()
 
+# postinst, prerm settings
+if(UNIX)
+		configure_file(${CMAKE_CURRENT_SOURCE_DIR}/postinst.in
+  			${CMAKE_CURRENT_SOURCE_DIR}/postinst @ONLY
+		)
+		configure_file(${CMAKE_CURRENT_SOURCE_DIR}/prerm.in
+			  ${CMAKE_CURRENT_SOURCE_DIR}/prerm @ONLY
+		)
+endif()
 
 # add uninstall target
 configure_file(
@@ -138,7 +136,6 @@ else()
     COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/idl
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${PROJECT_SOURCE_DIR}/idl ${PROJECT_BINARY_DIR}/idl
-    COMMAND /bin/sh ${PROJECT_SOURCE_DIR}/idlcompile.sh
   )
 endif()
 
@@ -152,14 +149,20 @@ endforeach()
 install(PROGRAMS ${EXEC_FILES} DESTINATION "${INSTALL_PREFIX}"
         COMPONENT "applications")
 
-install(FILES ${PROJECT_BINARY_DIR}/CalibrationService_idl.py DESTINATION "${INSTALL_PREFIX}"
-        COMPONENT "applications")
+if(WIN32)
+	install(FILES ${PROJECT_BINARY_DIR}/CalibrationService_idl.py DESTINATION "${INSTALL_PREFIX}"
+	        COMPONENT "applications")
 
-install(DIRECTORY idl 
+	install(DIRECTORY idl 
                   ${PROJECT_BINARY_DIR}/ImageCalibService 
                   ${PROJECT_BINARY_DIR}/ImageCalibService__POA 
-        DESTINATION "${INSTALL_PREFIX}"
-        COMPONENT "applications")
+  	      DESTINATION "${INSTALL_PREFIX}"
+  	      COMPONENT "applications")
+else()        
+	install(DIRECTORY idl 
+	        DESTINATION "${INSTALL_PREFIX}"
+	        COMPONENT "applications")
+endif()
 
 # install source files
 #install(FILES ${IDL_FILES} ${EXEC_FILES} ${OTHER_SRCS}
@@ -174,6 +177,7 @@ install(DIRECTORY idl
 # package settings
 set(CPACK_PACKAGE_NAME "${RTC_NAME}")
 string(TOLOWER ${CPACK_PACKAGE_NAME} CPACK_PACKAGE_NAME_LOWER)
+set(CPACK_RPM_PACKAGE_NAME "${RTC_NAME}")
 set(CPACK_PACKAGE_VERSION_MAJOR "${RTC_VERSION_MAJOR}")
 set(CPACK_PACKAGE_VERSION_MINOR "${RTC_VERSION_MINOR}")
 set(CPACK_PACKAGE_VERSION_PATCH "${RTC_VERSION_PATCH}")
@@ -220,23 +224,36 @@ else()
     set(CPACK_GENERATOR "${LINUX_PACKAGE_GENERATOR}")
     if(CPACK_DEBIAN_PACKAGE_ARCHITECTURE)
         set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME_LOWER}_${CPACK_PACKAGE_VERSION}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}")
+				set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_SOURCE_DIR}/postinst;${CMAKE_SOURCE_DIR}/prerm")
     endif(CPACK_DEBIAN_PACKAGE_ARCHITECTURE)
     if(CPACK_RPM_PACKAGE_ARCHITECTURE)
         set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CPACK_RPM_PACKAGE_ARCHITECTURE}")
+        set(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${CMAKE_SOURCE_DIR}/postinst")
+        set(CPACK_RPM_POST_UNINSTALL_SCRIPT_FILE "${CMAKE_SOURCE_DIR}/prerm")
     endif(CPACK_RPM_PACKAGE_ARCHITECTURE)
 
 endif()
 
 include(CPack)
 
+
+
 if (SolutionDir)
-  SET (calib_python_file
+	if(WIN32)
+  	SET (calib_python_file
             ${PROJECT_SOURCE_DIR}/TkCalibGUIComp.py 
             ${PROJECT_SOURCE_DIR}/tkcalibgui.py 
             ${PROJECT_SOURCE_DIR}/rtutil.py 
             ${PROJECT_BINARY_DIR}/CalibrationService_idl.py 
             ${PROJECT_BINARY_DIR}/setup.py) 
-               
+	else()
+  	SET (calib_python_file
+            ${PROJECT_SOURCE_DIR}/TkCalibGUIComp.py 
+            ${PROJECT_SOURCE_DIR}/tkcalibgui.py 
+            ${PROJECT_SOURCE_DIR}/rtutil.py 
+            ${PROJECT_BINARY_DIR}/setup.py) 	
+	endif()
+	               
   foreach(target ${calib_python_file})
     add_custom_command(
       TARGET ${PROJECT_NAME} POST_BUILD
@@ -245,22 +262,24 @@ if (SolutionDir)
     )
   endforeach()
 
-  SET (calib_python_dir
+	if(WIN32)
+	  SET (calib_python_dir
             ImageCalibService 
             ImageCalibService__POA)
 
-  foreach(target ${calib_python_dir})
-    add_custom_command(
-      TARGET ${PROJECT_NAME} POST_BUILD
-      COMMAND ${CMAKE_COMMAND} -E make_directory ${SolutionDir}/bin/${target} 
-    )
-  endforeach()
+	  foreach(target ${calib_python_dir})
+	    add_custom_command(
+  	    TARGET ${PROJECT_NAME} POST_BUILD
+  	    COMMAND ${CMAKE_COMMAND} -E make_directory ${SolutionDir}/bin/${target} 
+  	  )
+  	endforeach()
   
-  foreach(target ${calib_python_dir})
-    add_custom_command(
-      TARGET ${PROJECT_NAME} POST_BUILD
-      COMMAND ${CMAKE_COMMAND} -E copy_directory
-          ${target} ${SolutionDir}/bin/${target}            
-    )
-  endforeach()
+  	foreach(target ${calib_python_dir})
+    	add_custom_command(
+    	  TARGET ${PROJECT_NAME} POST_BUILD
+    	  COMMAND ${CMAKE_COMMAND} -E copy_directory
+    	      ${target} ${SolutionDir}/bin/${target}            
+    	)
+  	endforeach()
+  endif()
 endif (SolutionDir)
