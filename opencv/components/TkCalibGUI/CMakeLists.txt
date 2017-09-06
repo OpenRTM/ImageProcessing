@@ -5,9 +5,57 @@ project(TkCalibGUI NONE)
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake_modules")
 
-set(LINUX_PACKAGE_GENERATOR "DEB")
-#set(LINUX_PACKAGE_GENERATOR "RPM")
+function(get_dist ARG0)
+  if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+    set(${ARG0} ${CMAKE_SYSTEM_NAME} PARENT_SCOPE)
+    return()
+  endif()
+  foreach(dist Debian Ubuntu RedHat Fedora CentOS)
+    execute_process(
+      COMMAND grep ${dist} -s /etc/issue /etc/os-release /etc/redhat-release /etc/system-release
+      OUTPUT_VARIABLE dist_name
+      )
+    if(${dist_name} MATCHES ${dist})
+      set(${ARG0} ${dist} PARENT_SCOPE)
+      return()
+    endif()
+  endforeach()
+endfunction(get_dist)
 
+function(get_pkgmgr ARG0)
+  get_dist(DIST_NAME)
+  if(${DIST_NAME} MATCHES "Debian" OR
+     ${DIST_NAME} MATCHES "Ubuntu")
+     set(${ARG0} "DEB" PARENT_SCOPE)
+     return()
+  endif()
+  if(${DIST_NAME} MATCHES "RedHat" OR
+     ${DIST_NAME} MATCHES "Fedora" OR
+     ${DIST_NAME} MATCHES "CentOS")
+     set(${ARG0} "RPM" PARENT_SCOPE)
+     return()
+  endif()
+endfunction(get_pkgmgr)
+
+get_dist(DIST_NAME)
+MESSAGE(STATUS "Distribution is ${DIST_NAME}")
+
+get_pkgmgr(PKGMGR)
+if(PKGMGR AND NOT LINUX_PACKAGE_GENERATOR)
+  set(LINUX_PACKAGE_GENERATOR ${PKGMGR})
+  if(${PKGMGR} MATCHES "DEB")    
+    execute_process(COMMAND dpkg --print-architecture
+      OUTPUT_VARIABLE CPACK_DEBIAN_PACKAGE_ARCHITECTURE
+      OUTPUT_STRIP_TRAILING_WHITESPACE)
+    message(STATUS "Package manager is ${PKGMGR}. Arch is ${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}.")   
+  endif()
+  if(${PKGMGR} MATCHES "RPM")
+    execute_process(COMMAND uname "-m"
+      OUTPUT_VARIABLE CPACK_RPM_PACKAGE_ARCHITECTURE
+      OUTPUT_STRIP_TRAILING_WHITESPACE)
+    message(STATUS "Package manager is ${PKGMGR}. Arch is ${CPACK_RPM_PACKAGE_ARCHITECTURE}.")   
+  endif()    
+endif()
 
 # component settings
 set(RTC_NAME "${PROJECT_NAME}")
@@ -60,8 +108,8 @@ else()
 #    set($ENV{PATH} $ENV{PATH} "${OPENRTM_DIR}/bin")
     # set install path prefix
 #    set(CMAKE_INSTALL_PREFIX "${OPENRTM_DIR}")
-    set(OPENRTM_SHARE_PREFIX "share/openrtm-${OPENRTM_VERSION_MAJOR}.${OPENRTM_VERSION_MINOR}")
-    set(INSTALL_PREFIX "${OPENRTM_SHARE_PREFIX}/components/${RTC_LANG}/${PACKAGE_NAME}${PACKAGE_VERSION}")
+    set(OPENRTM_SHARE_PREFIX "share/openrtm-${RTC_VERSION_MAJOR}.${RTC_VERSION_MINOR}")
+    set(INSTALL_PREFIX "${OPENRTM_SHARE_PREFIX}/components/${RTC_LANG}/${RTC_NAME}")
 endif()
 
 
@@ -125,6 +173,7 @@ install(DIRECTORY idl
 
 # package settings
 set(CPACK_PACKAGE_NAME "${RTC_NAME}")
+string(TOLOWER ${CPACK_PACKAGE_NAME} CPACK_PACKAGE_NAME_LOWER)
 set(CPACK_PACKAGE_VERSION_MAJOR "${RTC_VERSION_MAJOR}")
 set(CPACK_PACKAGE_VERSION_MINOR "${RTC_VERSION_MINOR}")
 set(CPACK_PACKAGE_VERSION_PATCH "${RTC_VERSION_PATCH}")
@@ -169,36 +218,14 @@ if(WIN32)
 
 else()
     set(CPACK_GENERATOR "${LINUX_PACKAGE_GENERATOR}")
+    if(CPACK_DEBIAN_PACKAGE_ARCHITECTURE)
+        set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME_LOWER}_${CPACK_PACKAGE_VERSION}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}")
+    endif(CPACK_DEBIAN_PACKAGE_ARCHITECTURE)
+    if(CPACK_RPM_PACKAGE_ARCHITECTURE)
+        set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CPACK_RPM_PACKAGE_ARCHITECTURE}")
+    endif(CPACK_RPM_PACKAGE_ARCHITECTURE)
 
-    if(CPACK_GENERATOR STREQUAL "DEB")
-        # Linux Debian package settings
-
-        set(CPACK_DEBIAN_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION}")
-        set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "i386")
-        set(CPACK_DEBIAN_PACKAGE_SECTION "main")
-        set(CPACK_DEBIAN_PACKAGE_PRIORITY  "extra")
-        set(CPACK_DEBIAN_PACKAGE_DEPENDS "openrtm-aist (>= 1.0.0)")
-
-        set(CPACK_PACKAGE_FILE_NAME
-            "rtc${OPENRTM_VERSION}-${PACKAGE_NAME}_${CPACK_DEBIAN_PACKAGE_VERSION}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}")
-
-    elseif(CPACK_GENERATOR STREQUAL "RPM")
-        # Linux RPM package settings
-
-        set(CPACK_RPM_PACKAGE_RELEASE "1.fc10")
-        set(CPACK_RPM_PACKAGE_ARCHITECTURE "i386")
-        set(CPACK_RPM_PACKAGE_GROUP "Development/Libraries")
-        set(CPACK_RPM_PACKAGE_LICENSE "LGPL")
-        set(CPACK_RPM_PACKAGE_REQUIRES "OpenRTM-aist >= 1.0.0")
-
-        set(CPACK_PACKAGE_FILE_NAME
-            "rtc${OPENRTM_VERSION}-${PACKAGE_NAME}-${PACKAGE_VERSION}-${CPACK_RPM_PACKAGE_RELEASE}.${CPACK_RPM_PACKAGE_ARCHITECTURE}")
-
-    endif()
 endif()
-
-message(STATUS "Package type: ${CPACK_GENERATOR}")
-message(STATUS "Package name: ${CPACK_PACKAGE_FILE_NAME}")
 
 include(CPack)
 

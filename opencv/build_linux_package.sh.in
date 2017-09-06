@@ -1,0 +1,18 @@
+#!/bin/sh
+
+GENERATOR=@LINUX_PACKAGE_GENERATOR@
+echo "Linux package generator:"  ${GENERATOR}
+
+cpack -C CPackConfig.cmake
+
+if test "x${GENERATOR}" = "xDEB" ;then
+	rename s/translate/imageprocessing/g *.deb
+	newname=`ls *.deb`
+fi
+if test "x${GENERATOR}" = "xRPM" ;then
+	rename Translate ImageProcessing *.rpm
+	newname=`ls *.rpm`
+fi
+
+echo "Rename package : "  ${newname}
+
