@@ -49,6 +49,12 @@ if not DEFINED OMNI_ROOT  set OMNI_ROOT=%RTM_ROOT%\omniORB
 set COIL_ROOT=%RTM_ROOT%\coil
 set OpenRTM_DIR=%RTM_ROOT%\cmake
 
+if %VC_VERSION% == 141 (
+  set VS_VERSION=15
+) else (
+  set VS_VERSION=%VC_VERSION%
+)
+
 @rem ------------------------------------------------------------
 @rem Printing env variables
 echo Environment variables:
@@ -96,7 +102,7 @@ goto END
 @rem start to cmake 32bit 
 @rem ============================================================
 :cmake_x86
-set VC_NAME="Visual Studio %VC_VERSION%"
+set VC_NAME="Visual Studio %VS_VERSION%"
 if %VC_VERSION% == 9  (
    cmake .. -G "Visual Studio 9 2008"
    goto x86
@@ -144,7 +150,7 @@ if %VC_VERSION% == 14 (
    set PLATFORMTOOL=/p:PlatformToolset=v140
    goto MSBUILDx86
    )
-if %VC_VERSION% == 15 (
+if %VC_VERSION% == 141 (
    call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" x86
    set VCTOOLSET=15.0
    set PLATFORMTOOL=/p:PlatformToolset=v141
@@ -186,7 +192,7 @@ goto MAKE_ZIP
 @rem start to cmake 64bit 
 @rem ============================================================
 :cmake_x86_64
-set VC_NAME="Visual Studio %VC_VERSION% Win64"
+set VC_NAME="Visual Studio %VS_VERSION% Win64"
 if %VC_VERSION% == 9  (
    echo 64bit compilation on Visual C++ 2008 is not supported. Aborting.
    goto END
@@ -230,7 +236,7 @@ if /i %VC_VERSION% == 14 (
    set PLATFORMTOOL=/p:PlatformToolset=v140
    goto MSBUILDx64
    )
-if /i %VC_VERSION% == 15 (
+if /i %VC_VERSION% == 141 (
    call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" amd64
    set VCTOOLSET=15.0
    set PLATFORMTOOL=/p:PlatformToolset=v141
