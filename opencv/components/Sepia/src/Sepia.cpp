@@ -160,10 +160,11 @@ RTC::ReturnCode_t Sepia::onExecute(RTC::UniqueId ec_id)
 
     /* HSV画像をH、S、V画像に分ける */
 	std::vector<cv::Mat> tmp;
-	tmp.push_back(m_hueImage);
-	tmp.push_back(m_saturationImage);
-	tmp.push_back(m_valueImage);
+	
 	cv::split(m_hsvImage, tmp);
+	m_hueImage = tmp[0];
+	m_saturationImage = tmp[1];
+	m_valueImage = tmp[2];
 
     /* HとSの値を変更する */
 	m_hueImage.setTo(cv::Scalar(m_nHue));
@@ -176,6 +177,8 @@ RTC::ReturnCode_t Sepia::onExecute(RTC::UniqueId ec_id)
 	tmp.push_back(m_hueImage);
 	tmp.push_back(m_saturationImage);
 	tmp.push_back(m_valueImage);
+
+	
 	cv::merge(tmp, m_mergeImage);
 
     /* HSVからBGRに変換する */
