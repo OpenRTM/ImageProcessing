@@ -12,8 +12,10 @@ add_subdirectory(CameraViewer)
 add_subdirectory(Chromakey)
 add_subdirectory(Dilationerosion)
 
+
+
 if (WIN32)
-  if ($ENV{VC_VERSION} MATCHES "10" OR $ENV{VC_VERSION} MATCHES "9")
+  if (${CMAKE_GENERATOR} MATCHES [[Visual Studio (9|10) (2008|2010)(| Win64| ARM)]])
     if(DIRECTSHOW_FOUND)
       add_subdirectory(DirectShowCam)
     endif()
