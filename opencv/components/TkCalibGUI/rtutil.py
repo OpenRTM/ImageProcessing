@@ -1,4 +1,4 @@
-#! python.exe
+#! /usr/bin/env python
 
 import cgi
 import subprocess
