@@ -17,22 +17,19 @@ Steps to reproduce the behavior:
 3. Scroll down to '....'
 4. See error
 
+**Reproducibility**
+Ran XXX times, occurred YYY times.
+
 **Expected behavior**
 A clear and concise description of what you expected to happen.
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+**Screenshots or Logs**
+If applicable, add screenshots or logs to help explain your problem.
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
-
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
+**Environment**
+ - OS: [e.g. Ubnutn 16.04 32bits]
+ - OpenRTM-aist Version [e.g. 1.2.1]
+ - ...
 
 **Additional context**
 Add any other context about the problem here.
