@@ -296,6 +296,7 @@ class OpenCVCamera
   // </rtc-template>
   int dummy;
   int m_device_id;	/* 使用中のカメラデバイスID */
+  int m_current_frame_rate;	/* 現在のフレームレート */
   cv::VideoCapture m_capture;	/* カメラ用メモリ */
 };
 
