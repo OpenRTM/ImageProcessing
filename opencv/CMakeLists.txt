@@ -50,14 +50,14 @@ if(PKGMGR)
       OUTPUT_VARIABLE CPACK_DEBIAN_PACKAGE_ARCHITECTURE
       OUTPUT_STRIP_TRAILING_WHITESPACE)
     message(STATUS "Package manager is ${PKGMGR}. Arch is ${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}.")   
-    set(CPACK_DEBIAN_PACKAGE_DEPENDS "libopencv-dev")   
+    #set(CPACK_DEBIAN_PACKAGE_DEPENDS "libopencv-dev")
   endif()
   if(${PKGMGR} MATCHES "RPM")
     execute_process(COMMAND uname "-m"
       OUTPUT_VARIABLE CPACK_RPM_PACKAGE_ARCHITECTURE
       OUTPUT_STRIP_TRAILING_WHITESPACE)
     message(STATUS "Package manager is ${PKGMGR}. Arch is ${CPACK_RPM_PACKAGE_ARCHITECTURE}.")   
-    set(CPACK_RPM_PACKAGE_REQUIRES "opencv-devel") 
+    #set(CPACK_RPM_PACKAGE_REQUIRES "opencv-devel")
   endif()    
 endif()
 
