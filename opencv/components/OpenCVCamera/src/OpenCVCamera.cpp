@@ -38,6 +38,9 @@ static const char* opencvcamera_spec[] =
 	"conf.__widget__.frame_height", "text",
 	"conf.__widget__.frame_rate", "text",
     // Constraints
+    "exec_cxt.activation_timeout",  "3",
+    "exec_cxt.deactivation_timeout",  "3",
+    "exec_cxt.reset_timeout",  "3",
     ""
   };
 // </rtc-template>
