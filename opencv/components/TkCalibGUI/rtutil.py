@@ -853,7 +853,7 @@ def connectPorts(name1, name2, tree=None):
         #result = "Connected:  %s %s" % (name1, name2)
         result = "Connected:  "
         code = 1
-    except Exception, e:
+    except Exception as e:
       result = "Error in connectPorts"
       code=-1
 
@@ -883,7 +883,7 @@ def disconnectPorts(name1, name2):
         result = "No such a connection."
         code = 0
 
-    except Exception, e:
+    except Exception as e:
       result = "Error in disconnectPorts"
       code = -1
 
@@ -912,7 +912,7 @@ def disconnectAll(name1, tree=None):
         result = "Disonnected:  %s" % (comp1.name)
         code = 0
 
-    except Exception, e:
+    except Exception as e:
       result = "Error in disconnectPorts"
       code = -1
 
@@ -933,7 +933,7 @@ def delete_all_zombies(hosts='localhost'):
       name = node.name
       node.parent.unbind(node.name)
       return name
-    except Exception, e:
+    except Exception as e:
       traceback.print_exc()
       print >>sys.stderr, '{0}: {1}'.format(sys.argv[0], e)
 
@@ -953,7 +953,7 @@ def getRtcConfigurationList(name):
 #  result =  '{"name": "error", "config": "", "msg" : "Invalid Component name!!"}'
 
   conf_sets = comp.conf_sets
-  print conf_sets.keys()
+  print(conf_sets.keys())
 
   active_conf = comp.active_conf_set_name 
 
@@ -966,7 +966,7 @@ def getRtcConfigurationList(name):
       result = conf_sets[set_name].data
       params = conf_sets[set_name].data.keys()
       for param in params:
-        print """ %s   %s """ % (param, conf_sets[set_name].data[param])
+        print(param,"   ", conf_sets[set_name].data[param])
 
   return result
 
@@ -997,7 +997,7 @@ def setRtcConfiguration(name, conf_name, val, setname=None):
   comp.set_conf_set_value(active_conf, conf_name, val)
   comp.activate_conf_set(active_conf)
 
-  print >> sys.stderr, "Config: %s: %s = %s" % (active_conf, conf_name, val)
+  print >> sys.stderr, "Config: {0}: {1} = {2}".format(active_conf, conf_name, val)
   result = """ {"ConfigName" : "%s", "Value": "%s" }""" % (conf_name, val)
   return result
 
@@ -1058,9 +1058,9 @@ def getValue(form, val, n_arg):
 """
 def printResult(result, isCGI=1):
   if isCGI == 1 :
-    print "Content-type: text/html;charset=utf-8"
-    print ""
-    print result
+    print("Content-type: text/html;charset=utf-8")
+    print("")
+    print(result)
   else:
     printJSON(result)
 
@@ -1069,6 +1069,6 @@ def printResult(result, isCGI=1):
 def printJSON(result):
   try:
     res = json.loads(result)
-    print json.dumps(res, indent=2)
+    print(json.dumps(res, indent=2))
   except:
-    print result
+    print(result)
