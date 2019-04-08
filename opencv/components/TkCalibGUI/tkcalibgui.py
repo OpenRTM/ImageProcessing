@@ -136,7 +136,7 @@ class TkCalibGUI(Frame):
 				if os_name == "Windows":
 					path += ".exe"
 				if os.path.isfile(path):
-					print "find path = {0}".format(path)
+					print("find path = {0}".format(path))
 					base, ext = os.path.splitext(comp_name[i])
 					# basename : path
 					comp_path[base] = path_list[j]
@@ -400,7 +400,7 @@ class TkCalibGUI(Frame):
 		if os_name == "Windows":
 			# camera
 			comp_name = camera_path + self.camera_comp + ".exe"
-			print "windows: comp_name = {0}".format(comp_name)
+			print("windows: comp_name = {0}".format(comp_name))
 			subprocess.Popen([comp_name, "-o", self.comp_option])
 			camera_outport = self.default_camera[self.camera_comp]
 		
@@ -492,7 +492,7 @@ class TkCalibGUI(Frame):
 				judge = " found."
 				break
 			time.sleep(1)
-		print name + judge	
+		print(name, judge)	
 		return tree	
 
 	# [callback] activate button	
@@ -683,7 +683,7 @@ class TkCalibGUI(Frame):
 			# Remove all saved images
 			self.provider.removeCalibImage(-1)
 			self.pic_num = num
-			print "tkcalibgui.py : redraw_gui : pic_num changed = %d" % self.pic_num
+			print("tkcalibgui.py : redraw_gui : pic_num changed = ",self.pic_num)
 			self.check_lang()
 			self.variable_mes.set(self.msg2)
 			self.redraw_frameR()
@@ -760,10 +760,10 @@ class CompTransitionThread(Thread):
 				pass
 
 			if ret == 0:
-				print "{0}:{1} OK!".format(cmd, str(rtc))
+				print("{0}:{1} OK!".format(cmd, str(rtc)))
 				break
 			else:
-				print "{0}:{1} NG!".format(cmd, str(rtc))
+				print("{0}:{1} NG!".format(cmd, str(rtc)))
 		return ret
 
 class RTMLogo:

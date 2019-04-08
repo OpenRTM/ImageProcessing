@@ -11,7 +11,7 @@
 def check_openrtmpy():
     try:
         import OpenRTM_aist
-        print "OpenRTM python is installed."
+        print("OpenRTM python is installed.")
     except:
         import tkMessageBox
         import Tkinter
@@ -25,7 +25,7 @@ def check_openrtmpy():
 def check_ttk():
     try:
         import ttk
-        print "Ttk is installed."
+        print("Ttk is installed.")
     except:
         import tkMessageBox
         import Tkinter
@@ -39,7 +39,7 @@ def check_ttk():
 def check_pil():
     try:
         from PIL import Image, ImageTk
-        print "Python Imaging Library (PIL) is installed."
+        print("Python Imaging Library (PIL) is installed.")
     except:
         import tkMessageBox
         import Tkinter
@@ -53,7 +53,7 @@ def check_pil():
 def check_numpy():
     try:
         import numpy
-        print "Numpy is installed."
+        print("Numpy is installed.")
     except:
         import tkMessageBox
         import Tkinter
@@ -67,7 +67,7 @@ def check_numpy():
 def check_rtctree():
     try:
         import rtctree
-        print "rtctree is installed."
+        print("rtctree is installed.")
     except:
         import tkMessageBox
         import Tkinter
@@ -277,13 +277,13 @@ class TkCalibGUI(OpenRTM_aist.DataFlowComponentBase):
 		
 		try:
 			if CORBA.is_nil(self._CalibrationService._ptr()):
-#				print "TkCalibGUI : [nil] object reference is not assigned."
+#				print("TkCalibGUI : [nil] object reference is not assigned.")
 				return RTC.RTC_OK
 			elif self._CalibrationService._ptr()._non_existent():
-#				print "TkCalibGUI : provider is inactive."
+#				print("TkCalibGUI : provider is inactive.")
 				return RTC.RTC_OK
 		except Exception as e:
-			print "TkCalibGUI : " + str(e)
+			print("TkCalibGUI : ",str(e))
 			return RTC.RTC_OK
 
 		if self._checker_imageIn.isNew():
@@ -293,7 +293,7 @@ class TkCalibGUI(OpenRTM_aist.DataFlowComponentBase):
 			try:
 				num = self._CalibrationService._ptr().getImageNumber()
 			except Exception as e:
-#				print "TkCalibGUI : getImageNumber() : " + str(e)
+#				print("TkCalibGUI : getImageNumber() : ",str(e))
 				return RTC.RTC_OK
 				
 			if self.pic_num != num:
@@ -403,7 +403,7 @@ def get_options(pid, opts):
 	return comp_option
 	
 def usage():
-	print "usage: TkCalibGUIComp.py [-o naming.formats]"
+	print("usage: TkCalibGUIComp.py [-o naming.formats]")
 
 def main():
 	calibgui = tkcalibgui.TkCalibGUI()
@@ -412,8 +412,8 @@ def main():
 	rt_dir = "/localhost/cvcalib{0}/".format(pid)
 	try:
 		opts, args = getopt.getopt(sys.argv[1:], "o:f:")
-	except getopt.GetoptError, err:
-		print usage()
+	except getopt.GetoptError as err:
+		print(usage())
 		return
 
 	comp_option = get_options(pid, opts)
