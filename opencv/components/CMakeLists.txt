@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
 project(components)
-include(DirectShowCam/BaseClasses/FindDirectShow.cmake)
 include(PGRCamera/cmake/FindFlyCapture.cmake)
 
 add_subdirectory(TkCalibGUI)
@@ -12,14 +11,8 @@ add_subdirectory(CameraViewer)
 add_subdirectory(Chromakey)
 add_subdirectory(Dilationerosion)
 
-
-
 if (WIN32)
-  if (${CMAKE_GENERATOR} MATCHES [[Visual Studio (9|10) (2008|2010)(| Win64| ARM)]])
-    if(DIRECTSHOW_FOUND)
-      add_subdirectory(DirectShowCam)
-    endif()
-  else()
+  if (NOT ${CMAKE_GENERATOR} MATCHES [[Visual Studio 10]])
     add_subdirectory(MFCamera)
   endif()
 endif()

@@ -48,12 +48,8 @@ if not DEFINED OMNI_ROOT  set OMNI_ROOT=%RTM_ROOT%\omniORB
 
 set COIL_ROOT=%RTM_ROOT%\coil
 set OpenRTM_DIR=%RTM_ROOT%\cmake
+set VS_VERSION=%VC_VERSION%
 
-if %VC_VERSION% == 141 (
-  set VS_VERSION=15
-) else (
-  set VS_VERSION=%VC_VERSION%
-)
 
 @rem ------------------------------------------------------------
 @rem Printing env variables
@@ -69,15 +65,6 @@ set PATH=%OMNI_ROOT%\bin\x86_win32;%PATH%;%PYTHON_DIR%;
 if %ARCH% == x86       set DLL_ARCH=
 if %ARCH% == x86_64    set DLL_ARCH=_x64
 
-
-if %VC_VERSION% LEQ 10 (
-	@set WindowsSdkDir=
-	@for /F "tokens=1,2*" %%i in ('reg query "HKLM\SOFTWARE\Microsoft\Microsoft SDKs\Windows" /v "CurrentInstallFolder"') DO (
-		if "%%i"=="CurrentInstallFolder" (
-			set "WindowsSdkDir=%%k"
-		)
-	)
-)
 
 @set PATH="c:\WINDOWS\Microsoft.NET\Framework\v4.0.30319";%PATH%
 
@@ -103,26 +90,13 @@ goto END
 @rem ============================================================
 :cmake_x86
 set VC_NAME="Visual Studio %VS_VERSION%"
-if %VC_VERSION% == 9  (
-   cmake .. -G "Visual Studio 9 2008"
-   goto x86
-) else (
-   cmake .. -G %VC_NAME%
-   goto x86
-   )
-goto END
+cmake .. -G %VC_NAME%
 
 @rem ============================================================
 @rem  Compiling 32bit binaries
 @rem ============================================================
-:x86
 echo Compiling 32bit binaries
 echo Setting up Visual C++ environment.
-if %VC_VERSION% == 9  (
-   @rem call "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\vcvarsall.bat" x86
-   call C:\"Program Files (x86)"\"Microsoft Visual Studio 9.0"\VC\vcvarsall.bat x86
-   goto VCBUILDx86
-   )
 if %VC_VERSION% == 10 (
    call C:\"Program Files (x86)"\"Microsoft Visual Studio 10.0"\VC\vcvarsall.bat x86
    @rem call "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\vcvarsall.bat%" x86
@@ -150,24 +124,6 @@ if %VC_VERSION% == 14 (
    set PLATFORMTOOL=/p:PlatformToolset=v140
    goto MSBUILDx86
    )
-if %VC_VERSION% == 141 (
-   call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" x86
-   set VCTOOLSET=15.0
-   set PLATFORMTOOL=/p:PlatformToolset=v141
-   goto MSBUILDx86
-   )
-
-@rem ------------------------------------------------------------
-@rem Build (VC2008 x86)
-@rem ------------------------------------------------------------
-:VCBUILDx86
-echo Visual Studio Dir: %VSINSTALLDIR%
-echo LIB: %LIB%
-
-vcbuild /M2 /rebuild components\DirectShowCam\BaseClasses\BaseClasses.sln "release|win32"
-vcbuild /M2 /rebuild components\ImageCalibration\idl\InterfaceDataTypes_TGT.vcproj "release|win32"
-vcbuild /M2 /build ImageProcessing.sln "release|win32"
-goto MAKE_ZIP
 
 @rem ------------------------------------------------------------
 @rem Build (VC2010- x86)
@@ -179,9 +135,6 @@ set OPT=/M:4 /toolsversion:%VCTOOLSET% %PLATFORMTOOL% /p:platform=Win32
 set SLN=ImageProcessing.sln
 set LOG=/fileLogger /flp:logfile=debug.log /v:diag 
 
-if %VC_VERSION% == 10  (
-	msbuild /t:rebuild /p:configuration=release %OPT% components\DirectShowCam\BaseClasses\BaseClasses.sln
-)
 msbuild /t:build /p:configuration=release %OPT% components\ImageCalibration\idl\ALL_IDL_TGT.vcxproj
 msbuild /t:build /p:configuration=release %OPT% %SLN%
 
@@ -193,25 +146,13 @@ goto MAKE_ZIP
 @rem ============================================================
 :cmake_x86_64
 set VC_NAME="Visual Studio %VS_VERSION% Win64"
-if %VC_VERSION% == 9  (
-   echo 64bit compilation on Visual C++ 2008 is not supported. Aborting.
-   goto END
-   ) else (
-   cmake .. -G %VC_NAME%
-   goto x86_64
-   )
-goto END
+cmake .. -G %VC_NAME%
 
 @rem ============================================================
 @rem  Compiling 64bit binaries
 @rem ============================================================
-:x86_64
 echo Compiling 64bit binaries
 @rem Setting up Visual C++ environment
-if /i %VC_VERSION% == 9  (
-   echo 64bit compilation on Visual C++ 2008 is not supported. Aborting.
-   goto END
-   )
 if /i %VC_VERSION% == 10 (
    call "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\vcvarsall.bat" amd64
    set VCTOOLSET=4.0
@@ -236,12 +177,6 @@ if /i %VC_VERSION% == 14 (
    set PLATFORMTOOL=/p:PlatformToolset=v140
    goto MSBUILDx64
    )
-if /i %VC_VERSION% == 141 (
-   call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" amd64
-   set VCTOOLSET=15.0
-   set PLATFORMTOOL=/p:PlatformToolset=v141
-   goto MSBUILDx64
-   )
 
 @rem ------------------------------------------------------------
 @rem Build (VC2010- x64)
@@ -253,9 +188,6 @@ set OPT=/M:4 /toolsversion:%VCTOOLSET% %PLATFORMTOOL% /p:platform=x64
 set LOG=/fileLogger /flp:logfile=debug.log /v:diag 
 set SLN=ImageProcessing.sln
 
-if %VC_VERSION% == 10  (
-	msbuild /t:rebuild /p:configuration=release %OPT% components\DirectShowCam\BaseClasses\BaseClasses.sln
-)
 msbuild /t:build /p:configuration=release %OPT% %SLN%
 
 goto MAKE_ZIP
