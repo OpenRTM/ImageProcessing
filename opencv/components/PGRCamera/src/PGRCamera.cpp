@@ -8,6 +8,7 @@
  */
 
 #include "PGRCamera.h"
+#include <chrono>
 #include <iostream>
 using namespace std;
 
@@ -176,7 +177,7 @@ RTC::ReturnCode_t PGRCamera::onDeactivated(RTC::UniqueId ec_id)
 RTC::ReturnCode_t PGRCamera::onExecute(RTC::UniqueId ec_id)
 {
   Error error;
-  static coil::TimeValue tm_pre;
+  static auto tm_pre = std::chrono::system_clock::now();
   static int count = 0;
 
   /* 映像のImage */
@@ -221,10 +222,8 @@ RTC::ReturnCode_t PGRCamera::onExecute(RTC::UniqueId ec_id)
   if (count > 100)
   {
     count = 0;
-    coil::TimeValue tm;
-    tm = coil::gettimeofday();
-
-    double sec(tm - tm_pre);
+    auto tm = std::chrono::system_clock::now();
+    double sec(std::chrono::duration<double>(tmNow - tmOld).count());
 
     if (sec > 1.0 && sec < 1000.0)
     {
