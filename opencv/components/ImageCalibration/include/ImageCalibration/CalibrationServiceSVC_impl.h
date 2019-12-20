@@ -15,7 +15,7 @@
 #define CALIBRATIONSERVICESVC_IMPL_H
 
 #include <iostream>
-#include <coil/Mutex.h>
+#include <mutex>
 
 /* OpenCVHeadファイルのIncluding */
 #include <opencv2/opencv.hpp>
@@ -63,7 +63,7 @@ class CalibrationServiceSVC_impl
 
    ImageCalibService::ImageList m_imageList;
    RTC::CameraImage m_currentCameraImg;
-   coil::Mutex m_mutex;
+   std::mutex m_mutex;
    CORBA::Short m_current_image_num;  /* チェスボード撮影枚数 */
    CORBA::Short m_old_image_num;      /* 変更前のチェスボード撮影枚数 */
    int m_checker_w;       /* チェスボード横方向の交点の数 */
