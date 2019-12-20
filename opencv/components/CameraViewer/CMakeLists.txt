@@ -16,6 +16,7 @@ set(PROJECT_DESCRIPTION "USB Camera Monitor component")
 set(PROJECT_VENDOR "AIST")
 set(PROJECT_AUTHOR "AIST")
 set(PROJECT_AUTHOR_SHORT "AIST")
+set(CMAKE_CXX_STANDARD 11)
 
 function(get_dist ARG0)
   if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
