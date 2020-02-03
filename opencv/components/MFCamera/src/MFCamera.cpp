@@ -8,6 +8,7 @@
  */
 
 #include "MFCamera.h"
+#include <chrono>
 #include <iostream>
 using namespace std;
 
@@ -168,7 +169,7 @@ RTC::ReturnCode_t MFCamera::onDeactivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t MFCamera::onExecute(RTC::UniqueId ec_id)
 {
-    static coil::TimeValue tm_pre;
+    static auto tm_pre = std::chrono::system_clock::now();
     static int count = 0;
     
     if(m_device_id != device_id_old){
@@ -215,10 +216,8 @@ RTC::ReturnCode_t MFCamera::onExecute(RTC::UniqueId ec_id)
     if (count > 100)
     {
       count = 0;
-      coil::TimeValue tm;
-      tm = coil::gettimeofday();
-
-      double sec(tm - tm_pre);
+      auto tm = std::chrono::system_clock::now();
+      double sec(std::chrono::duration<double>(tm - tm_pre).count());
 
       if (sec > 1.0 && sec < 1000.0)
       {

@@ -8,6 +8,7 @@
  */
 
 #include "CameraViewer.h"
+#include <chrono>
 
 // Module specification
 // <rtc-template block="module_spec">
@@ -148,7 +149,7 @@ RTC::ReturnCode_t CameraViewer::onDeactivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t CameraViewer::onExecute(RTC::UniqueId ec_id)
 {
-  static coil::TimeValue tm_pre;
+  static auto tm_pre = std::chrono::system_clock::now();
   static int count = 0;
 
   int nLength;
@@ -188,9 +189,8 @@ RTC::ReturnCode_t CameraViewer::onExecute(RTC::UniqueId ec_id)
   if (count > 100)
   {
     count = 0;
-    coil::TimeValue tm;
-    tm = coil::gettimeofday();
-    double sec(tm - tm_pre);
+    auto tm = std::chrono::system_clock::now();
+    double sec(std::chrono::duration<double>(tm - tm_pre).count());
 
     if (sec > 1.0 && sec < 1000.0)
     {

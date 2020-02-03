@@ -8,6 +8,7 @@
  */
 
 #include "OpenCVCamera.h"
+#include <chrono>
 #include <iostream>
 
 using namespace std;
@@ -148,7 +149,7 @@ RTC::ReturnCode_t OpenCVCamera::onDeactivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t OpenCVCamera::onExecute(RTC::UniqueId ec_id)
 {
-  static coil::TimeValue tmOld;
+  static auto tmOld = std::chrono::system_clock::now();
   static int count = 0;
   const int DISPLAY_PERIOD_FRAME_NUM = 100;
   cv::Mat cam_frame;
@@ -212,8 +213,8 @@ RTC::ReturnCode_t OpenCVCamera::onExecute(RTC::UniqueId ec_id)
   /* フレームレートの表示 */
   if (count++ > DISPLAY_PERIOD_FRAME_NUM)
   {
-    coil::TimeValue tmNow = coil::gettimeofday();
-    double sec(tmNow - tmOld);
+    auto tmNow = std::chrono::system_clock::now();
+    double sec(std::chrono::duration<double>(tmNow - tmOld).count());
 
     if (sec > 1.0)
     {
