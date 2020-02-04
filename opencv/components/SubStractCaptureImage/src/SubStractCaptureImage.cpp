@@ -261,9 +261,9 @@ RTC::ReturnCode_t SubStractCaptureImage::onExecute(RTC::UniqueId ec_id)
       /* 背景に同化する場合 (backgroundMaskImage=1の場合) */
 	  
 	  
-	  cv::accumulateWeighted(backgroundAverageImage, frameImage32, BACKGROUND_ALPHA, backgroundMaskImage);
+	  cv::accumulateWeighted(frameImage32, backgroundAverageImage, BACKGROUND_ALPHA, backgroundMaskImage);
 
-	  cv::accumulateWeighted(backgroundThresholdImage, backgroundDifferenceImage, BACKGROUND_ALPHA, backgroundMaskImage);
+	  cv::accumulateWeighted( backgroundDifferenceImage, backgroundThresholdImage, BACKGROUND_ALPHA, backgroundMaskImage);
 	  
       /* 背景候補に同化する場合 (backgroundMaskImage=0 && stillObjectMaskImage=1) */
 	  cv::bitwise_not(backgroundMaskImage, foregroundMaskImage);
@@ -336,8 +336,8 @@ RTC::ReturnCode_t SubStractCaptureImage::onExecute(RTC::UniqueId ec_id)
       /* ノイズを除去する */
 	  cv::medianBlur(foregroundMaskImage, foregroundMaskImage, 7);
 
-	  backgroundAverageImage.convertTo(backgroundImage, CV_32F);
-	  stillObjectAverageImage.convertTo(stillObjectImage, CV_32F);
+	  backgroundAverageImage.convertTo(backgroundImage, CV_8UC3);
+	  stillObjectAverageImage.convertTo(stillObjectImage, CV_8UC3);
 
 
       cvWaitKey( 1 );
