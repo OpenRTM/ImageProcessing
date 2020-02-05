@@ -1,4 +1,4 @@
-// -*- C++ -*-
+  // -*- C++ -*-
 /*!
  * @file  SubStractCaptureImage.cpp
  * @brief SubStractCaptureImage component
@@ -193,7 +193,7 @@ RTC::ReturnCode_t SubStractCaptureImage::onExecute(RTC::UniqueId ec_id)
       //memcpy(inputImage.data,(void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length());
 
       /* 初期化する */
-	  inputImage.convertTo(backgroundAverageImage, CV_32F);
+	  inputImage.convertTo(backgroundAverageImage, CV_32FC3);
       
 	  backgroundThresholdImage.setTo(cv::Scalar::all(BACKGROUND_INITIAL_THRESHOLD));
 	  stillObjectAverageImage = cv::Mat::zeros(imageSize, CV_32FC3);
@@ -219,7 +219,7 @@ RTC::ReturnCode_t SubStractCaptureImage::onExecute(RTC::UniqueId ec_id)
 
       /* float 32bitに変換する */
 	  
-	  inputImage.convertTo(frameImage32, CV_32F);
+	  inputImage.convertTo(frameImage32, CV_32FC3);
 	  
 
       // 背景との差 /////////////////////////////////////////////////////////
@@ -231,7 +231,7 @@ RTC::ReturnCode_t SubStractCaptureImage::onExecute(RTC::UniqueId ec_id)
       cv::addWeighted( backgroundDifferenceImage, 1.0, backgroundThresholdImage, -THRESHOLD_COEFFICIENT, 0.0, thresholdImage32 );
 
       /* thresholdImage の要素が1つでも0以上だったら背景ではない */
-	  thresholdImage32.convertTo(thresholdImage, CV_8U);
+	  thresholdImage32.convertTo(thresholdImage, CV_8UC3);
 	  cv::cvtColor(thresholdImage, resultImage, cv::COLOR_BGR2GRAY);
       cv::threshold( resultImage, backgroundMaskImage, MASK_THRESHOLD, THRESHOLD_MAX_VALUE, cv::THRESH_BINARY_INV );
 
@@ -241,13 +241,11 @@ RTC::ReturnCode_t SubStractCaptureImage::onExecute(RTC::UniqueId ec_id)
       cv::absdiff( frameImage32, stillObjectAverageImage, stillObjectDifferenceImage );
 
       /* 閾値の値を引く */
-      cv::addWeighted( stillObjectDifferenceImage, 1.0, stillObjectThresholdImage, -THRESHOLD_COEFFICIENT, 0.0, thresholdImage32 );
+	  cv::addWeighted(stillObjectDifferenceImage, 1.0, stillObjectThresholdImage, -THRESHOLD_COEFFICIENT, 0.0, thresholdImage32); 
 
       /* thresholdImage の要素が1つでも0以上だったら背景候補ではない */
-	  thresholdImage32.convertTo(thresholdImage, CV_8U);
-	  
+	  thresholdImage32.convertTo(thresholdImage, CV_8UC3);
 	  cv::cvtColor(thresholdImage, resultImage, cv::COLOR_BGR2GRAY);
-	  
       cv::threshold( resultImage, stillObjectMaskImage, MASK_THRESHOLD, THRESHOLD_MAX_VALUE, cv::THRESH_BINARY_INV );
 	  
       /* ここまでで、
@@ -260,42 +258,25 @@ RTC::ReturnCode_t SubStractCaptureImage::onExecute(RTC::UniqueId ec_id)
 
       /* 背景に同化する場合 (backgroundMaskImage=1の場合) */
 	  
-	  
 	  cv::accumulateWeighted(frameImage32, backgroundAverageImage, BACKGROUND_ALPHA, backgroundMaskImage);
-
 	  cv::accumulateWeighted( backgroundDifferenceImage, backgroundThresholdImage, BACKGROUND_ALPHA, backgroundMaskImage);
 	  
       /* 背景候補に同化する場合 (backgroundMaskImage=0 && stillObjectMaskImage=1) */
 	  cv::bitwise_not(backgroundMaskImage, foregroundMaskImage);
-	  //foregroundMaskImage.convertTo(foregroundMaskImage, CV_32F);
-	  
 	  cv::bitwise_and(foregroundMaskImage, stillObjectMaskImage, tmpMaskImage); /*  */
-
-	  //tmpMaskImage.convertTo(tmpMaskImage, CV_8U);
 
 	  cv::accumulateWeighted(frameImage32, stillObjectAverageImage, STILL_OBJECT_ALPHA, tmpMaskImage);
 	  cv::accumulateWeighted(stillObjectDifferenceImage, stillObjectThresholdImage, STILL_OBJECT_ALPHA, tmpMaskImage);
 
       /* 背景候補カウンタを増やす */
 	  
-	  //backgroundMaskImage.convertTo(stillObjectCounterImage, CV_8U);
-	  
-	  
 	  cv::add(stillObjectCounterImage, cv::Scalar::all(1), stillObjectCounterImage, tmpMaskImage);
 	  
       /* カウンタが閾値以上になったら、背景候補を背景として採用する */
 	  
 	  cv::threshold(stillObjectCounterImage, tmp2MaskImage, STILL_OBJECT_TO_BACKGROUND, THRESHOLD_MAX_VALUE, cv::THRESH_BINARY);
-	  
-	  //cv::cvtColor(tmp2MaskImage, tmp2MaskImage, cv::COLOR_BGR2GRAY);
-	  
-	  
-	  
 	  cv::bitwise_and(tmpMaskImage, tmp2MaskImage, backgroundCopyMaskImage);
-	  
-	  //backgroundCopyMaskImage.convertTo(tmpMaskImage, CV_8U);
 	  stillObjectAverageImage.copyTo(backgroundAverageImage, backgroundCopyMaskImage);
-	  
 	  stillObjectThresholdImage.copyTo(backgroundThresholdImage, backgroundCopyMaskImage);
       
 
@@ -304,7 +285,6 @@ RTC::ReturnCode_t SubStractCaptureImage::onExecute(RTC::UniqueId ec_id)
 	  
       /* 背景候補でもなく、背景でもない場合 */
       /* (foregroundMaskImage = 1 && stillObjectMaskImage = 0) */
-	  //stillObjectMaskImage.convertTo(stillObjectMaskImage, CV_8U);
 	  
 	  cv::bitwise_not(stillObjectMaskImage, movingObjectMask);
 	  
@@ -314,7 +294,6 @@ RTC::ReturnCode_t SubStractCaptureImage::onExecute(RTC::UniqueId ec_id)
        * movingObjectMask == 1 || backgroundMaskImage == 1
        */
 	  cv::bitwise_or(backgroundMaskImage, movingObjectMask, tmpMaskImage);
-	  
 	  cv::subtract(stillObjectCounterImage, cv::Scalar::all(NOT_STILL_DEC_STEP), stillObjectCounterImage, tmpMaskImage);
 	  
       /* カウンタが0になったら背景候補を初期化する */
@@ -326,7 +305,6 @@ RTC::ReturnCode_t SubStractCaptureImage::onExecute(RTC::UniqueId ec_id)
        * ここでは(1)で初期化しておく
        */
 	  cv::bitwise_or(tmpMaskImage, backgroundCopyMaskImage, tmpMaskImage);
-	  
 	  cv::bitwise_and(tmpMaskImage, tmp2MaskImage, tmpMaskImage);
 
 	  frameImage32.copyTo(stillObjectAverageImage, tmpMaskImage);
@@ -338,7 +316,6 @@ RTC::ReturnCode_t SubStractCaptureImage::onExecute(RTC::UniqueId ec_id)
 
 	  backgroundAverageImage.convertTo(backgroundImage, CV_8UC3);
 	  stillObjectAverageImage.convertTo(stillObjectImage, CV_8UC3);
-
 
       cvWaitKey( 1 );
 
