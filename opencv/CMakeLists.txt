@@ -1,7 +1,6 @@
-cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.5.1)
 
-project(ImageProcessing)
-set(PROJECT_VERSION 1.2.2 CACHE STRING "ImageProcessing version")
+project(ImageProcessing VERSION 1.2.2)
 set(TOP_PROJECT_NAME ${PROJECT_NAME})
 string(TOLOWER ${TOP_PROJECT_NAME} TOP_PROJECT_NAME_LOWER)
 SUBDIRS(components)

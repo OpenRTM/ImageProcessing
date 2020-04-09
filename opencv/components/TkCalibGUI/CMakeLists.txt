@@ -1,9 +1,9 @@
-cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.5.1)
 if(POLICY CMP0053)
   cmake_policy(SET CMP0053 OLD)
 endif()
 
-project(TkCalibGUI NONE)
+project(TkCalibGUI VERSION 1.2.2)
 
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 
@@ -61,10 +61,10 @@ endif()
 
 # component settings
 set(RTC_NAME "${PROJECT_NAME}")
-set(RTC_VERSION "1.2.0")
-set(RTC_VERSION_MAJOR "1")
-set(RTC_VERSION_MINOR "2")
-set(RTC_VERSION_PATCH "0")
+set(RTC_VERSION "${TkCalibGUI_VERSION}")
+set(RTC_VERSION_MAJOR "${TkCalibGUI_VERSION_MAJOR}")
+set(RTC_VERSION_MINOR "${TkCalibGUI_VERSION_MINOR}")
+set(RTC_VERSION_PATCH "${TkCalibGUI_VERSION_PATCH}")
 set(RTC_LANG "python")
 set(RTC_DESCRIPTION "Image Calibration GUI")
 set(RTC_VENDOR "AIST")
