@@ -26,7 +26,7 @@ cp ${WORK_ROOT}/bin/*.conf .
 cp ${WORK_ROOT}/bin/*.dll .
 cp ${WORK_ROOT}/bin/*.exe .
 cp ${WORK_ROOT}/bin/dist/TkCalibGUIComp.exe .
-cp ${WORK_ROOT}/bin/dist/python27.dll .
+cp ${WORK_ROOT}/bin/dist/python*.dll .
 cp -r ${WORK_ROOT}/bin/dist/lib .
 cd ${WORK_ROOT}
 chmod -R 755 ${NEW_DIR}
