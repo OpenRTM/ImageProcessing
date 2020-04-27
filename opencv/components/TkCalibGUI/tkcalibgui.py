@@ -1383,9 +1383,7 @@ AAAqAAIYAAAAqAAIYAAAAKACIIABAACACoAABgAAACoAAhgAAACoAAhgAAAAoAIg
 gAEAAIAKgAAGAAAAKgACGAAAAKiA/wdXr6Z02sdfbwAAAABJRU5ErkJggg=="""
 	def __init__(self):
 		import binascii
-		self.buff = ''
-		for l in self.logo.split("\n"):
-			self.buff += binascii.a2b_base64(l)	
+		self.buff = b"".join([binascii.a2b_base64(l) for l in self.logo.split("\n")])
 	def get_image(self):
 		return self.buff
 		
@@ -1393,5 +1391,5 @@ gAEAAIAKgAAGAAAAKgACGAAAAKiA/wdXr6Z02sdfbwAAAABJRU5ErkJggg=="""
 
 if __name__ == "__main__":
 	RTMLogo()
-#	f = TkCalibGUI()
-#	f.mainloop()
+	f = TkCalibGUI()
+	f.mainloop()
