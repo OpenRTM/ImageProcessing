@@ -9,16 +9,24 @@
 
 
 """
-from Tkinter import *
-import ttk
+import sys
+if sys.version_info[0] == 2:
+  from Tkinter import *
+  import ttk
+else:
+  from tkinter import *
+  import tkinter.ttk as ttk
+
 from PIL import Image, ImageTk
 import time
-import sys
 import os.path
 #from cv2.cv import *
 import numpy
 from io import BytesIO
-from StringIO import StringIO
+if sys.version_info[0] == 2:
+  from StringIO import StringIO
+else:
+  from io import StringIO
 from threading import Thread
 
 import rtutil
@@ -123,7 +131,10 @@ class TkCalibGUI(Frame):
 	# check build camera component
 	def check_camera_comp(self):
 		camera_list = self.get_avail_camera_list()
-		self.select_camera_list = self.get_comp_path(camera_list)
+		if sys.version_info[0] == 2:
+			self.select_camera_list = self.get_comp_path(camera_list)
+		else:
+			self.select_camera_list = self.get_comp_path(list(camera_list))
 		
 	def get_comp_path(self, comp_name):
 		import platform
@@ -189,7 +200,11 @@ class TkCalibGUI(Frame):
 		self.fix1.pack(fill=X, ipadx=3, ipady=3)	
 		lb = Label(self.fix1, text=self.msg10)
 		lb.grid(column=0, row=0, padx=3)
-		self.box = ttk.Combobox(self.fix1, values=self.select_camera_list.keys(), state='readonly',
+		if sys.version_info[0] == 2:
+			self.box = ttk.Combobox(self.fix1, values=self.select_camera_list.keys(), state='readonly',
+												width=30, height=2)
+		else:
+			self.box = ttk.Combobox(self.fix1, values=list(self.select_camera_list.keys()), state='readonly',
 												width=30, height=2)
 		self.box.grid(column=1, row=0, padx=3, pady=3)
 		self.box.bind("<<ComboboxSelected>>", self.change_camera)
