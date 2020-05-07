@@ -13,26 +13,41 @@ def check_openrtmpy():
         import OpenRTM_aist
         print("OpenRTM python is installed.")
     except:
-        import tkMessageBox
-        import Tkinter
+        if sys.version_info[0] == 2:
+            import tkMessageBox
+            import Tkinter
+        else:
+            from tkinter import messagebox as tkMessageBox
         msg = u'OpenRTM-aist Python is not installed. '
         msg += u'Please download it from \n'
         msg += u'http://openrtm.org/openrtm/ja/content/tkcalibgui'
-        Tkinter.Tk().withdraw()
+        if sys.version_info[0] == 2:
+            Tkinter.Tk().withdraw()
+        else:
+            tkinter.Tk().withdraw()
         tkMessageBox.showerror(title = "OpenRTM not found",
                   message = msg)
 
 def check_ttk():
     try:
-        import ttk
+        if sys.version_info[0] == 2:
+            import ttk
+        else:
+            import tkinter.ttk as ttk
         print("Ttk is installed.")
     except:
-        import tkMessageBox
-        import Tkinter
+        if sys.version_info[0] == 2:
+            import tkMessageBox
+            import Tkinter
+        else:
+            from tkinter import messagebox as tkMessageBox
         msg = u'Ttk is not installed. '
         msg += u'Please download it from \n'
         msg += u'http://openrtm.org/openrtm/ja/content/tkcalibgui'
-        Tkinter.Tk().withdraw()
+        if sys.version_info[0] == 2:
+            Tkinter.Tk().withdraw()
+        else:
+            tkinter.Tk().withdraw()
         tkMessageBox.showerror(title = "Ttk not found",
                   message = msg)
 
@@ -41,12 +56,18 @@ def check_pil():
         from PIL import Image, ImageTk
         print("Python Imaging Library (PIL) is installed.")
     except:
-        import tkMessageBox
-        import Tkinter
+        if sys.version_info[0] == 2:
+            import tkMessageBox
+            import Tkinter
+        else:
+            from tkinter import messagebox as tkMessageBox
         msg = u'Python Imaging Library (PIL) is not installed. '
         msg += u'Please download it from \n'
         msg += u'http://openrtm.org/openrtm/ja/content/tkcalibgui'
-        Tkinter.Tk().withdraw()
+        if sys.version_info[0] == 2:
+            Tkinter.Tk().withdraw()
+        else:
+            tkinter.Tk().withdraw()
         tkMessageBox.showerror(title = "PIL not found",
                   message = msg)
 
@@ -55,12 +76,18 @@ def check_numpy():
         import numpy
         print("Numpy is installed.")
     except:
-        import tkMessageBox
-        import Tkinter
+        if sys.version_info[0] == 2:
+            import tkMessageBox
+            import Tkinter
+        else:
+            from tkinter import messagebox as tkMessageBox
         msg = u'Numpy is not installed. '
         msg += u'Please download it from \n'
         msg += u'http://openrtm.org/openrtm/ja/content/tkcalibgui'
-        Tkinter.Tk().withdraw()
+        if sys.version_info[0] == 2:
+            Tkinter.Tk().withdraw()
+        else:
+            tkinter.Tk().withdraw()
         tkMessageBox.showerror(title = "Numpy not found",
                   message = msg)
                   
@@ -69,16 +96,24 @@ def check_rtctree():
         import rtctree
         print("rtctree is installed.")
     except:
-        import tkMessageBox
-        import Tkinter
+        if sys.version_info[0] == 2:
+            import tkMessageBox
+            import Tkinter
+        else:
+            from tkinter import messagebox as tkMessageBox
         msg = u'rtctree is not installed. '
         msg += u'Please download it from \n'
         msg += u'http://openrtm.org/openrtm/ja/content/tkcalibgui'
-        Tkinter.Tk().withdraw()
+        if sys.version_info[0] == 2:
+            Tkinter.Tk().withdraw()
+        else:
+            tkinter.Tk().withdraw()
         tkMessageBox.showerror(title = "rtctree not found",
                   message = msg)
         return
 		
+import sys
+
 # check execution condition
 check_openrtmpy()
 check_pil()
@@ -87,7 +122,6 @@ check_numpy()
 check_rtctree()
 
 import os
-import sys
 import socket
 import getopt
 import re
