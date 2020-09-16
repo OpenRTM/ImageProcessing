@@ -21,6 +21,19 @@
 
 //OpenCV header file include
 #include <opencv2/opencv.hpp>
+using namespace cv;
+#if CV_MAJOR_VERSION < 3
+#ifndef COLOR_BGR2GRAY
+#define COLOR_BGR2GRAY CV_BGR2GRAY
+#endif
+#ifndef RETR_CCOMP
+#define RETR_CCOMP CV_RETR_CCOMP
+#endif
+#ifndef CHAIN_APPROX_NONE
+#define CHAIN_APPROX_NONE CV_CHAIN_APPROX_NONE
+#endif
+#endif //CV_MAJOR_VERSION
+
 
 #define THRESHOLD_MAX_VALUE	255	  /* 2値化の際に使用する最大値 */
 

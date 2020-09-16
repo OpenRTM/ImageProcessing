@@ -126,7 +126,7 @@ RTC::ReturnCode_t CameraViewer::onActivated(RTC::UniqueId ec_id)
 
 
   /* 画像表示用ウィンドウの作成 */
-  cv::namedWindow("CaptureImage", CV_WINDOW_AUTOSIZE);
+  cv::namedWindow("CaptureImage", WINDOW_AUTOSIZE);
   cv::setMouseCallback("CaptureImage", onMouse, (void*)this);
 
 #ifndef STARTWINDOWTHREAD_DISABLE

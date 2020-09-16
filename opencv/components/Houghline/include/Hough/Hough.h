@@ -22,6 +22,15 @@
 
 //OpenCV header file include
 #include <opencv2/opencv.hpp>
+using namespace cv;
+#if CV_MAJOR_VERSION < 3
+#ifndef COLOR_RGBR2GRAY
+#define COLOR_RGB2GRAY CV_RGB2GRAY
+#endif
+#ifndef COLOR_GRAY2RGB
+#define COLOR_GRAY2RGB CV_GRAY2RGB
+#endif
+#endif //CV_MAJOR_VERSION
 
 /* cvCanny用定数 */
 #define	APERTURE_SIZE   3   /* Sobelオペレータのサイズ (リファレンス参照) */

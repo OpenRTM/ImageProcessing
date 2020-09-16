@@ -194,7 +194,7 @@ RTC::ReturnCode_t Histogram::onExecute(RTC::UniqueId ec_id)
 	
 	
     /* RGBからグレースケールに変換 */
-    cv::cvtColor( imageBuff, grayImage, CV_RGB2GRAY);
+    cv::cvtColor( imageBuff, grayImage, COLOR_RGB2GRAY);
 
     int brightness = m_brightness - TRACKBAR_MAX_VALUE / 2;	//	輝度値
     int contrast = m_contrast - TRACKBAR_MAX_VALUE / 2;		//	コントラスト
@@ -237,7 +237,7 @@ RTC::ReturnCode_t Histogram::onExecute(RTC::UniqueId ec_id)
 	cv::LUT(grayImage, lookUpTableMatrix, destinationImage);
 
     /* グレースケールからRGBに変換 */
-    cv::cvtColor( destinationImage, histogramImage, CV_GRAY2RGB );
+    cv::cvtColor( destinationImage, histogramImage, COLOR_GRAY2RGB );
 
     /* 画像データのサイズ取得 */
 	int len = histogramImage.channels() * histogramImage.size().width * histogramImage.size().height;
@@ -285,8 +285,8 @@ RTC::ReturnCode_t Histogram::onExecute(RTC::UniqueId ec_id)
     for ( int i = 0; i < histogramSize; i++ ) {
       cv::rectangle(
         histogramBarImage,
-        cvPoint( i * bin_w, histogramBarImage.size().height ),
-		cvPoint((i + 1) * bin_w, histogramBarImage.size().height - cvRound(histogram.at<float>(i))),
+        cv::Point( i * bin_w, histogramBarImage.size().height ),
+		cv::Point((i + 1) * bin_w, histogramBarImage.size().height - cvRound(histogram.at<float>(i))),
 		cv::Scalar::all(0),
         LINE_THICKNESS,
         LINE_TYPE,

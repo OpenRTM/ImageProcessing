@@ -21,6 +21,15 @@
 
 /* OpenCV用インクルードファイルのインクルード */
 #include <opencv2/opencv.hpp>
+using namespace cv;
+#if CV_MAJOR_VERSION < 3
+#ifndef COLOR_BGR2HSV
+#define COLOR_BGR2HSV CV_BGR2HSV
+#endif
+#ifndef COLOR_HSV2BGR
+#define COLOR_HSV2BGR CV_HSV2BGR
+#endif
+#endif //CV_MAJOR_VERSION
 
 // Service implementation headers
 // <rtc-template block="service_impl_h">

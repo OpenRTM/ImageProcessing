@@ -10,13 +10,6 @@ add_subdirectory(Binarization)
 add_subdirectory(CameraViewer)
 add_subdirectory(Chromakey)
 add_subdirectory(Dilationerosion)
-
-if (WIN32)
-  if (NOT ${CMAKE_GENERATOR} MATCHES [[Visual Studio 10]])
-    add_subdirectory(MFCamera)
-  endif()
-endif()
-
 add_subdirectory(Edge)
 add_subdirectory(Findcontour)
 add_subdirectory(Flip)

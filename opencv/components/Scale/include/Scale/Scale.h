@@ -21,6 +21,13 @@
 
 /* OpenCV用インクルードファイルのインクルード */
 #include <opencv2/opencv.hpp>
+using namespace cv;
+#if CV_MAJOR_VERSION < 3
+#ifndef INTER_LINEAR
+#define INTER_LINEAR CV_INTER_LINEAR
+#endif
+#endif //CV_MAJOR_VERSION
+
 
 // Service implementation headers
 // <rtc-template block="service_impl_h">

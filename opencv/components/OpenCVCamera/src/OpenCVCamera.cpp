@@ -126,7 +126,7 @@ RTC::ReturnCode_t OpenCVCamera::onActivated(RTC::UniqueId ec_id)
 {
   m_device_id = m_device_num;
   m_capture.open(m_device_id);
-  m_capture.set(CV_CAP_PROP_FPS, m_frame_rate);
+  m_capture.set(CAP_PROP_FPS, m_frame_rate);
   m_current_frame_rate = m_frame_rate;
   /* カメラデバイスの探索 */
   if (!m_capture.isOpened())
@@ -170,7 +170,7 @@ RTC::ReturnCode_t OpenCVCamera::onExecute(RTC::UniqueId ec_id)
   }
   if(m_current_frame_rate != m_frame_rate)
   {
-    m_capture.set(CV_CAP_PROP_FPS, m_frame_rate);
+    m_capture.set(CAP_PROP_FPS, m_frame_rate);
   }
   //m_capture.set(CV_CAP_PROP_FRAME_WIDTH, m_frame_width);
   //m_capture.set(CV_CAP_PROP_FRAME_HEIGHT, m_frame_height);

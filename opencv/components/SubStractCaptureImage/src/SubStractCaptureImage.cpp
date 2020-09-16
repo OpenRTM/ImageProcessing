@@ -27,8 +27,11 @@ static const char* substractcaptureimage_spec[] =
     ""
   };
 // </rtc-template>
-
+#if CV_MAJOR_VERSION < 3
 CvSize imageSize;
+#else
+cv::Size imageSize;
+#endif
 
 int g_temp_w = 0;
 int g_temp_h = 0;
@@ -317,7 +320,7 @@ RTC::ReturnCode_t SubStractCaptureImage::onExecute(RTC::UniqueId ec_id)
 	  backgroundAverageImage.convertTo(backgroundImage, CV_8UC3);
 	  stillObjectAverageImage.convertTo(stillObjectImage, CV_8UC3);
 
-      cvWaitKey( 1 );
+	  cv::waitKey( 1 );
 
       /* 画像データのサイズ取得 */
       double len;

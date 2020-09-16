@@ -55,9 +55,13 @@ void ObjectTracking::on_mouse(int event, int x, int y, int flags, void* param){
   if( selectObject == SELECT_ON ){
     selection.x = MIN( x, origin.x );
     selection.y = MIN( y, origin.y );
+#if CV_MAJOR_VERSION < 3
     selection.width = selection.x + CV_IABS( x - origin.x );
     selection.height = selection.y + CV_IABS( y - origin.y );
-
+#else
+    selection.width = selection.x + abs( x - origin.x );
+    selection.height = selection.y + abs( y - origin.y );
+#endif
     selection.x = MAX( selection.x, 0 );
     selection.y = MAX( selection.y, 0 );
     selection.width = MIN( selection.width, resultImage.size().width );
@@ -67,13 +71,13 @@ void ObjectTracking::on_mouse(int event, int x, int y, int flags, void* param){
   }
   /* マウスの左ボタンの状態によって処理を分岐 */
   switch( event ){
-    case CV_EVENT_LBUTTONDOWN:
+    case EVENT_LBUTTONDOWN:
       /* マウスの左ボタンが押されたのであれば、原点および選択された領域を設定 */
       origin = cv::Point( x, y );
       selection = cv::Rect( x, y, 0, 0 );
       selectObject = SELECT_ON;
       break;
-    case CV_EVENT_LBUTTONUP:
+    case EVENT_LBUTTONUP:
       /* マウスの左ボタンが離されたとき、widthとheightがどちらも正であれば、*/
       /* trackObjectフラグをTRACKING_STARTにする */
       selectObject = SELECT_OFF;
@@ -102,7 +106,7 @@ cv::Scalar ObjectTracking::hsv2rgb(float hue){
   hsvValue.data[2] = 255;	/* 明度値V */
 
   /* HSV表色系をRGB表色系に変換する */
-  cv::cvtColor( hsvValue, rgbValue, CV_HSV2BGR );
+  cv::cvtColor( hsvValue, rgbValue, COLOR_HSV2BGR );
 
 
   return cv::Scalar((unsigned char)rgbValue.data[0], (unsigned char)rgbValue.data[1],
@@ -210,7 +214,7 @@ void ObjectTracking::CalculateHist(cv::MatND &hist, cv::Mat &hsvImage, cv::Mat &
 		  cv::Point(i * binW, histImage.size().height),
 		  cv::Point((i + 1) * binW, histImage.size().height - hist.at<uchar>(i)),
 		  cv::Scalar::all(255),               // 矩形の色
-		  CV_FILLED                           // 矩形の枠線の太さ。CV_FILLEDの場合塗りつぶし
+		  FILLED                           // 矩形の枠線の太さ。CV_FILLEDの場合塗りつぶし
 		  );
 	 
     }
@@ -457,7 +461,7 @@ RTC::ReturnCode_t ObjectTracking::onExecute(RTC::UniqueId ec_id)
 
 		/* キャプチャされた画像をresultImageにコピーし、HSV表色系に変換してhsvImageに格納 */
 		inputImage.copyTo(resultImage);
-		cv::cvtColor(resultImage, hsvImage, CV_BGR2HSV);
+		cv::cvtColor(resultImage, hsvImage, COLOR_BGR2HSV);
 
 		/* WindowのEvent情報の取得に対する処理 */
 		if (m_eventIn.isNew() && m_xIn.isNew() && m_yIn.isNew()){

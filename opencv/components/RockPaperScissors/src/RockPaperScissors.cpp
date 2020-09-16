@@ -473,7 +473,11 @@ void RockPaperScissors::createConvexHull(int handarea, cv::Mat &pointMatrix, cv:
   
 
   /* ConvexHullを生成する */
+#if CV_MAJOR_VERSION < 3
   cv::convexHull( pointMatrix, hullMatrix, CV_CLOCKWISE, 0 );
+#else
+  cv::convexHull( pointMatrix, hullMatrix, true, 0 );
+#endif
 }
 
 //

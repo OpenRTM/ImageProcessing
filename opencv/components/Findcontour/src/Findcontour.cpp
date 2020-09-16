@@ -169,7 +169,7 @@ RTC::ReturnCode_t Findcontour::onExecute(RTC::UniqueId ec_id)
 
 
     /* RGBからグレースケールに変換 */
-    cv::cvtColor( imageBuff, grayImage, CV_RGB2GRAY);
+    cv::cvtColor( imageBuff, grayImage, COLOR_RGB2GRAY);
 
     /* グレースケールから2値に変換する */
     cv::threshold( grayImage, binaryImage, m_nThresholdLv, THRESHOLD_MAX_VALUE, cv::THRESH_BINARY );
@@ -179,10 +179,10 @@ RTC::ReturnCode_t Findcontour::onExecute(RTC::UniqueId ec_id)
     /* 2値画像中の輪郭を見つけ、その数を返す */
     cv::findContours( 
           binaryImage,          /* 入力画像(８ビットシングルチャンネル） */
-		  find_contour,        /* 一番外側の輪郭へのポインタへのポインタ */
-		  hierarchy,
-		  CV_RETR_CCOMP,         /* 抽出モード */
-          CV_CHAIN_APPROX_NONE, /* 推定手法 */
+          find_contour,        /* 一番外側の輪郭へのポインタへのポインタ */
+          hierarchy,
+          RETR_CCOMP,         /* 抽出モード */
+          CHAIN_APPROX_NONE, /* 推定手法 */
           cv::Point( 0, 0 )       /* オフセット */
     );
 

@@ -156,7 +156,7 @@ RTC::ReturnCode_t Sepia::onExecute(RTC::UniqueId ec_id)
     // Anternative actions
 
     /* BGRからHSVに変換する */
-    cv::cvtColor(m_image_buff, m_hsvImage, CV_BGR2HSV);
+    cv::cvtColor(m_image_buff, m_hsvImage, COLOR_BGR2HSV);
 
     /* HSV画像をH、S、V画像に分ける */
 	std::vector<cv::Mat> tmp;
@@ -182,7 +182,7 @@ RTC::ReturnCode_t Sepia::onExecute(RTC::UniqueId ec_id)
 	cv::merge(tmp, m_mergeImage);
 
     /* HSVからBGRに変換する */
-    cv::cvtColor(m_mergeImage, m_destinationImage, CV_HSV2BGR);
+    cv::cvtColor(m_mergeImage, m_destinationImage, COLOR_HSV2BGR);
 
     /* 画像データのサイズ取得 */
 	int len = m_destinationImage.channels() * m_destinationImage.size().width * m_destinationImage.size().height;
