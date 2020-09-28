@@ -20,7 +20,12 @@
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
 #include <opencv2/opencv.hpp>
-
+using namespace cv;
+#if CV_MAJOR_VERSION < 3
+#ifndef WINDOW_AUTOSIZE
+#define WINDOW_AUTOSIZE CV_WINDOW_AUTOSIZE
+#endif
+#endif //CV_MAJOR_VERSION
 
 // Service implementation headers
 // <rtc-template block="service_impl_h">

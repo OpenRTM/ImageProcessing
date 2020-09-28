@@ -145,13 +145,17 @@ RTC::ReturnCode_t Rotate::onExecute(RTC::UniqueId ec_id)
 
     /* Anternative process */
     /* 回転中心 */
+#if CV_MAJOR_VERSION < 3
 	CvPoint2D32f center = cvPoint2D32f(m_image_buff.size().width / 2.0, m_image_buff.size().height / 2.0);
-
+#else
+	cv::Point2f center = cv::Point2f(static_cast<float>(m_image_buff.size().width / 2.0), 
+			static_cast<float>(m_image_buff.size().height / 2.0));
+#endif
     /* 変換行列を求める */
 	m_transformMatrix = cv::getRotationMatrix2D(center, m_dbRotate, m_dbScale);
 
     /* 画像の拡大、縮小、回転を行う */
-	cv:warpAffine(m_image_buff, m_image_dest, m_transformMatrix, m_image_dest.size(), cv::INTER_LINEAR, cv::BORDER_CONSTANT, cv::Scalar::all(255));
+	cv::warpAffine(m_image_buff, m_image_dest, m_transformMatrix, m_image_dest.size(), cv::INTER_LINEAR, cv::BORDER_CONSTANT, cv::Scalar::all(255));
 
     /* Common process */
     /* 画像データのサイズ取得 */

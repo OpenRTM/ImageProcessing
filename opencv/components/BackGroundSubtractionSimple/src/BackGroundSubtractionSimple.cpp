@@ -384,8 +384,8 @@ void BackGroundSubtractionSimple::labDifference( void )
 	currentLabImage.convertTo(m_currentImage, CV_32F, SCALE);
 	backgroundLabImage.convertTo(m_backgroundImage, CV_32F, SCALE);
 
-	cv::cvtColor(currentLabImage, currentLabImage, CV_BGR2Lab);
-	cv::cvtColor(backgroundLabImage, backgroundLabImage, CV_BGR2Lab);
+	cv::cvtColor(currentLabImage, currentLabImage, COLOR_BGR2Lab);
+	cv::cvtColor(backgroundLabImage, backgroundLabImage, COLOR_BGR2Lab);
 
   /* 距離の二乗を計算する */
 	subtract(currentLabImage, backgroundLabImage, differenceLabImage);

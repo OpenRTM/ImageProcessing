@@ -185,7 +185,7 @@ RTC::ReturnCode_t Hough::onExecute(RTC::UniqueId ec_id)
     
 
     /* RGBからグレースケールに変換 */
-    cv::cvtColor( imageBuff, grayImage, CV_RGB2GRAY );
+    cv::cvtColor( imageBuff, grayImage, COLOR_RGB2GRAY );
 
     /* ハフ変換に必要なメモリ領域 */
 	std::vector<cv::Vec4i> storage;
@@ -194,7 +194,7 @@ RTC::ReturnCode_t Hough::onExecute(RTC::UniqueId ec_id)
     cv::Canny( grayImage, edgeImage, m_canny_threshold1, m_canny_threshold2, APERTURE_SIZE );
 
     /* グレースケールからRGBに変換する */
-    cv::cvtColor( edgeImage, houghImage, CV_GRAY2RGB );
+    cv::cvtColor( edgeImage, houghImage, COLOR_GRAY2RGB );
 
 	std::vector<cv::Vec2f>  lines;
 	std::vector<cv::Vec4i>  lines_P;
@@ -232,7 +232,11 @@ RTC::ReturnCode_t Hough::onExecute(RTC::UniqueId ec_id)
     int line_type;
     if ( m_line_type == "CV_AA" )
     {
+#if CV_MAJOR_VERSION < 3
       line_type = CV_AA;
+#else
+      line_type = LINE_AA;
+#endif
     }
     else
     {

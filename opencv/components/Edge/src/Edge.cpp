@@ -163,7 +163,7 @@ RTC::ReturnCode_t Edge::onExecute(RTC::UniqueId ec_id)
 	cv::Mat edgeImage;
 
     /* RGBからグレースケールに変換 */
-    cv::cvtColor( imageBuff, grayImage, CV_RGB2GRAY );
+    cv::cvtColor( imageBuff, grayImage, COLOR_RGB2GRAY );
 
     /* Sobel_X */
     /* X方向のSobelオペレータをかける */
@@ -173,7 +173,7 @@ RTC::ReturnCode_t Edge::onExecute(RTC::UniqueId ec_id)
     cv::convertScaleAbs( destinationImage_x, destinationEdge, SCALE, SHIFT );
 
     /* グレースケールからRGBに変換 */
-    cv::cvtColor( destinationEdge, edgeImage, CV_GRAY2RGB );
+    cv::cvtColor( destinationEdge, edgeImage, COLOR_GRAY2RGB );
 
     /* 画像データのサイズ取得 */
 	len = edgeImage.channels() * edgeImage.size().width * edgeImage.size().height;
@@ -196,7 +196,7 @@ RTC::ReturnCode_t Edge::onExecute(RTC::UniqueId ec_id)
 
     cv::convertScaleAbs( destinationImage_y, destinationEdge, SCALE, SHIFT );
 
-    cv::cvtColor( destinationEdge, edgeImage, CV_GRAY2RGB );
+    cv::cvtColor( destinationEdge, edgeImage, COLOR_GRAY2RGB );
 
 	len = edgeImage.channels() * edgeImage.size().width * edgeImage.size().height;
     m_image_edge_sobel_y.pixels.length(len);
@@ -210,7 +210,7 @@ RTC::ReturnCode_t Edge::onExecute(RTC::UniqueId ec_id)
 
     cv::convertScaleAbs( destinationImage_LAPLACIAN, destinationEdge, SCALE, SHIFT );
 
-    cv::cvtColor( destinationEdge, edgeImage, CV_GRAY2RGB );
+    cv::cvtColor( destinationEdge, edgeImage, COLOR_GRAY2RGB );
 
 	len = edgeImage.channels() * edgeImage.size().width * edgeImage.size().height;
 	

@@ -21,6 +21,16 @@
 
 //OpenCV header file include
 #include <opencv2/opencv.hpp>
+using namespace cv;
+#if CV_MAJOR_VERSION < 3
+#ifndef COLOR_BGR2GRAY
+#define COLOR_BGR2GRAY CV_BGR2GRAY
+#endif
+#ifndef COLOR_GRAY2BGR
+#define COLOR_GRAY2BGR CV_GRAY2BGR
+#endif
+#endif //CV_MAJOR_VERSION
+
 
 //	cvConvertScaleAbs用定数
 #define SCALE   1   /* ScaleAbs係数 */

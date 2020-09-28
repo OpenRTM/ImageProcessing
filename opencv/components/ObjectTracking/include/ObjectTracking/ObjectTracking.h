@@ -20,8 +20,26 @@
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
 #include <opencv2/opencv.hpp>
+using namespace cv;
+#if CV_MAJOR_VERSION < 3
+#ifndef EVENT_LBUTTONDOWN
+#define EVENT_LBUTTONDOWN CV_EVENT_LBUTTONDOWN
+#endif
+#ifndef EVENT_LBUTTONUP
+#define EVENT_LBUTTONUP CV_EVENT_LBUTTONUP
+#endif
 
+#ifndef COLOR_HSV2BGR
+#define COLOR_HSV2BGR CV_HSV2BGR
+#endif
+#ifndef COLOR_BGR2HSV
+#define COLOR_BGR2HSV CV_BGR2HSV
+#endif
 
+#ifndef FILLED
+#define FILLED CV_FILLED
+#endif
+#endif //CV_MAJOR_VERSION
 
 #define		SEGMENT				150		/* cvSnakeImageで用いる制御点の数 */
 #define		WINDOW_WIDTH		17		/* cvSnakeImageで最小値を探索する近傍領域の幅 */

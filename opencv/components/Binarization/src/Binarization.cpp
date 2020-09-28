@@ -57,7 +57,6 @@ Binarization::~Binarization()
 {
 }
 
-IplImage *sourceImage;  /* 元画像用IplImage */
 
 RTC::ReturnCode_t Binarization::onInitialize()
 {

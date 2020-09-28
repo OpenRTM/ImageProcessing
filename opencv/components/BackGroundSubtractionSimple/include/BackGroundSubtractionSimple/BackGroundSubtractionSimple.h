@@ -20,6 +20,12 @@
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
 #include <opencv2/opencv.hpp>
+using namespace cv;
+#if CV_MAJOR_VERSION < 3
+#ifndef COLOR_BGR2Lab
+#define COLOR_BGR2Lab CV_BGR2Lab
+#endif
+#endif //CV_MAJOR_VERSION
 
 #define THRESHOLD_MAX_VALUE	255				/* 2値化の際に使用する最大値 */
 #define	SCALE				( 1.0 / 255.0 )	/* L*a*b*に変換するために必要なスケールファクタ */

@@ -21,6 +21,21 @@
 
 //OpenCV headr file include
 #include <opencv2/opencv.hpp>
+using namespace cv;
+#if CV_MAJOR_VERSION < 3
+#ifndef IMREAD_ANYDEPTH
+#define IMREAD_ANYDEPTH CV_LOAD_IMAGE_ANYDEPTH
+#endif
+#ifndef IMREAD_ANYCOLOR
+#define IMREAD_ANYCOLOR CV_LOAD_IMAGE_ANYCOLOR
+#endif
+#ifndef COLOR_RGB2GRAY
+#define COLOR_RGB2GRAY CV_RGB2GRAY
+#endif
+#ifndef TM_SQDIFF
+#define TM_SQDIFF CV_TM_SQDIFF
+#endif
+#endif //CV_MAJOR_VERSION
 
 #define THRESHOLD	50            /* 2値化の際の閾値 */
 #define THRESHOLD_MAX_VALUE	255 /* 2値化の際に使用する最大値 */

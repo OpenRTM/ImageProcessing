@@ -165,7 +165,7 @@ RTC::ReturnCode_t Template::onExecute(RTC::UniqueId ec_id)
 	if (templateID != m_img_path)
 	{
 		/* 対象画像を読み込む */
-		templateImage = cv::imread(m_img_path, CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_ANYCOLOR);
+		templateImage = cv::imread(m_img_path, IMREAD_ANYDEPTH | IMREAD_ANYCOLOR);
 	}
 
     if( templateImage.empty() )
@@ -196,7 +196,7 @@ RTC::ReturnCode_t Template::onExecute(RTC::UniqueId ec_id)
       cout << "template - height :"<<templateHeight<<endl;
 
       /* RGBからグレースケールに変換する */
-      cv::cvtColor( templateImage, templateGrayImage, CV_RGB2GRAY );
+      cv::cvtColor( templateImage, templateGrayImage, COLOR_RGB2GRAY );
 
       /* グレースケールから2値に変換する */
       cv::threshold( templateGrayImage, templateBinaryImage, THRESHOLD, THRESHOLD_MAX_VALUE, cv::THRESH_BINARY );
@@ -224,13 +224,13 @@ RTC::ReturnCode_t Template::onExecute(RTC::UniqueId ec_id)
     if( !templateImage.empty() )
     {
       /* RGBからグレースケールに変換する */
-      cv::cvtColor( imageBuff, sourceGrayImage, CV_RGB2GRAY );
+      cv::cvtColor( imageBuff, sourceGrayImage, COLOR_RGB2GRAY );
 
       /* グレースケールから2値に変換する */
       cv::threshold( sourceGrayImage, sourceBinaryImage, THRESHOLD, THRESHOLD_MAX_VALUE, cv::THRESH_BINARY );
 
       /* テンプレートマッチングを行う */
-	  cv::matchTemplate(sourceBinaryImage, templateBinaryImage, differenceMapImage, CV_TM_SQDIFF);
+	  cv::matchTemplate(sourceBinaryImage, templateBinaryImage, differenceMapImage, TM_SQDIFF);
 
       /* テンプレートが元画像のどの部分にあるのかという情報を得る */
 	  cv::Point max_pt;

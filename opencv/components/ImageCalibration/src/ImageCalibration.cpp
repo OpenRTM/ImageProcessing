@@ -139,7 +139,11 @@ RTC::ReturnCode_t ImageCalibration::onExecute(RTC::UniqueId ec_id)
   /* コーナー位置高精度化のための繰り返し処理の停止基準
    * 「反復回数が20回に達する」または「イプシロンが0.001に達する」どちらかの条件を満たした時に終了する 
    */
+#if CV_MAJOR_VERSION < 3
   cv::TermCriteria	criteria( CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, 20, 0.001 );
+#else
+  cv::TermCriteria	criteria( cv::TermCriteria::MAX_ITER | cv::TermCriteria::EPS, 20, 0.001 );
+#endif
  
   if(m_img_origIn.isNew())
   {

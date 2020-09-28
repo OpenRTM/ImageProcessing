@@ -142,7 +142,7 @@ RTC::ReturnCode_t Scale::onExecute(RTC::UniqueId ec_id)
           
 
     /* 画像の大きさを変換する */
-	cv::resize(m_image_buff, m_image_dest, m_image_dest.size(), CV_INTER_LINEAR);
+	cv::resize(m_image_buff, m_image_dest, m_image_dest.size(), INTER_LINEAR);
 
     /* 画像データのサイズ取得 */
 	int len = m_image_dest.channels() * m_image_dest.size().width * m_image_dest.size().height;
