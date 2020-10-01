@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5.1)
 
-project(ImageProcessing VERSION 1.2.2)
+project(ImageProcessing VERSION 1.2.3)
 set(TOP_PROJECT_NAME ${PROJECT_NAME})
 string(TOLOWER ${TOP_PROJECT_NAME} TOP_PROJECT_NAME_LOWER)
 SUBDIRS(components)
