@@ -1,4 +1,4 @@
-BackGroundSubtractionSimpleName - English
+﻿BackGroundSubtractionSimpleName - English
 ========================
 
 .. toctree::

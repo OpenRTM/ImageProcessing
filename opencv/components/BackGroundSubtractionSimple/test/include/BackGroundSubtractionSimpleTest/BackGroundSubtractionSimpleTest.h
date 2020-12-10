@@ -1,48 +1,33 @@
 ﻿// -*- C++ -*-
 /*!
- * @file  BackGroundSubtractionSimple.h
+ * @file  BackGroundSubtractionSimpleTest.h
  * @brief BackGroundSubtractionSimple component
  * @date  $Date$
  *
  * $Id$
  */
 
-#ifndef BACKGROUNDSUBTRACTIONSIMPLE_H
-#define BACKGROUNDSUBTRACTIONSIMPLE_H
+#ifndef BACKGROUNDSUBTRACTIONSIMPLE_TEST__H
+#define BACKGROUNDSUBTRACTIONSIMPLE_TEST_H
 
 #include <rtm/idl/BasicDataTypeSkel.h>
 #include <rtm/idl/ExtendedDataTypesSkel.h>
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
-#include <opencv2/opencv.hpp>
-using namespace cv;
-#if CV_MAJOR_VERSION < 3
-#ifndef COLOR_BGR2Lab
-#define COLOR_BGR2Lab CV_BGR2Lab
-#endif
-#endif //CV_MAJOR_VERSION
-
-#define THRESHOLD_MAX_VALUE	255				/* 2値化の際に使用する最大値 */
-#define	SCALE				( 1.0 / 255.0 )	/* L*a*b*に変換するために必要なスケールファクタ */
-
-#define COLOR_DIFFERENCE  0   /* RGB各成分における差分算出のフラグ値 */
-#define LAB_DIFFERENCE    1   /* L*a*b*表色系における差分算出のフラグ値 */
-#define GRAY_DIFFERENCE   2   /* グレースケールにおける差分算出のフラグ値 */
-#define NOISE_KEEP        0   /* ノイズを除去しないフラグ値 */
-#define	NOISE_MORPHOLOGY  1   /* モルフォロジー演算によるノイズ除去のフラグ値 */
-#define NOISE_MEDIAN      2   /* メディアンフィルタによるノイズ除去のフラグ値 */
-
-
 // Service implementation headers
 // <rtc-template block="service_impl_h">
+#include "InterfaceDataTypesSVC_impl.h"
+#include "BasicDataTypeSVC_impl.h"
 
 // </rtc-template>
 
 // Service Consumer stub headers
 // <rtc-template block="consumer_stub_h">
-#include "InterfaceDataTypesStub.h"
-#include "BasicDataTypeStub.h"
 
+// </rtc-template>
+
+// Service Consumer stub headers
+// <rtc-template block="port_stub_h">
 // </rtc-template>
 
 #include <rtm/Manager.h>
@@ -52,11 +37,11 @@ using namespace cv;
 #include <rtm/DataOutPort.h>
 
 /*!
- * @class BackGroundSubtractionSimple
+ * @class BackGroundSubtractionSimpleTest
  * @brief BackGroundSubtractionSimple component
  *
  */
-class BackGroundSubtractionSimple
+class BackGroundSubtractionSimpleTest
   : public RTC::DataFlowComponentBase
 {
  public:
@@ -64,12 +49,12 @@ class BackGroundSubtractionSimple
    * @brief constructor
    * @param manager Maneger Object
    */
-  BackGroundSubtractionSimple(RTC::Manager* manager);
+  BackGroundSubtractionSimpleTest(RTC::Manager* manager);
 
   /*!
    * @brief destructor
    */
-  ~BackGroundSubtractionSimple();
+  ~BackGroundSubtractionSimpleTest();
 
   // <rtc-template block="public_attribute">
   
@@ -82,6 +67,7 @@ class BackGroundSubtractionSimple
   /***
    *
    * The initialize action (on CREATED->ALIVE transition)
+   * formaer rtc_init_entry() 
    *
    * @return RTC::ReturnCode_t
    * 
@@ -92,6 +78,7 @@ class BackGroundSubtractionSimple
   /***
    *
    * The finalize action (on ALIVE->END transition)
+   * formaer rtc_exiting_entry()
    *
    * @return RTC::ReturnCode_t
    * 
@@ -102,6 +89,7 @@ class BackGroundSubtractionSimple
   /***
    *
    * The startup action when ExecutionContext startup
+   * former rtc_starting_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -114,6 +102,7 @@ class BackGroundSubtractionSimple
   /***
    *
    * The shutdown action when ExecutionContext stop
+   * former rtc_stopping_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -126,6 +115,7 @@ class BackGroundSubtractionSimple
   /***
    *
    * The activated action (Active state entry action)
+   * former rtc_active_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -138,6 +128,7 @@ class BackGroundSubtractionSimple
   /***
    *
    * The deactivated action (Active state exit action)
+   * former rtc_active_exit()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -150,6 +141,7 @@ class BackGroundSubtractionSimple
   /***
    *
    * The execution action that is invoked periodically
+   * former rtc_active_do()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -162,6 +154,7 @@ class BackGroundSubtractionSimple
   /***
    *
    * The aborting action when main logic error occurred.
+   * former rtc_aborting_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -174,6 +167,7 @@ class BackGroundSubtractionSimple
   /***
    *
    * The error action in ERROR state
+   * former rtc_error_do()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -186,6 +180,7 @@ class BackGroundSubtractionSimple
   /***
    *
    * The reset action that is invoked resetting
+   * This is same but different the former rtc_init_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -198,6 +193,7 @@ class BackGroundSubtractionSimple
   /***
    *
    * The state update action that is invoked after onExecute() action
+   * no corresponding operation exists in OpenRTm-aist-0.2.0
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -210,6 +206,7 @@ class BackGroundSubtractionSimple
   /***
    *
    * The action that is invoked when execution context's rate is changed
+   * no corresponding operation exists in OpenRTm-aist-0.2.0
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -260,32 +257,32 @@ class BackGroundSubtractionSimple
 
   // DataInPort declaration
   // <rtc-template block="inport_declare">
-  RTC::CameraImage m_img_orig;
+  RTC::CameraImage m_img_curr;
   /*!
    */
-  RTC::InPort<RTC::CameraImage> m_img_origIn;
-  RTC::TimedLong m_key;
+  RTC::InPort<RTC::CameraImage> m_img_currIn;
+  RTC::CameraImage m_img_resu;
   /*!
    */
-  RTC::InPort<RTC::TimedLong> m_keyIn;
+  RTC::InPort<RTC::CameraImage> m_img_resuIn;
+  RTC::CameraImage m_img_back;
+  /*!
+   */
+  RTC::InPort<RTC::CameraImage> m_img_backIn;
   
   // </rtc-template>
 
 
   // DataOutPort declaration
   // <rtc-template block="outport_declare">
-  RTC::CameraImage m_img_curr;
+  RTC::CameraImage m_img_orig;
   /*!
    */
-  RTC::OutPort<RTC::CameraImage> m_img_currOut;
-  RTC::CameraImage m_img_resu;
+  RTC::OutPort<RTC::CameraImage> m_img_origOut;
+  RTC::TimedLong m_key;
   /*!
    */
-  RTC::OutPort<RTC::CameraImage> m_img_resuOut;
-  RTC::CameraImage m_img_back;
-  /*!
-   */
-  RTC::OutPort<RTC::CameraImage> m_img_backOut;
+  RTC::OutPort<RTC::TimedLong> m_keyOut;
   
   // </rtc-template>
 
@@ -312,25 +309,13 @@ class BackGroundSubtractionSimple
   // <rtc-template block="private_operation">
   
   // </rtc-template>
-  void colorDifference( void );
-  void labDifference( void );
-  void grayScaleDifference( void );
-	
-  cv::Mat m_currentImage;
-  cv::Mat m_backgroundImage;
-  cv::Mat m_resultImage;
-	
-  int m_differenceMode;   /* 差分の計算モード */
-  int m_noiseMode;        /* ノイズを除去するモード */
-  int m_temp_w;
-  int m_temp_h;
 
 };
 
 
 extern "C"
 {
-  DLL_EXPORT void BackGroundSubtractionSimpleInit(RTC::Manager* manager);
+  DLL_EXPORT void BackGroundSubtractionSimpleTestInit(RTC::Manager* manager);
 };
 
-#endif // BACKGROUNDSUBTRACTIONSIMPLE_H
+#endif // BACKGROUNDSUBTRACTIONSIMPLE_TEST_H
