@@ -1,4 +1,4 @@
-// -*- C++ -*-
+﻿// -*- C++ -*-
 /*!
  * @file  Affine.cpp
  * @brief Affine image component
@@ -20,7 +20,7 @@ static const char* affine_spec[] =
     "implementation_id", "Affine",
     "type_name",         "Affine",
     "description",       "Affine image component",
-    "version",           "1.2.0",
+    "version",           "1.2.3",
     "vendor",            "AIST",
     "category",          "Category",
     "activity_type",     "PERIODIC",
@@ -30,9 +30,13 @@ static const char* affine_spec[] =
     "lang_type",         "compile",
     // Configuration variables
     "conf.default.affine_matrix", "0.825,-0.167,40;-0.1,0.83,30",
+
     // Widget
     "conf.__widget__.affine_matrix", "text",
     // Constraints
+
+    "conf.__type__.affine_matrix", "double",
+
     ""
   };
 // </rtc-template>
@@ -100,23 +104,23 @@ RTC::ReturnCode_t Affine::onInitialize()
   // <rtc-template block="registration">
   // Set InPort buffers
   addInPort("original_image", m_image_origIn);
-  
+
   // Set OutPort buffer
   addOutPort("affined_image", m_image_affineOut);
-  
+
   // Set service provider to Ports
-  
+
   // Set service consumers to Ports
-  
+
   // Set CORBA Service Ports
-  
+
   // </rtc-template>
 
   // <rtc-template block="bind_config">
   // Bind variables and configuration variable
   bindParameter("affine_matrix", m_ve2dbMatrix, "0.825,-0.167,40;-0.1,0.83,30");
   // </rtc-template>
-  
+
   return RTC::RTC_OK;
 }
 
@@ -144,21 +148,12 @@ RTC::ReturnCode_t Affine::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Affine::onActivated(RTC::UniqueId ec_id)
 {
-
-
-
-
   return RTC::RTC_OK;
 }
 
 
 RTC::ReturnCode_t Affine::onDeactivated(RTC::UniqueId ec_id)
 {
-
-
-  
-
-
   return RTC::RTC_OK;
 }
 
@@ -171,48 +166,39 @@ RTC::ReturnCode_t Affine::onExecute(RTC::UniqueId ec_id)
   {
     /* InPortデータの読み込み */
     m_image_origIn.read();
-	
-
-
-	cv::Mat m_image_buff(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3, (void *)&(m_image_orig.pixels[0]));
-    /* InPortの画像データをIplImageのimageDataにコピー */
-	//memcpy(m_image_buff.data, (void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length());
-	
-	cv::Mat_<double> m_affineMatrix(2, 3);
-   	/* 変換後の座標を設定する */
-	
+    cv::Mat m_image_buff(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3, (void *)&(m_image_orig.pixels[0]));
+    
+    /* 変換後の座標を設定する */
+    cv::Mat_<double> m_affineMatrix(2, 3);
+    
     // Check configuration validations
     if(isConfigurationValidated())
     {
-		m_affineMatrix(0, 0) = m_ve2dbMatrix[0][0];
-		m_affineMatrix(0, 1) = m_ve2dbMatrix[0][1];
-		m_affineMatrix(0, 2) = m_ve2dbMatrix[0][2];
-		m_affineMatrix(1, 0) = m_ve2dbMatrix[1][0];
-		m_affineMatrix(1, 1) = m_ve2dbMatrix[1][1];
-		m_affineMatrix(1, 2) = m_ve2dbMatrix[1][2];
-
-           
+      m_affineMatrix(0, 0) = m_ve2dbMatrix[0][0];
+      m_affineMatrix(0, 1) = m_ve2dbMatrix[0][1];
+      m_affineMatrix(0, 2) = m_ve2dbMatrix[0][2];
+      m_affineMatrix(1, 0) = m_ve2dbMatrix[1][0];
+      m_affineMatrix(1, 1) = m_ve2dbMatrix[1][1];
+      m_affineMatrix(1, 2) = m_ve2dbMatrix[1][2];
+          
     }else
     {
       cout<<"Incorrect configuration information."<<endl;
 
       return RTC::RTC_ERROR;
     }
-
 	
-	
-	cv::Mat m_image_dest;
+    cv::Mat m_image_dest;
     /* 変換行列を反映させる */
-	warpAffine(m_image_buff, m_image_dest, m_affineMatrix, m_image_dest.size());
+    warpAffine(m_image_buff, m_image_dest, m_affineMatrix, m_image_dest.size());
 
     /* 画像データのサイズ取得 */
-	int len = m_image_dest.channels() * m_image_dest.size().width * m_image_dest.size().height;
+    int len = m_image_dest.channels() * m_image_dest.size().width * m_image_dest.size().height;
 
     /* 画面のサイズ情報を入れる */
-
-	m_image_affine.pixels.length(len);
-	m_image_affine.width = m_image_dest.size().width;
-	m_image_affine.height = m_image_dest.size().height;
+    m_image_affine.pixels.length(len);
+    m_image_affine.width = m_image_dest.size().width;
+    m_image_affine.height = m_image_dest.size().height;
 
     /* 反転した画像データをOutPortにコピー */
     memcpy((void *)&(m_image_affine.pixels[0]), m_image_dest.data,len);
@@ -278,7 +264,7 @@ bool Affine::isConfigurationValidated()
 
 extern "C"
 {
- 
+
   void AffineInit(RTC::Manager* manager)
   {
     coil::Properties profile(affine_spec);
@@ -286,7 +272,7 @@ extern "C"
                              RTC::Create<Affine>,
                              RTC::Delete<Affine>);
   }
-  
+
 };
 
 

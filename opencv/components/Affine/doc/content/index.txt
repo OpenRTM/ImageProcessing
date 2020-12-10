@@ -1,4 +1,4 @@
-AffineName - English
+﻿AffineName - English
 ========================
 
 .. toctree::
