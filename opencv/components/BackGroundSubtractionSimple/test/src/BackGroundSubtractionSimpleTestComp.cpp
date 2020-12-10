@@ -1,6 +1,6 @@
 ﻿// -*- C++ -*-
 /*!
- * @file BackGroundSubtractionSimpleComp.cpp
+ * @file BackGroundSubtractionSimpleTestComp.cpp
  * @brief Standalone component
  * @date $Date$
  *
@@ -11,16 +11,16 @@
 #include <iostream>
 #include <string>
 #include <stdlib.h>
-#include "BackGroundSubtractionSimple.h"
+#include "BackGroundSubtractionSimpleTest.h"
 
 
 void MyModuleInit(RTC::Manager* manager)
 {
-  BackGroundSubtractionSimpleInit(manager);
+  BackGroundSubtractionSimpleTestInit(manager);
   RTC::RtcBase* comp;
 
   // Create a component
-  comp = manager->createComponent("BackGroundSubtractionSimple");
+  comp = manager->createComponent("BackGroundSubtractionSimpleTest");
 
   if (comp==NULL)
   {
@@ -75,6 +75,9 @@ int main (int argc, char** argv)
 {
   RTC::Manager* manager;
   manager = RTC::Manager::init(argc, argv);
+
+  // Initialize manager
+  manager->init(argc, argv);
 
   // Set module initialization proceduer
   // This procedure will be invoked in activateManager() function.
