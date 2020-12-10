@@ -1,6 +1,6 @@
 ﻿// -*- C++ -*-
 /*!
- * @file AffineComp.cpp
+ * @file AffineTestComp.cpp
  * @brief Standalone component
  * @date $Date$
  *
@@ -11,16 +11,16 @@
 #include <iostream>
 #include <string>
 #include <stdlib.h>
-#include "Affine.h"
+#include "AffineTest.h"
 
 
 void MyModuleInit(RTC::Manager* manager)
 {
-  AffineInit(manager);
+  AffineTestInit(manager);
   RTC::RtcBase* comp;
 
   // Create a component
-  comp = manager->createComponent("Affine");
+  comp = manager->createComponent("AffineTest");
 
   if (comp==NULL)
   {
@@ -75,6 +75,9 @@ int main (int argc, char** argv)
 {
   RTC::Manager* manager;
   manager = RTC::Manager::init(argc, argv);
+
+  // Initialize manager
+  manager->init(argc, argv);
 
   // Set module initialization proceduer
   // This procedure will be invoked in activateManager() function.
