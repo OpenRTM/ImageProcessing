@@ -1,4 +1,4 @@
-BinarizationName - English
+﻿BinarizationName - English
 ========================
 
 .. toctree::

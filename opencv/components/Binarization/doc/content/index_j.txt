@@ -1,4 +1,4 @@
-Binarization - 日本語
+﻿Binarization - 日本語
 =======================
 
 
