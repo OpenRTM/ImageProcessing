@@ -1,6 +1,6 @@
 ﻿// -*- C++ -*-
 /*!
- * @file  CameraViewer.h
+ * @file  CameraViewerTest.h
  * @brief USB Camera Monitor component
  * @date  $Date$
  *
@@ -9,31 +9,27 @@
  * $Id$
  */
 
-#ifndef CAMERAVIEWER_H
-#define CAMERAVIEWER_H
+#ifndef CAMERAVIEWER_TEST__H
+#define CAMERAVIEWER_TEST_H
 
 #include <rtm/idl/BasicDataTypeSkel.h>
 #include <rtm/idl/ExtendedDataTypesSkel.h>
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
-#include <opencv2/opencv.hpp>
-using namespace cv;
-#if CV_MAJOR_VERSION < 3
-#ifndef WINDOW_AUTOSIZE
-#define WINDOW_AUTOSIZE CV_WINDOW_AUTOSIZE
-#endif
-#endif //CV_MAJOR_VERSION
-
 // Service implementation headers
 // <rtc-template block="service_impl_h">
+#include "InterfaceDataTypesSVC_impl.h"
+#include "BasicDataTypeSVC_impl.h"
 
 // </rtc-template>
 
 // Service Consumer stub headers
 // <rtc-template block="consumer_stub_h">
-#include "InterfaceDataTypesStub.h"
-#include "BasicDataTypeStub.h"
 
+// </rtc-template>
+
+// Service Consumer stub headers
+// <rtc-template block="port_stub_h">
 // </rtc-template>
 
 #include <rtm/Manager.h>
@@ -42,15 +38,12 @@ using namespace cv;
 #include <rtm/DataInPort.h>
 #include <rtm/DataOutPort.h>
 
-/* 事前宣言 */
-void onMouse(int nEvent, int x, int y, int nFlags, void* param);
-
 /*!
- * @class CameraViewer
+ * @class CameraViewerTest
  * @brief USB Camera Monitor component
  *
  */
-class CameraViewer
+class CameraViewerTest
   : public RTC::DataFlowComponentBase
 {
  public:
@@ -58,12 +51,12 @@ class CameraViewer
    * @brief constructor
    * @param manager Maneger Object
    */
-  CameraViewer(RTC::Manager* manager);
+  CameraViewerTest(RTC::Manager* manager);
 
   /*!
    * @brief destructor
    */
-  ~CameraViewer();
+  ~CameraViewerTest();
 
   // <rtc-template block="public_attribute">
   
@@ -76,6 +69,7 @@ class CameraViewer
   /***
    *
    * The initialize action (on CREATED->ALIVE transition)
+   * formaer rtc_init_entry() 
    *
    * @return RTC::ReturnCode_t
    * 
@@ -86,6 +80,7 @@ class CameraViewer
   /***
    *
    * The finalize action (on ALIVE->END transition)
+   * formaer rtc_exiting_entry()
    *
    * @return RTC::ReturnCode_t
    * 
@@ -96,6 +91,7 @@ class CameraViewer
   /***
    *
    * The startup action when ExecutionContext startup
+   * former rtc_starting_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -108,6 +104,7 @@ class CameraViewer
   /***
    *
    * The shutdown action when ExecutionContext stop
+   * former rtc_stopping_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -120,6 +117,7 @@ class CameraViewer
   /***
    *
    * The activated action (Active state entry action)
+   * former rtc_active_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -132,6 +130,7 @@ class CameraViewer
   /***
    *
    * The deactivated action (Active state exit action)
+   * former rtc_active_exit()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -144,6 +143,7 @@ class CameraViewer
   /***
    *
    * The execution action that is invoked periodically
+   * former rtc_active_do()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -156,6 +156,7 @@ class CameraViewer
   /***
    *
    * The aborting action when main logic error occurred.
+   * former rtc_aborting_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -168,6 +169,7 @@ class CameraViewer
   /***
    *
    * The error action in ERROR state
+   * former rtc_error_do()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -180,6 +182,7 @@ class CameraViewer
   /***
    *
    * The reset action that is invoked resetting
+   * This is same but different the former rtc_init_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -192,6 +195,7 @@ class CameraViewer
   /***
    *
    * The state update action that is invoked after onExecute() action
+   * no corresponding operation exists in OpenRTm-aist-0.2.0
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -204,6 +208,7 @@ class CameraViewer
   /***
    *
    * The action that is invoked when execution context's rate is changed
+   * no corresponding operation exists in OpenRTm-aist-0.2.0
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -242,32 +247,32 @@ class CameraViewer
 
   // DataInPort declaration
   // <rtc-template block="inport_declare">
-  RTC::CameraImage m_in;
+  RTC::TimedLong m_lKey;
   /*!
    */
-  RTC::InPort<RTC::CameraImage> m_inIn;
+  RTC::InPort<RTC::TimedLong> m_lKeyIn;
+  RTC::TimedLong m_lMouseEv;
+  /*!
+   */
+  RTC::InPort<RTC::TimedLong> m_lMouseEvIn;
+  RTC::TimedLong m_lMouseX;
+  /*!
+   */
+  RTC::InPort<RTC::TimedLong> m_lMouseXIn;
+  RTC::TimedLong m_lMouseY;
+  /*!
+   */
+  RTC::InPort<RTC::TimedLong> m_lMouseYIn;
   
   // </rtc-template>
 
 
   // DataOutPort declaration
   // <rtc-template block="outport_declare">
-  RTC::TimedLong m_lKey;
+  RTC::CameraImage m_in;
   /*!
    */
-  RTC::OutPort<RTC::TimedLong> m_lKeyOut;
-  RTC::TimedLong m_lMouseEv;
-  /*!
-   */
-  RTC::OutPort<RTC::TimedLong> m_lMouseEvOut;
-  RTC::TimedLong m_lMouseX;
-  /*!
-   */
-  RTC::OutPort<RTC::TimedLong> m_lMouseXOut;
-  RTC::TimedLong m_lMouseY;
-  /*!
-   */
-  RTC::OutPort<RTC::TimedLong> m_lMouseYOut;
+  RTC::OutPort<RTC::CameraImage> m_inOut;
   
   // </rtc-template>
 
@@ -295,22 +300,12 @@ class CameraViewer
   
   // </rtc-template>
 
-private:
-  int dummy;
-  int m_nOldHeight;     /* CFG更新チェック用 */
-  int m_nOldWidth;
-
-  bool isCFGChanged();
-
-
-public:
-    friend void onMouse(int nEvent, int x, int y, int nFlags, void* param);
 };
 
 
 extern "C"
 {
-  DLL_EXPORT void CameraViewerInit(RTC::Manager* manager);
+  DLL_EXPORT void CameraViewerTestInit(RTC::Manager* manager);
 };
 
-#endif // CAMERAVIEWER_H
+#endif // CAMERAVIEWER_TEST_H

@@ -1,8 +1,10 @@
-// -*- C++ -*-
+﻿// -*- C++ -*-
 /*!
  * @file  CameraViewer.cpp
  * @brief USB Camera Monitor component
  * @date $Date$
+ *
+ * @author Noriaki Ando <n-ando@aist.go.jp>
  *
  * $Id$
  */
@@ -17,9 +19,9 @@ static const char* cameraviewer_spec[] =
     "implementation_id", "CameraViewer",
     "type_name",         "CameraViewer",
     "description",       "USB Camera Monitor component",
-    "version",           "1.2.0",
+    "version",           "1.2.3",
     "vendor",            "AIST",
-    "category",          "Category",
+    "category",          "opencv-rtcs",
     "activity_type",     "PERIODIC",
     "kind",              "DataFlowComponent",
     "max_instance",      "1",
@@ -28,10 +30,15 @@ static const char* cameraviewer_spec[] =
     // Configuration variables
     "conf.default.image_height", "240",
     "conf.default.image_width", "320",
+
     // Widget
     "conf.__widget__.image_height", "text",
     "conf.__widget__.image_width", "text",
     // Constraints
+
+    "conf.__type__.image_height", "int",
+    "conf.__type__.image_width", "int",
+
     ""
   };
 // </rtc-template>
@@ -68,19 +75,19 @@ RTC::ReturnCode_t CameraViewer::onInitialize()
   // <rtc-template block="registration">
   // Set InPort buffers
   addInPort("in", m_inIn);
-  
+
   // Set OutPort buffer
   addOutPort("Key_out", m_lKeyOut);
   addOutPort("Mouse_event", m_lMouseEvOut);
   addOutPort("Mouse_X_pos", m_lMouseXOut);
   addOutPort("Mouse_Y_pos", m_lMouseYOut);
-  
+
   // Set service provider to Ports
-  
+
   // Set service consumers to Ports
-  
+
   // Set CORBA Service Ports
-  
+
   // </rtc-template>
 
   // <rtc-template block="bind_config">
@@ -121,10 +128,6 @@ RTC::ReturnCode_t CameraViewer::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t CameraViewer::onActivated(RTC::UniqueId ec_id)
 { 
-
-
-
-
   /* 画像表示用ウィンドウの作成 */
   cv::namedWindow("CaptureImage", WINDOW_AUTOSIZE);
   cv::setMouseCallback("CaptureImage", onMouse, (void*)this);
@@ -138,10 +141,7 @@ RTC::ReturnCode_t CameraViewer::onActivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t CameraViewer::onDeactivated(RTC::UniqueId ec_id)
 {
-
-
   cv::destroyWindow("CaptureImage");
-
 
   return RTC::RTC_OK;
 }
@@ -164,7 +164,7 @@ RTC::ReturnCode_t CameraViewer::onExecute(RTC::UniqueId ec_id)
   // Check input image is new
   if (!m_inIn.isNew())
   {	
-	  return RTC::RTC_OK;
+    return RTC::RTC_OK;
   }
   m_inIn.read();    
 
@@ -175,15 +175,10 @@ RTC::ReturnCode_t CameraViewer::onExecute(RTC::UniqueId ec_id)
     return RTC::RTC_OK;
   }
 
-
-
   /* データコピー */
   cv::Mat m_orig_img(cv::Size(m_in.width, m_in.height), CV_8UC3, (void *)&(m_in.pixels[0]));
   
-
-
   /* 画像表示 */
-
   cv::imshow("CaptureImage", m_orig_img);
 
   if (count > 100)
@@ -265,7 +260,7 @@ void onMouse(int nEvent, int x, int y, int nFlags, void *param)
 
 extern "C"
 {
- 
+
   void CameraViewerInit(RTC::Manager* manager)
   {
     coil::Properties profile(cameraviewer_spec);
@@ -273,7 +268,7 @@ extern "C"
                              RTC::Create<CameraViewer>,
                              RTC::Delete<CameraViewer>);
   }
-  
+
 };
 
 
