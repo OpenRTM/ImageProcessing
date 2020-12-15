@@ -1,6 +1,6 @@
 ﻿// -*- C++ -*-
 /*!
- * @file ChromakeyComp.cpp
+ * @file ChromakeyTestComp.cpp
  * @brief Standalone component
  * @date $Date$
  *
@@ -13,16 +13,16 @@
 #include <iostream>
 #include <string>
 #include <stdlib.h>
-#include "Chromakey.h"
+#include "ChromakeyTest.h"
 
 
 void MyModuleInit(RTC::Manager* manager)
 {
-  ChromakeyInit(manager);
+  ChromakeyTestInit(manager);
   RTC::RtcBase* comp;
 
   // Create a component
-  comp = manager->createComponent("Chromakey");
+  comp = manager->createComponent("ChromakeyTest");
 
   if (comp==NULL)
   {
@@ -77,6 +77,9 @@ int main (int argc, char** argv)
 {
   RTC::Manager* manager;
   manager = RTC::Manager::init(argc, argv);
+
+  // Initialize manager
+  manager->init(argc, argv);
 
   // Set module initialization proceduer
   // This procedure will be invoked in activateManager() function.
