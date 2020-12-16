@@ -1,8 +1,14 @@
-// -*- C++ -*-
+﻿// -*- C++ -*-
 /*!
  * @file  Edge.cpp
  * @brief Edge image component
  * @date $Date$
+ *
+ * This RT-Component source code is using the code in 
+ * "OpenCVプログラミングブック" (OpenCV Programming book). 
+ * Please refer: https://book.mynavi.jp/support/pc/opencv11/#F_DWN
+ *
+ * @author Noriaki Ando <n-ando@aist.go.jp>
  *
  * $Id$
  */
@@ -19,9 +25,9 @@ static const char* edge_spec[] =
     "implementation_id", "Edge",
     "type_name",         "Edge",
     "description",       "Edge image component",
-    "version",           "1.2.0",
+    "version",           "1.2.3",
     "vendor",            "AIST",
-    "category",          "Category",
+    "category",          "opencv-rtcs",
     "activity_type",     "PERIODIC",
     "kind",              "DataFlowComponent",
     "max_instance",      "1",
@@ -31,6 +37,7 @@ static const char* edge_spec[] =
     "conf.default.sobel_x_size", "3",
     "conf.default.sobel_y_size", "3",
     "conf.default.laplacian_size", "3",
+
     // Widget
     "conf.__widget__.sobel_x_size", "radio",
     "conf.__widget__.sobel_y_size", "radio",
@@ -39,6 +46,11 @@ static const char* edge_spec[] =
     "conf.__constraints__.sobel_x_size", "(1,3,5,7)",
     "conf.__constraints__.sobel_y_size", "(1,3,5,7)",
     "conf.__constraints__.laplacian_size", "(1,3,5,7)",
+
+    "conf.__type__.sobel_x_size", "int",
+    "conf.__type__.sobel_y_size", "int",
+    "conf.__type__.laplacian_size", "int",
+
     ""
   };
 // </rtc-template>
@@ -74,18 +86,18 @@ RTC::ReturnCode_t Edge::onInitialize()
   // <rtc-template block="registration">
   // Set InPort buffers
   addInPort("original_image", m_image_origIn);
-  
+
   // Set OutPort buffer
   addOutPort("Edge_image_sobel_x", m_image_edge_sobel_xOut);
   addOutPort("Edge_image_sobel_y", m_image_edge_sobel_yOut);
   addOutPort("Edge_image_LAPLACIAN", m_image_edge_LAPLACIANOut);
-  
+
   // Set service provider to Ports
-  
+
   // Set service consumers to Ports
-  
+
   // Set CORBA Service Ports
-  
+
   // </rtc-template>
 
   // <rtc-template block="bind_config">
@@ -94,7 +106,7 @@ RTC::ReturnCode_t Edge::onInitialize()
   bindParameter("sobel_y_size", m_sobel_y_size, "3");
   bindParameter("laplacian_size", m_laplacian_size, "3");
   // </rtc-template>
-  
+
   return RTC::RTC_OK;
 }
 
@@ -122,8 +134,6 @@ RTC::ReturnCode_t Edge::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Edge::onActivated(RTC::UniqueId ec_id)
 {
-
-
   /* OutPort画面サイズの初期化 */
   m_image_edge_sobel_x.width = m_image_edge_sobel_y.width = m_image_edge_LAPLACIAN.width = 0;
   m_image_edge_sobel_x.height = m_image_edge_sobel_y.height = m_image_edge_LAPLACIAN.height = 0;
@@ -136,9 +146,6 @@ RTC::ReturnCode_t Edge::onActivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Edge::onDeactivated(RTC::UniqueId ec_id)
 {
-
-
-
   return RTC::RTC_OK;
 }
 
@@ -150,24 +157,21 @@ RTC::ReturnCode_t Edge::onExecute(RTC::UniqueId ec_id)
     /* InPortデータの読み込み */
     m_image_origIn.read();
 
-
-
     /* InPortの画面データをコピー */
-	cv::Mat imageBuff(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3, (void *)&(m_image_orig.pixels[0]));
-    //memcpy( imageBuff.data, (void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length() );
-	cv::Mat grayImage;
-	cv::Mat destinationImage_x;
-	cv::Mat destinationImage_y;
-	cv::Mat destinationImage_LAPLACIAN;
-	cv::Mat destinationEdge;
-	cv::Mat edgeImage;
+    cv::Mat imageBuff(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3, (void *)&(m_image_orig.pixels[0]));
+    cv::Mat grayImage;
+    cv::Mat destinationImage_x;
+    cv::Mat destinationImage_y;
+    cv::Mat destinationImage_LAPLACIAN;
+    cv::Mat destinationEdge;
+    cv::Mat edgeImage;
 
     /* RGBからグレースケールに変換 */
     cv::cvtColor( imageBuff, grayImage, COLOR_RGB2GRAY );
 
     /* Sobel_X */
     /* X方向のSobelオペレータをかける */
-	cv::Sobel(grayImage, destinationImage_x, destinationImage_x.type(), 1, 0, m_sobel_x_size);
+    cv::Sobel(grayImage, destinationImage_x, destinationImage_x.type(), 1, 0, m_sobel_x_size);
 
     /* 16ビットの符号ありデータを8ビットの符号なしデータに変換する */
     cv::convertScaleAbs( destinationImage_x, destinationEdge, SCALE, SHIFT );
@@ -176,10 +180,10 @@ RTC::ReturnCode_t Edge::onExecute(RTC::UniqueId ec_id)
     cv::cvtColor( destinationEdge, edgeImage, COLOR_GRAY2RGB );
 
     /* 画像データのサイズ取得 */
-	len = edgeImage.channels() * edgeImage.size().width * edgeImage.size().height;
+    len = edgeImage.channels() * edgeImage.size().width * edgeImage.size().height;
 	
-	m_image_edge_sobel_x.width = m_image_edge_sobel_y.width = m_image_edge_LAPLACIAN.width = m_image_orig.width;
-	m_image_edge_sobel_x.height = m_image_edge_sobel_y.height = m_image_edge_LAPLACIAN.height = m_image_orig.height;
+    m_image_edge_sobel_x.width = m_image_edge_sobel_y.width = m_image_edge_LAPLACIAN.width = m_image_orig.width;
+    m_image_edge_sobel_x.height = m_image_edge_sobel_y.height = m_image_edge_LAPLACIAN.height = m_image_orig.height;
 
     m_image_edge_sobel_x.pixels.length(len);
 
@@ -189,30 +193,24 @@ RTC::ReturnCode_t Edge::onExecute(RTC::UniqueId ec_id)
     /* 反転した画像データをOutPortから出力 */
     m_image_edge_sobel_xOut.write();
 
-
     /* Sobel_Y */
     /* Y方向のSobelオペレータをかける */
-	cv::Sobel(grayImage, destinationImage_y, destinationImage_y.type(), 0, 1, m_sobel_y_size);
-
+    cv::Sobel(grayImage, destinationImage_y, destinationImage_y.type(), 0, 1, m_sobel_y_size);
     cv::convertScaleAbs( destinationImage_y, destinationEdge, SCALE, SHIFT );
-
     cv::cvtColor( destinationEdge, edgeImage, COLOR_GRAY2RGB );
 
-	len = edgeImage.channels() * edgeImage.size().width * edgeImage.size().height;
+    len = edgeImage.channels() * edgeImage.size().width * edgeImage.size().height;
     m_image_edge_sobel_y.pixels.length(len);
     memcpy( (void *)&(m_image_edge_sobel_y.pixels[0]), edgeImage.data, len );
 
     m_image_edge_sobel_yOut.write();
 
-
     // LAPLACIAN
-	cv::Laplacian(grayImage, destinationImage_LAPLACIAN, m_laplacian_size);
-
+    cv::Laplacian(grayImage, destinationImage_LAPLACIAN, m_laplacian_size);
     cv::convertScaleAbs( destinationImage_LAPLACIAN, destinationEdge, SCALE, SHIFT );
-
     cv::cvtColor( destinationEdge, edgeImage, COLOR_GRAY2RGB );
 
-	len = edgeImage.channels() * edgeImage.size().width * edgeImage.size().height;
+    len = edgeImage.channels() * edgeImage.size().width * edgeImage.size().height;
 	
     m_image_edge_LAPLACIAN.pixels.length(len);
     memcpy( (void *)&(m_image_edge_LAPLACIAN.pixels[0]), edgeImage.data, len );
@@ -262,7 +260,7 @@ RTC::ReturnCode_t Edge::onRateChanged(RTC::UniqueId ec_id)
 
 extern "C"
 {
- 
+
   void EdgeInit(RTC::Manager* manager)
   {
     coil::Properties profile(edge_spec);
@@ -270,7 +268,7 @@ extern "C"
                              RTC::Create<Edge>,
                              RTC::Delete<Edge>);
   }
-  
+
 };
 
 

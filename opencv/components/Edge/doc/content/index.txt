@@ -1,4 +1,4 @@
-EdgeName - English
+﻿EdgeName - English
 ========================
 
 .. toctree::
