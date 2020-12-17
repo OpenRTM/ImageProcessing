@@ -1,6 +1,6 @@
 ﻿// -*- C++ -*-
 /*!
- * @file  Findcontour.h
+ * @file  FindcontourTest.h
  * @brief Findcontour component
  * @date  $Date$
  *
@@ -9,40 +9,26 @@
  * $Id$
  */
 
-#ifndef FINDCONTOUR_H
-#define FINDCONTOUR_H
+#ifndef FINDCONTOUR_TEST__H
+#define FINDCONTOUR_TEST_H
 
 #include <rtm/idl/BasicDataTypeSkel.h>
 #include <rtm/idl/ExtendedDataTypesSkel.h>
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
-//OpenCV header file include
-#include <opencv2/opencv.hpp>
-using namespace cv;
-#if CV_MAJOR_VERSION < 3
-#ifndef COLOR_BGR2GRAY
-#define COLOR_BGR2GRAY CV_BGR2GRAY
-#endif
-#ifndef RETR_CCOMP
-#define RETR_CCOMP CV_RETR_CCOMP
-#endif
-#ifndef CHAIN_APPROX_NONE
-#define CHAIN_APPROX_NONE CV_CHAIN_APPROX_NONE
-#endif
-#endif //CV_MAJOR_VERSION
-
-
-#define THRESHOLD_MAX_VALUE	255	  /* 2値化の際に使用する最大値 */
-
 // Service implementation headers
 // <rtc-template block="service_impl_h">
+#include "InterfaceDataTypesSVC_impl.h"
 
 // </rtc-template>
 
 // Service Consumer stub headers
 // <rtc-template block="consumer_stub_h">
-#include "InterfaceDataTypesStub.h"
 
+// </rtc-template>
+
+// Service Consumer stub headers
+// <rtc-template block="port_stub_h">
 // </rtc-template>
 
 #include <rtm/Manager.h>
@@ -52,11 +38,11 @@ using namespace cv;
 #include <rtm/DataOutPort.h>
 
 /*!
- * @class Findcontour
+ * @class FindcontourTest
  * @brief Findcontour component
  *
  */
-class Findcontour
+class FindcontourTest
   : public RTC::DataFlowComponentBase
 {
  public:
@@ -64,12 +50,12 @@ class Findcontour
    * @brief constructor
    * @param manager Maneger Object
    */
-  Findcontour(RTC::Manager* manager);
+  FindcontourTest(RTC::Manager* manager);
 
   /*!
    * @brief destructor
    */
-  ~Findcontour();
+  ~FindcontourTest();
 
   // <rtc-template block="public_attribute">
   
@@ -82,6 +68,7 @@ class Findcontour
   /***
    *
    * The initialize action (on CREATED->ALIVE transition)
+   * formaer rtc_init_entry() 
    *
    * @return RTC::ReturnCode_t
    * 
@@ -92,6 +79,7 @@ class Findcontour
   /***
    *
    * The finalize action (on ALIVE->END transition)
+   * formaer rtc_exiting_entry()
    *
    * @return RTC::ReturnCode_t
    * 
@@ -102,6 +90,7 @@ class Findcontour
   /***
    *
    * The startup action when ExecutionContext startup
+   * former rtc_starting_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -114,6 +103,7 @@ class Findcontour
   /***
    *
    * The shutdown action when ExecutionContext stop
+   * former rtc_stopping_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -126,6 +116,7 @@ class Findcontour
   /***
    *
    * The activated action (Active state entry action)
+   * former rtc_active_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -138,6 +129,7 @@ class Findcontour
   /***
    *
    * The deactivated action (Active state exit action)
+   * former rtc_active_exit()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -150,6 +142,7 @@ class Findcontour
   /***
    *
    * The execution action that is invoked periodically
+   * former rtc_active_do()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -162,6 +155,7 @@ class Findcontour
   /***
    *
    * The aborting action when main logic error occurred.
+   * former rtc_aborting_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -174,6 +168,7 @@ class Findcontour
   /***
    *
    * The error action in ERROR state
+   * former rtc_error_do()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -186,6 +181,7 @@ class Findcontour
   /***
    *
    * The reset action that is invoked resetting
+   * This is same but different the former rtc_init_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -198,6 +194,7 @@ class Findcontour
   /***
    *
    * The state update action that is invoked after onExecute() action
+   * no corresponding operation exists in OpenRTm-aist-0.2.0
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -210,6 +207,7 @@ class Findcontour
   /***
    *
    * The action that is invoked when execution context's rate is changed
+   * no corresponding operation exists in OpenRTm-aist-0.2.0
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -260,20 +258,20 @@ class Findcontour
 
   // DataInPort declaration
   // <rtc-template block="inport_declare">
-  RTC::CameraImage m_image_orig;
+  RTC::CameraImage m_image_contour;
   /*!
    */
-  RTC::InPort<RTC::CameraImage> m_image_origIn;
+  RTC::InPort<RTC::CameraImage> m_image_contourIn;
   
   // </rtc-template>
 
 
   // DataOutPort declaration
   // <rtc-template block="outport_declare">
-  RTC::CameraImage m_image_contour;
+  RTC::CameraImage m_image_orig;
   /*!
    */
-  RTC::OutPort<RTC::CameraImage> m_image_contourOut;
+  RTC::OutPort<RTC::CameraImage> m_image_origOut;
   
   // </rtc-template>
 
@@ -306,7 +304,7 @@ class Findcontour
 
 extern "C"
 {
-  DLL_EXPORT void FindcontourInit(RTC::Manager* manager);
+  DLL_EXPORT void FindcontourTestInit(RTC::Manager* manager);
 };
 
-#endif // FINDCONTOUR_H
+#endif // FINDCONTOUR_TEST_H
