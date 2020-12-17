@@ -1,4 +1,4 @@
-ChromakeyName - English
+﻿ChromakeyName - English
 ========================
 
 .. toctree::
@@ -108,8 +108,8 @@ Parameter        Data type          Default Value    Effect
 ================ ================== ================ ======
 lower_blue       int                0                
 upper_blue       int                0                
-lower_yellow     int                0                
-upper_yellow     int                0                
+lower_green      int                0                
+upper_green      int                0                
 lower_red        int                0                
 upper_red        int                0                
 ================ ================== ================ ======

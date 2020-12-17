@@ -1,4 +1,4 @@
-Chromakey - 日本語
+﻿Chromakey - 日本語
 =======================
 
 
@@ -100,8 +100,8 @@ Chromakeyは ``ChromakeyComp`` を実行（ ``${prefix}/components/bin`` に
 ================ ================== ================ ====
 lower_blue       int                0                
 upper_blue       int                0                
-lower_yellow     int                0                
-upper_yellow     int                0                
+lower_green      int                0                
+upper_green      int                0                
 lower_red        int                0                
 upper_red        int                0                
 ================ ================== ================ ====
