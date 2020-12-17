@@ -1,6 +1,6 @@
 ﻿// -*- C++ -*-
 /*!
- * @file  Edge.h
+ * @file  EdgeTest.h
  * @brief Edge image component
  * @date  $Date$
  *
@@ -9,39 +9,26 @@
  * $Id$
  */
 
-#ifndef EDGE_H
-#define EDGE_H
+#ifndef EDGE_TEST__H
+#define EDGE_TEST_H
 
 #include <rtm/idl/BasicDataTypeSkel.h>
 #include <rtm/idl/ExtendedDataTypesSkel.h>
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
-//OpenCV header file include
-#include <opencv2/opencv.hpp>
-using namespace cv;
-#if CV_MAJOR_VERSION < 3
-#ifndef COLOR_BGR2GRAY
-#define COLOR_BGR2GRAY CV_BGR2GRAY
-#endif
-#ifndef COLOR_GRAY2BGR
-#define COLOR_GRAY2BGR CV_GRAY2BGR
-#endif
-#endif //CV_MAJOR_VERSION
-
-
-//	cvConvertScaleAbs用定数
-#define SCALE   1   /* ScaleAbs係数 */
-#define SHIFT   0   /* スケーリングした入力配列の要素に加える値 */
-
 // Service implementation headers
 // <rtc-template block="service_impl_h">
+#include "InterfaceDataTypesSVC_impl.h"
 
 // </rtc-template>
 
 // Service Consumer stub headers
 // <rtc-template block="consumer_stub_h">
-#include "InterfaceDataTypesStub.h"
 
+// </rtc-template>
+
+// Service Consumer stub headers
+// <rtc-template block="port_stub_h">
 // </rtc-template>
 
 #include <rtm/Manager.h>
@@ -51,11 +38,11 @@ using namespace cv;
 #include <rtm/DataOutPort.h>
 
 /*!
- * @class Edge
+ * @class EdgeTest
  * @brief Edge image component
  *
  */
-class Edge
+class EdgeTest
   : public RTC::DataFlowComponentBase
 {
  public:
@@ -63,12 +50,12 @@ class Edge
    * @brief constructor
    * @param manager Maneger Object
    */
-  Edge(RTC::Manager* manager);
+  EdgeTest(RTC::Manager* manager);
 
   /*!
    * @brief destructor
    */
-  ~Edge();
+  ~EdgeTest();
 
   // <rtc-template block="public_attribute">
   
@@ -81,6 +68,7 @@ class Edge
   /***
    *
    * The initialize action (on CREATED->ALIVE transition)
+   * formaer rtc_init_entry() 
    *
    * @return RTC::ReturnCode_t
    * 
@@ -91,6 +79,7 @@ class Edge
   /***
    *
    * The finalize action (on ALIVE->END transition)
+   * formaer rtc_exiting_entry()
    *
    * @return RTC::ReturnCode_t
    * 
@@ -101,6 +90,7 @@ class Edge
   /***
    *
    * The startup action when ExecutionContext startup
+   * former rtc_starting_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -113,6 +103,7 @@ class Edge
   /***
    *
    * The shutdown action when ExecutionContext stop
+   * former rtc_stopping_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -125,6 +116,7 @@ class Edge
   /***
    *
    * The activated action (Active state entry action)
+   * former rtc_active_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -137,6 +129,7 @@ class Edge
   /***
    *
    * The deactivated action (Active state exit action)
+   * former rtc_active_exit()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -149,6 +142,7 @@ class Edge
   /***
    *
    * The execution action that is invoked periodically
+   * former rtc_active_do()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -161,6 +155,7 @@ class Edge
   /***
    *
    * The aborting action when main logic error occurred.
+   * former rtc_aborting_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -173,6 +168,7 @@ class Edge
   /***
    *
    * The error action in ERROR state
+   * former rtc_error_do()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -185,6 +181,7 @@ class Edge
   /***
    *
    * The reset action that is invoked resetting
+   * This is same but different the former rtc_init_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -197,6 +194,7 @@ class Edge
   /***
    *
    * The state update action that is invoked after onExecute() action
+   * no corresponding operation exists in OpenRTm-aist-0.2.0
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -209,6 +207,7 @@ class Edge
   /***
    *
    * The action that is invoked when execution context's rate is changed
+   * no corresponding operation exists in OpenRTm-aist-0.2.0
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -253,28 +252,28 @@ class Edge
 
   // DataInPort declaration
   // <rtc-template block="inport_declare">
-  RTC::CameraImage m_image_orig;
+  RTC::CameraImage m_image_edge_sobel_x;
   /*!
    */
-  RTC::InPort<RTC::CameraImage> m_image_origIn;
+  RTC::InPort<RTC::CameraImage> m_image_edge_sobel_xIn;
+  RTC::CameraImage m_image_edge_sobel_y;
+  /*!
+   */
+  RTC::InPort<RTC::CameraImage> m_image_edge_sobel_yIn;
+  RTC::CameraImage m_image_edge_LAPLACIAN;
+  /*!
+   */
+  RTC::InPort<RTC::CameraImage> m_image_edge_LAPLACIANIn;
   
   // </rtc-template>
 
 
   // DataOutPort declaration
   // <rtc-template block="outport_declare">
-  RTC::CameraImage m_image_edge_sobel_x;
+  RTC::CameraImage m_image_orig;
   /*!
    */
-  RTC::OutPort<RTC::CameraImage> m_image_edge_sobel_xOut;
-  RTC::CameraImage m_image_edge_sobel_y;
-  /*!
-   */
-  RTC::OutPort<RTC::CameraImage> m_image_edge_sobel_yOut;
-  RTC::CameraImage m_image_edge_LAPLACIAN;
-  /*!
-   */
-  RTC::OutPort<RTC::CameraImage> m_image_edge_LAPLACIANOut;
+  RTC::OutPort<RTC::CameraImage> m_image_origOut;
   
   // </rtc-template>
 
@@ -302,13 +301,12 @@ class Edge
   
   // </rtc-template>
 
-  int len;
 };
 
 
 extern "C"
 {
-  DLL_EXPORT void EdgeInit(RTC::Manager* manager);
+  DLL_EXPORT void EdgeTestInit(RTC::Manager* manager);
 };
 
-#endif // EDGE_H
+#endif // EDGE_TEST_H
