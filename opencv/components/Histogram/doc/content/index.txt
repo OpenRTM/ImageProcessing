@@ -1,4 +1,4 @@
-HistogramName - English
+﻿HistogramName - English
 ========================
 
 .. toctree::
