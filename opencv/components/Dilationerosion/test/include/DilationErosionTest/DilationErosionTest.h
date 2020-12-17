@@ -1,6 +1,6 @@
 ﻿// -*- C++ -*-
 /*!
- * @file  DilationErosion.h
+ * @file  DilationErosionTest.h
  * @brief Dilation and erosion component
  * @date  $Date$
  *
@@ -9,27 +9,26 @@
  * $Id$
  */
 
-#ifndef DILATIONEROSION_H
-#define DILATIONEROSION_H
-
-#define THRESHOLD_MAX_VALUE	255
+#ifndef DILATIONEROSION_TEST__H
+#define DILATIONEROSION_TEST_H
 
 #include <rtm/idl/BasicDataTypeSkel.h>
 #include <rtm/idl/ExtendedDataTypesSkel.h>
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
-/* OpenCVHeadファイルのIncluding */
-#include <opencv2/opencv.hpp>
-
 // Service implementation headers
 // <rtc-template block="service_impl_h">
+#include "InterfaceDataTypesSVC_impl.h"
 
 // </rtc-template>
 
 // Service Consumer stub headers
 // <rtc-template block="consumer_stub_h">
-#include "InterfaceDataTypesStub.h"
 
+// </rtc-template>
+
+// Service Consumer stub headers
+// <rtc-template block="port_stub_h">
 // </rtc-template>
 
 #include <rtm/Manager.h>
@@ -39,11 +38,11 @@
 #include <rtm/DataOutPort.h>
 
 /*!
- * @class DilationErosion
+ * @class DilationErosionTest
  * @brief Dilation and erosion component
  *
  */
-class DilationErosion
+class DilationErosionTest
   : public RTC::DataFlowComponentBase
 {
  public:
@@ -51,12 +50,12 @@ class DilationErosion
    * @brief constructor
    * @param manager Maneger Object
    */
-  DilationErosion(RTC::Manager* manager);
+  DilationErosionTest(RTC::Manager* manager);
 
   /*!
    * @brief destructor
    */
-  ~DilationErosion();
+  ~DilationErosionTest();
 
   // <rtc-template block="public_attribute">
   
@@ -69,6 +68,7 @@ class DilationErosion
   /***
    *
    * The initialize action (on CREATED->ALIVE transition)
+   * formaer rtc_init_entry() 
    *
    * @return RTC::ReturnCode_t
    * 
@@ -79,6 +79,7 @@ class DilationErosion
   /***
    *
    * The finalize action (on ALIVE->END transition)
+   * formaer rtc_exiting_entry()
    *
    * @return RTC::ReturnCode_t
    * 
@@ -89,6 +90,7 @@ class DilationErosion
   /***
    *
    * The startup action when ExecutionContext startup
+   * former rtc_starting_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -101,6 +103,7 @@ class DilationErosion
   /***
    *
    * The shutdown action when ExecutionContext stop
+   * former rtc_stopping_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -113,6 +116,7 @@ class DilationErosion
   /***
    *
    * The activated action (Active state entry action)
+   * former rtc_active_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -125,6 +129,7 @@ class DilationErosion
   /***
    *
    * The deactivated action (Active state exit action)
+   * former rtc_active_exit()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -137,6 +142,7 @@ class DilationErosion
   /***
    *
    * The execution action that is invoked periodically
+   * former rtc_active_do()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -149,6 +155,7 @@ class DilationErosion
   /***
    *
    * The aborting action when main logic error occurred.
+   * former rtc_aborting_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -161,6 +168,7 @@ class DilationErosion
   /***
    *
    * The error action in ERROR state
+   * former rtc_error_do()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -173,6 +181,7 @@ class DilationErosion
   /***
    *
    * The reset action that is invoked resetting
+   * This is same but different the former rtc_init_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -185,6 +194,7 @@ class DilationErosion
   /***
    *
    * The state update action that is invoked after onExecute() action
+   * no corresponding operation exists in OpenRTm-aist-0.2.0
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -197,6 +207,7 @@ class DilationErosion
   /***
    *
    * The action that is invoked when execution context's rate is changed
+   * no corresponding operation exists in OpenRTm-aist-0.2.0
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -241,28 +252,28 @@ class DilationErosion
 
   // DataInPort declaration
   // <rtc-template block="inport_declare">
-  RTC::CameraImage m_img_orig;
+  RTC::CameraImage m_img_out;
   /*!
    */
-  RTC::InPort<RTC::CameraImage> m_img_origIn;
+  RTC::InPort<RTC::CameraImage> m_img_outIn;
+  RTC::CameraImage m_img_dilation;
+  /*!
+   */
+  RTC::InPort<RTC::CameraImage> m_img_dilationIn;
+  RTC::CameraImage m_img_erosion;
+  /*!
+   */
+  RTC::InPort<RTC::CameraImage> m_img_erosionIn;
   
   // </rtc-template>
 
 
   // DataOutPort declaration
   // <rtc-template block="outport_declare">
-  RTC::CameraImage m_img_out;
+  RTC::CameraImage m_img_orig;
   /*!
    */
-  RTC::OutPort<RTC::CameraImage> m_img_outOut;
-  RTC::CameraImage m_img_dilation;
-  /*!
-   */
-  RTC::OutPort<RTC::CameraImage> m_img_dilationOut;
-  RTC::CameraImage m_img_erosion;
-  /*!
-   */
-  RTC::OutPort<RTC::CameraImage> m_img_erosionOut;
+  RTC::OutPort<RTC::CameraImage> m_img_origOut;
   
   // </rtc-template>
 
@@ -289,26 +300,13 @@ class DilationErosion
   // <rtc-template block="private_operation">
   
   // </rtc-template>
-  int dummy;
-  cv::Mat m_image_buff;
-  cv::Mat m_output_image_buff;
-  cv::Mat m_gray_buff;
-  cv::Mat m_binary_buff;
-  cv::Mat m_dilation_buff;
-  cv::Mat m_erosion_buff;
-  cv::Mat m_merge_Image;
-  cv::Mat m_dilation_image;
-  cv::Mat m_erosion_image;
-  cv::Mat m_dila_merge_img;
-  cv::Mat m_ero_merge_img;
-  cv::Mat m_noise_merge_img;
 
 };
 
 
 extern "C"
 {
-  DLL_EXPORT void DilationErosionInit(RTC::Manager* manager);
+  DLL_EXPORT void DilationErosionTestInit(RTC::Manager* manager);
 };
 
-#endif // DILATIONEROSION_H
+#endif // DILATIONEROSION_TEST_H
