@@ -1,6 +1,6 @@
 ﻿// -*- C++ -*-
 /*!
- * @file  Flip.h
+ * @file  FlipTest.h
  * @brief Flip image component
  * @date  $Date$
  *
@@ -9,26 +9,26 @@
  * $Id$
  */
 
-#ifndef FLIP_H
-#define FLIP_H
+#ifndef FLIP_TEST__H
+#define FLIP_TEST_H
 
 #include <rtm/idl/BasicDataTypeSkel.h>
 #include <rtm/idl/ExtendedDataTypesSkel.h>
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
-
-/* OpenCV用インクルードファイルのインクルード */
-#include <opencv2/opencv.hpp>
-
 // Service implementation headers
 // <rtc-template block="service_impl_h">
+#include "InterfaceDataTypesSVC_impl.h"
 
 // </rtc-template>
 
 // Service Consumer stub headers
 // <rtc-template block="consumer_stub_h">
-#include "InterfaceDataTypesStub.h"
 
+// </rtc-template>
+
+// Service Consumer stub headers
+// <rtc-template block="port_stub_h">
 // </rtc-template>
 
 #include <rtm/Manager.h>
@@ -38,11 +38,11 @@
 #include <rtm/DataOutPort.h>
 
 /*!
- * @class Flip
+ * @class FlipTest
  * @brief Flip image component
  *
  */
-class Flip
+class FlipTest
   : public RTC::DataFlowComponentBase
 {
  public:
@@ -50,12 +50,12 @@ class Flip
    * @brief constructor
    * @param manager Maneger Object
    */
-  Flip(RTC::Manager* manager);
+  FlipTest(RTC::Manager* manager);
 
   /*!
    * @brief destructor
    */
-  ~Flip();
+  ~FlipTest();
 
   // <rtc-template block="public_attribute">
   
@@ -68,6 +68,7 @@ class Flip
   /***
    *
    * The initialize action (on CREATED->ALIVE transition)
+   * formaer rtc_init_entry() 
    *
    * @return RTC::ReturnCode_t
    * 
@@ -78,6 +79,7 @@ class Flip
   /***
    *
    * The finalize action (on ALIVE->END transition)
+   * formaer rtc_exiting_entry()
    *
    * @return RTC::ReturnCode_t
    * 
@@ -88,6 +90,7 @@ class Flip
   /***
    *
    * The startup action when ExecutionContext startup
+   * former rtc_starting_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -100,6 +103,7 @@ class Flip
   /***
    *
    * The shutdown action when ExecutionContext stop
+   * former rtc_stopping_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -112,6 +116,7 @@ class Flip
   /***
    *
    * The activated action (Active state entry action)
+   * former rtc_active_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -124,6 +129,7 @@ class Flip
   /***
    *
    * The deactivated action (Active state exit action)
+   * former rtc_active_exit()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -136,6 +142,7 @@ class Flip
   /***
    *
    * The execution action that is invoked periodically
+   * former rtc_active_do()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -148,6 +155,7 @@ class Flip
   /***
    *
    * The aborting action when main logic error occurred.
+   * former rtc_aborting_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -160,6 +168,7 @@ class Flip
   /***
    *
    * The error action in ERROR state
+   * former rtc_error_do()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -172,6 +181,7 @@ class Flip
   /***
    *
    * The reset action that is invoked resetting
+   * This is same but different the former rtc_init_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -184,6 +194,7 @@ class Flip
   /***
    *
    * The state update action that is invoked after onExecute() action
+   * no corresponding operation exists in OpenRTm-aist-0.2.0
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -196,6 +207,7 @@ class Flip
   /***
    *
    * The action that is invoked when execution context's rate is changed
+   * no corresponding operation exists in OpenRTm-aist-0.2.0
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -228,20 +240,20 @@ class Flip
 
   // DataInPort declaration
   // <rtc-template block="inport_declare">
-  RTC::CameraImage m_image_orig;
+  RTC::CameraImage m_image_flip;
   /*!
    */
-  RTC::InPort<RTC::CameraImage> m_image_origIn;
+  RTC::InPort<RTC::CameraImage> m_image_flipIn;
   
   // </rtc-template>
 
 
   // DataOutPort declaration
   // <rtc-template block="outport_declare">
-  RTC::CameraImage m_image_flip;
+  RTC::CameraImage m_image_orig;
   /*!
    */
-  RTC::OutPort<RTC::CameraImage> m_image_flipOut;
+  RTC::OutPort<RTC::CameraImage> m_image_origOut;
   
   // </rtc-template>
 
@@ -274,7 +286,7 @@ class Flip
 
 extern "C"
 {
-  DLL_EXPORT void FlipInit(RTC::Manager* manager);
+  DLL_EXPORT void FlipTestInit(RTC::Manager* manager);
 };
 
-#endif // FLIP_H
+#endif // FLIP_TEST_H
