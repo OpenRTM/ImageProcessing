@@ -1,6 +1,6 @@
 ﻿// -*- C++ -*-
 /*!
- * @file  Histogram.h
+ * @file  HistogramTest.h
  * @brief Histogram image component
  * @date  $Date$
  *
@@ -9,44 +9,26 @@
  * $Id$
  */
 
-#ifndef HISTOGRAM_H
-#define HISTOGRAM_H
+#ifndef HISTOGRAM_TEST__H
+#define HISTOGRAM_TEST_H
 
 #include <rtm/idl/BasicDataTypeSkel.h>
 #include <rtm/idl/ExtendedDataTypesSkel.h>
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
-//OpenCV header file include
-#include <opencv2/opencv.hpp>
-using namespace cv;
-#if CV_MAJOR_VERSION < 3
-#ifndef COLOR_RGBR2GRAY
-#define COLOR_RGB2GRAY CV_RGB2GRAY
-#endif
-#ifndef COLOR_GRAY2RGB
-#define COLOR_GRAY2RGB CV_GRAY2RGB
-#endif
-#endif //CV_MAJOR_VERSION
-
-#define DIMENSIONS  1     /* ヒストグラムの次元数 */
-#define UNIFORM     1     /* 一様性に関するフラグ */
-#define ACCUMULATE  0     /* 計算フラグ */
-#define TRACKBAR_MAX_VALUE  200 /* トラックバーの最大値 */
-
-#define SCALE_SHIFT     0   /* スケーリングした入力配列の要素に加える値 */
-#define LINE_THICKNESS  -1  /* 線の太さ */
-#define LINE_TYPE       1   /* 線の種類 */
-#define SHIFT           0   /* 座標の小数点以下の桁を表すビット数 */
-
 // Service implementation headers
 // <rtc-template block="service_impl_h">
+#include "InterfaceDataTypesSVC_impl.h"
 
 // </rtc-template>
 
 // Service Consumer stub headers
 // <rtc-template block="consumer_stub_h">
-#include "InterfaceDataTypesStub.h"
 
+// </rtc-template>
+
+// Service Consumer stub headers
+// <rtc-template block="port_stub_h">
 // </rtc-template>
 
 #include <rtm/Manager.h>
@@ -56,11 +38,11 @@ using namespace cv;
 #include <rtm/DataOutPort.h>
 
 /*!
- * @class Histogram
+ * @class HistogramTest
  * @brief Histogram image component
  *
  */
-class Histogram
+class HistogramTest
   : public RTC::DataFlowComponentBase
 {
  public:
@@ -68,12 +50,12 @@ class Histogram
    * @brief constructor
    * @param manager Maneger Object
    */
-  Histogram(RTC::Manager* manager);
+  HistogramTest(RTC::Manager* manager);
 
   /*!
    * @brief destructor
    */
-  ~Histogram();
+  ~HistogramTest();
 
   // <rtc-template block="public_attribute">
   
@@ -86,6 +68,7 @@ class Histogram
   /***
    *
    * The initialize action (on CREATED->ALIVE transition)
+   * formaer rtc_init_entry() 
    *
    * @return RTC::ReturnCode_t
    * 
@@ -96,6 +79,7 @@ class Histogram
   /***
    *
    * The finalize action (on ALIVE->END transition)
+   * formaer rtc_exiting_entry()
    *
    * @return RTC::ReturnCode_t
    * 
@@ -106,6 +90,7 @@ class Histogram
   /***
    *
    * The startup action when ExecutionContext startup
+   * former rtc_starting_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -118,6 +103,7 @@ class Histogram
   /***
    *
    * The shutdown action when ExecutionContext stop
+   * former rtc_stopping_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -130,6 +116,7 @@ class Histogram
   /***
    *
    * The activated action (Active state entry action)
+   * former rtc_active_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -142,6 +129,7 @@ class Histogram
   /***
    *
    * The deactivated action (Active state exit action)
+   * former rtc_active_exit()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -154,6 +142,7 @@ class Histogram
   /***
    *
    * The execution action that is invoked periodically
+   * former rtc_active_do()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -166,6 +155,7 @@ class Histogram
   /***
    *
    * The aborting action when main logic error occurred.
+   * former rtc_aborting_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -178,6 +168,7 @@ class Histogram
   /***
    *
    * The error action in ERROR state
+   * former rtc_error_do()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -190,6 +181,7 @@ class Histogram
   /***
    *
    * The reset action that is invoked resetting
+   * This is same but different the former rtc_init_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -202,6 +194,7 @@ class Histogram
   /***
    *
    * The state update action that is invoked after onExecute() action
+   * no corresponding operation exists in OpenRTm-aist-0.2.0
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -214,6 +207,7 @@ class Histogram
   /***
    *
    * The action that is invoked when execution context's rate is changed
+   * no corresponding operation exists in OpenRTm-aist-0.2.0
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -252,24 +246,24 @@ class Histogram
 
   // DataInPort declaration
   // <rtc-template block="inport_declare">
-  RTC::CameraImage m_image_orig;
+  RTC::CameraImage m_image_histogramImage;
   /*!
    */
-  RTC::InPort<RTC::CameraImage> m_image_origIn;
+  RTC::InPort<RTC::CameraImage> m_image_histogramImageIn;
+  RTC::CameraImage m_image_histogram;
+  /*!
+   */
+  RTC::InPort<RTC::CameraImage> m_image_histogramIn;
   
   // </rtc-template>
 
 
   // DataOutPort declaration
   // <rtc-template block="outport_declare">
-  RTC::CameraImage m_image_histogramImage;
+  RTC::CameraImage m_image_orig;
   /*!
    */
-  RTC::OutPort<RTC::CameraImage> m_image_histogramImageOut;
-  RTC::CameraImage m_image_histogram;
-  /*!
-   */
-  RTC::OutPort<RTC::CameraImage> m_image_histogramOut;
+  RTC::OutPort<RTC::CameraImage> m_image_origOut;
   
   // </rtc-template>
 
@@ -296,20 +290,13 @@ class Histogram
   // <rtc-template block="private_operation">
   
   // </rtc-template>
-  cv::Mat lookUpTableMatrix; /* 濃度対応行列 */
 
-  int histogramSize;
-  int bin_w;
-
-  float range_0[2];
-  float* ranges[1];
-  unsigned char lookUpTable[256];
 };
 
 
 extern "C"
 {
-  DLL_EXPORT void HistogramInit(RTC::Manager* manager);
+  DLL_EXPORT void HistogramTestInit(RTC::Manager* manager);
 };
 
-#endif // HISTOGRAM_H
+#endif // HISTOGRAM_TEST_H
