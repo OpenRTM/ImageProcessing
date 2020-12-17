@@ -1,4 +1,4 @@
-HoughName - English
+﻿HoughName - English
 ========================
 
 .. toctree::

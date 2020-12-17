@@ -1,6 +1,6 @@
 ﻿// -*- C++ -*-
 /*!
- * @file  Hough.h
+ * @file  HoughTest.h
  * @brief Hough line component
  * @date  $Date$
  *
@@ -9,45 +9,26 @@
  * $Id$
  */
 
-#ifndef HOUGH_H
-#define HOUGH_H
+#ifndef HOUGH_TEST__H
+#define HOUGH_TEST_H
 
-#include <fstream>
 #include <rtm/idl/BasicDataTypeSkel.h>
 #include <rtm/idl/ExtendedDataTypesSkel.h>
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
-//OpenCV header file include
-#include <opencv2/opencv.hpp>
-using namespace cv;
-#if CV_MAJOR_VERSION < 3
-#ifndef COLOR_RGBR2GRAY
-#define COLOR_RGB2GRAY CV_RGB2GRAY
-#endif
-#ifndef COLOR_GRAY2RGB
-#define COLOR_GRAY2RGB CV_GRAY2RGB
-#endif
-#endif //CV_MAJOR_VERSION
-
-/* cvCanny用定数 */
-#define	APERTURE_SIZE   3   /* Sobelオペレータのサイズ (リファレンス参照) */
-
-/* cvHoughLines2用定数 */
-#define RHO             1         /* パラメータ空間におけるρ軸の分解能(ピクセル単位) */
-#define THETA   ( CV_PI / 180 )   /* パラメータ空間におけるθ軸の分解能(ラジアン単位) */
-
-/* cvLine用定数 */
-#define SHIFT     0   /* 座標の小数点以下の桁を表すビット数 */
-
 // Service implementation headers
 // <rtc-template block="service_impl_h">
+#include "InterfaceDataTypesSVC_impl.h"
 
 // </rtc-template>
 
 // Service Consumer stub headers
 // <rtc-template block="consumer_stub_h">
-#include "InterfaceDataTypesStub.h"
 
+// </rtc-template>
+
+// Service Consumer stub headers
+// <rtc-template block="port_stub_h">
 // </rtc-template>
 
 #include <rtm/Manager.h>
@@ -57,11 +38,11 @@ using namespace cv;
 #include <rtm/DataOutPort.h>
 
 /*!
- * @class Hough
+ * @class HoughTest
  * @brief Hough line component
  *
  */
-class Hough
+class HoughTest
   : public RTC::DataFlowComponentBase
 {
  public:
@@ -69,12 +50,12 @@ class Hough
    * @brief constructor
    * @param manager Maneger Object
    */
-  Hough(RTC::Manager* manager);
+  HoughTest(RTC::Manager* manager);
 
   /*!
    * @brief destructor
    */
-  ~Hough();
+  ~HoughTest();
 
   // <rtc-template block="public_attribute">
   
@@ -87,6 +68,7 @@ class Hough
   /***
    *
    * The initialize action (on CREATED->ALIVE transition)
+   * formaer rtc_init_entry() 
    *
    * @return RTC::ReturnCode_t
    * 
@@ -97,6 +79,7 @@ class Hough
   /***
    *
    * The finalize action (on ALIVE->END transition)
+   * formaer rtc_exiting_entry()
    *
    * @return RTC::ReturnCode_t
    * 
@@ -107,6 +90,7 @@ class Hough
   /***
    *
    * The startup action when ExecutionContext startup
+   * former rtc_starting_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -119,6 +103,7 @@ class Hough
   /***
    *
    * The shutdown action when ExecutionContext stop
+   * former rtc_stopping_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -131,6 +116,7 @@ class Hough
   /***
    *
    * The activated action (Active state entry action)
+   * former rtc_active_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -143,6 +129,7 @@ class Hough
   /***
    *
    * The deactivated action (Active state exit action)
+   * former rtc_active_exit()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -155,6 +142,7 @@ class Hough
   /***
    *
    * The execution action that is invoked periodically
+   * former rtc_active_do()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -167,6 +155,7 @@ class Hough
   /***
    *
    * The aborting action when main logic error occurred.
+   * former rtc_aborting_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -179,6 +168,7 @@ class Hough
   /***
    *
    * The error action in ERROR state
+   * former rtc_error_do()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -191,6 +181,7 @@ class Hough
   /***
    *
    * The reset action that is invoked resetting
+   * This is same but different the former rtc_init_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -203,6 +194,7 @@ class Hough
   /***
    *
    * The state update action that is invoked after onExecute() action
+   * no corresponding operation exists in OpenRTm-aist-0.2.0
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -215,6 +207,7 @@ class Hough
   /***
    *
    * The action that is invoked when execution context's rate is changed
+   * no corresponding operation exists in OpenRTm-aist-0.2.0
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -307,20 +300,20 @@ class Hough
 
   // DataInPort declaration
   // <rtc-template block="inport_declare">
-  RTC::CameraImage m_image_orig;
+  RTC::CameraImage m_image_hough;
   /*!
    */
-  RTC::InPort<RTC::CameraImage> m_image_origIn;
+  RTC::InPort<RTC::CameraImage> m_image_houghIn;
   
   // </rtc-template>
 
 
   // DataOutPort declaration
   // <rtc-template block="outport_declare">
-  RTC::CameraImage m_image_hough;
+  RTC::CameraImage m_image_orig;
   /*!
    */
-  RTC::OutPort<RTC::CameraImage> m_image_houghOut;
+  RTC::OutPort<RTC::CameraImage> m_image_origOut;
   
   // </rtc-template>
 
@@ -348,13 +341,12 @@ class Hough
   
   // </rtc-template>
 
-
 };
 
 
 extern "C"
 {
-  DLL_EXPORT void HoughInit(RTC::Manager* manager);
+  DLL_EXPORT void HoughTestInit(RTC::Manager* manager);
 };
 
-#endif // HOUGH_H
+#endif // HOUGH_TEST_H
