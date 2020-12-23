@@ -1,9 +1,0 @@
-Architecture: amd64
-Description: Image Calibration
-Maintainer: Noriaki;Ando;<n-ando@aist.go.jp>
-Package: imagecalibration
-Priority: optional
-Section: devel
-Version: 1.2.3
-Installed-Size: 848
-

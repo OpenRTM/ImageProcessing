@@ -1,3 +1,0 @@
-/usr/share/openrtm-1.2/components/c++/opencv-rtcs/ImageCalibration/idl/CalibrationService.idl
-/usr/share/openrtm-1.2/components/c++/opencv-rtcs/ImageCalibration/ImageCalibration.so
-/usr/share/openrtm-1.2/components/c++/opencv-rtcs/ImageCalibration/ImageCalibrationComp
