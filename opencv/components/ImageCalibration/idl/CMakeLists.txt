@@ -1,11 +1,7 @@
-set(idls ${CMAKE_CURRENT_SOURCE_DIR}/CalibrationService.idl ${CMAKE_CURRENT_SOURCE_DIR}/InterfaceDataTypes.idl ${CMAKE_CURRENT_SOURCE_DIR}/BasicDataType.idl ${CMAKE_CURRENT_SOURCE_DIR}/ExtendedDataTypes.idl )
-
-#install(FILES ${idls} DESTINATION ${INC_INSTALL_DIR}/idl
-#    COMPONENT idl)
+set(idls ${CMAKE_CURRENT_SOURCE_DIR}/CalibrationService.idl )
 
 macro(_IDL_OUTPUTS _idl _dir _result)
-    set(${_result} ${_dir}/${_idl}SK.cc ${_dir}/${_idl}.hh
-        ${_dir}/${_idl}DynSK.cc)
+    set(${_result} ${_dir}/${_idl}Skel.cpp ${_dir}/${_idl}Skel.h)
 endmacro(_IDL_OUTPUTS)
 
 macro(_COMPILE_IDL _idl_file)
@@ -24,7 +20,7 @@ macro(_COMPILE_IDL _idl_file)
     get_filename_component(_idl ${_idl_file} NAME_WE)
     set(_idl_srcs_var ${_idl}_SRCS)
     _IDL_OUTPUTS(${_idl} ${CMAKE_CURRENT_BINARY_DIR} ${_idl_srcs_var})
-
+    
     if(WIN32)
         set(_python_command "python")
     else(WIN32)
@@ -55,8 +51,4 @@ endmacro(OPENRTM_COMPILE_IDL_FILES)
 
 OPENRTM_COMPILE_IDL_FILES(${idls})
 set(ALL_IDL_SRCS ${ALL_IDL_SRCS} PARENT_SCOPE)
-FILTER_LIST(ALL_IDL_SRCS "hh$" idl_headers)
-#install(FILES ${idl_headers}
-#    DESTINATION ${INC_INSTALL_DIR}/${PROJECT_NAME_LOWER}/idl
-#    COMPONENT headers)
-
+FILTER_LIST("ALL_IDL_SRCS" "hh$" idl_headers)

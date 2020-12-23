@@ -1,8 +1,10 @@
-// -*- C++ -*-
+﻿// -*- C++ -*-
 /*!
  * @file  ImageCalibration.h
  * @brief Image Calibration
  * @date  $Date$
+ *
+ * @author Noriaki Ando <n-ando@aist.go.jp>
  *
  * $Id$
  */
@@ -10,11 +12,6 @@
 #ifndef IMAGECALIBRATION_H
 #define IMAGECALIBRATION_H
 
-#include <rtm/Manager.h>
-#include <rtm/DataFlowComponentBase.h>
-#include <rtm/CorbaPort.h>
-#include <rtm/DataInPort.h>
-#include <rtm/DataOutPort.h>
 #include <rtm/idl/BasicDataTypeSkel.h>
 #include <rtm/idl/ExtendedDataTypesSkel.h>
 #include <rtm/idl/InterfaceDataTypesSkel.h>
@@ -27,10 +24,15 @@
 
 // Service Consumer stub headers
 // <rtc-template block="consumer_stub_h">
+#include "InterfaceDataTypesStub.h"
 
 // </rtc-template>
 
-using namespace RTC;
+#include <rtm/Manager.h>
+#include <rtm/DataFlowComponentBase.h>
+#include <rtm/CorbaPort.h>
+#include <rtm/DataInPort.h>
+#include <rtm/DataOutPort.h>
 
 /*!
  * @class ImageCalibration
@@ -63,7 +65,6 @@ class ImageCalibration
   /***
    *
    * The initialize action (on CREATED->ALIVE transition)
-   * formaer rtc_init_entry() 
    *
    * @return RTC::ReturnCode_t
    * 
@@ -74,7 +75,6 @@ class ImageCalibration
   /***
    *
    * The finalize action (on ALIVE->END transition)
-   * formaer rtc_exiting_entry()
    *
    * @return RTC::ReturnCode_t
    * 
@@ -85,7 +85,6 @@ class ImageCalibration
   /***
    *
    * The startup action when ExecutionContext startup
-   * former rtc_starting_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -98,7 +97,6 @@ class ImageCalibration
   /***
    *
    * The shutdown action when ExecutionContext stop
-   * former rtc_stopping_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -111,7 +109,6 @@ class ImageCalibration
   /***
    *
    * The activated action (Active state entry action)
-   * former rtc_active_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -124,7 +121,6 @@ class ImageCalibration
   /***
    *
    * The deactivated action (Active state exit action)
-   * former rtc_active_exit()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -137,7 +133,6 @@ class ImageCalibration
   /***
    *
    * The execution action that is invoked periodically
-   * former rtc_active_do()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -150,7 +145,6 @@ class ImageCalibration
   /***
    *
    * The aborting action when main logic error occurred.
-   * former rtc_aborting_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -163,7 +157,6 @@ class ImageCalibration
   /***
    *
    * The error action in ERROR state
-   * former rtc_error_do()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -176,7 +169,6 @@ class ImageCalibration
   /***
    *
    * The reset action that is invoked resetting
-   * This is same but different the former rtc_init_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -189,7 +181,6 @@ class ImageCalibration
   /***
    *
    * The state update action that is invoked after onExecute() action
-   * no corresponding operation exists in OpenRTm-aist-0.2.0
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -202,7 +193,6 @@ class ImageCalibration
   /***
    *
    * The action that is invoked when execution context's rate is changed
-   * no corresponding operation exists in OpenRTm-aist-0.2.0
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -250,7 +240,7 @@ class ImageCalibration
   RTC::CameraImage m_img_orig;
   /*!
    */
-  InPort<RTC::CameraImage> m_img_origIn;
+  RTC::InPort<RTC::CameraImage> m_img_origIn;
   
   // </rtc-template>
 
@@ -260,7 +250,7 @@ class ImageCalibration
   RTC::CameraImage m_img_check;
   /*!
    */
-  OutPort<RTC::CameraImage> m_img_checkOut;
+  RTC::OutPort<RTC::CameraImage> m_img_checkOut;
   
   // </rtc-template>
 
@@ -276,7 +266,7 @@ class ImageCalibration
   // <rtc-template block="service_declare">
   /*!
    */
-  CalibrationServiceSVC_impl m_CalibrationService;
+  ImageCalibService_CalibrationServiceSVC_impl m_CalibrationService;
   
   // </rtc-template>
 

@@ -1,8 +1,10 @@
-// -*- C++ -*-
+﻿// -*- C++ -*-
 /*!
  * @file ImageCalibrationComp.cpp
  * @brief Standalone component
  * @date $Date$
+ *
+ * @author Noriaki Ando <n-ando@aist.go.jp>
  *
  * $Id$
  */
@@ -75,9 +77,6 @@ int main (int argc, char** argv)
 {
   RTC::Manager* manager;
   manager = RTC::Manager::init(argc, argv);
-
-  // Initialize manager
-  manager->init(argc, argv);
 
   // Set module initialization proceduer
   // This procedure will be invoked in activateManager() function.
