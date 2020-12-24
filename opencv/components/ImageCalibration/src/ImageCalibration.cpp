@@ -1,8 +1,10 @@
-// -*- C++ -*-
+﻿// -*- C++ -*-
 /*!
  * @file  ImageCalibration.cpp
  * @brief Image Calibration
  * @date $Date$
+ *
+ * @author Noriaki Ando <n-ando@aist.go.jp>
  *
  * $Id$
  */
@@ -16,9 +18,9 @@ static const char* imagecalibration_spec[] =
     "implementation_id", "ImageCalibration",
     "type_name",         "ImageCalibration",
     "description",       "Image Calibration",
-    "version",           "1.2.0",
+    "version",           "1.2.3",
     "vendor",            "AIST",
-    "category",          "Category",
+    "category",          "opencv-rtcs",
     "activity_type",     "PERIODIC",
     "kind",              "DataFlowComponent",
     "max_instance",      "1",
@@ -28,11 +30,17 @@ static const char* imagecalibration_spec[] =
     "conf.default.checker_w", "13",
     "conf.default.checker_h", "9",
     "conf.default.image_num", "5",
+
     // Widget
     "conf.__widget__.checker_w", "text",
     "conf.__widget__.checker_h", "text",
     "conf.__widget__.image_num", "text",
     // Constraints
+
+    "conf.__type__.checker_w", "int",
+    "conf.__type__.checker_h", "int",
+    "conf.__type__.image_num", "int",
+
     ""
   };
 // </rtc-template>
@@ -67,18 +75,18 @@ RTC::ReturnCode_t ImageCalibration::onInitialize()
   // <rtc-template block="registration">
   // Set InPort buffers
   addInPort("original_image", m_img_origIn);
-  
+
   // Set OutPort buffer
   addOutPort("checker_image", m_img_checkOut);
-  
+
   // Set service provider to Ports
   m_CameraCalibrationServicePort.registerProvider("CalibrationService", "ImageCalibService::CalibrationService", m_CalibrationService);
-  
+
   // Set service consumers to Ports
-  
+
   // Set CORBA Service Ports
   addPort(m_CameraCalibrationServicePort);
-  
+
   // </rtc-template>
 
   // <rtc-template block="bind_config">
@@ -161,7 +169,7 @@ RTC::ReturnCode_t ImageCalibration::onExecute(RTC::UniqueId ec_id)
     memcpy(image.data,(void *)&(m_img_orig.pixels[0]), m_img_orig.pixels.length());
     
     /* グレースケールに変換 */
-	cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
+    cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
     
     /* プロバイダクラスへデータを渡す */
     RTC::CameraImage currentImg;
@@ -242,7 +250,7 @@ void ImageCalibration::checkImageNum(void)
 
 extern "C"
 {
- 
+
   void ImageCalibrationInit(RTC::Manager* manager)
   {
     coil::Properties profile(imagecalibration_spec);
@@ -250,7 +258,7 @@ extern "C"
                              RTC::Create<ImageCalibration>,
                              RTC::Delete<ImageCalibration>);
   }
-  
+
 };
 
 

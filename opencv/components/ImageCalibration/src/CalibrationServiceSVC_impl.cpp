@@ -1,7 +1,9 @@
-// -*-C++-*-
+﻿// -*-C++-*-
 /*!
  * @file  CalibrationServiceSVC_impl.cpp
  * @brief Service implementation code of CalibrationService.idl
+ *
+ * @author Noriaki Ando <n-ando@aist.go.jp>
  *
  */
 
@@ -12,7 +14,7 @@
 /*
  * Example implementational code for IDL interface ImageCalibService::CalibrationService
  */
-CalibrationServiceSVC_impl::CalibrationServiceSVC_impl()
+ImageCalibService_CalibrationServiceSVC_impl::ImageCalibService_CalibrationServiceSVC_impl()
   :m_imageList(0)
 {
   m_current_image_num = 0;
@@ -20,7 +22,7 @@ CalibrationServiceSVC_impl::CalibrationServiceSVC_impl()
 }
 
 
-CalibrationServiceSVC_impl::~CalibrationServiceSVC_impl()
+ImageCalibService_CalibrationServiceSVC_impl::~ImageCalibService_CalibrationServiceSVC_impl()
 {
   // Please add extra destructor code here.
 }
@@ -29,7 +31,7 @@ CalibrationServiceSVC_impl::~CalibrationServiceSVC_impl()
 /*
  * Methods corresponding to IDL attributes and operations
  */
-void CalibrationServiceSVC_impl::setImageNumber(CORBA::Short num)
+void ImageCalibService_CalibrationServiceSVC_impl::setImageNumber(::CORBA::Short num)
 {
   m_old_image_num = m_current_image_num;
   m_current_image_num = num;
@@ -43,7 +45,7 @@ void CalibrationServiceSVC_impl::setImageNumber(CORBA::Short num)
   return;
 }
 
-CORBA::Short CalibrationServiceSVC_impl::getImageNumber()
+::CORBA::Short ImageCalibService_CalibrationServiceSVC_impl::getImageNumber()
 {
   m_mutex.lock();
   CORBA::Short ret_num = m_current_image_num;
@@ -52,7 +54,7 @@ CORBA::Short CalibrationServiceSVC_impl::getImageNumber()
   return ret_num;
 }
 
-RTC::CameraImage* CalibrationServiceSVC_impl::captureCalibImage(CORBA::Short num)
+RTC::CameraImage* ImageCalibService_CalibrationServiceSVC_impl::captureCalibImage(::CORBA::Short num)
 {
   cv::Mat frame;
   std::string filename = "capture";
@@ -78,7 +80,7 @@ RTC::CameraImage* CalibrationServiceSVC_impl::captureCalibImage(CORBA::Short num
   return vl._retn();
 }
 
-RTC::CameraImage* CalibrationServiceSVC_impl::getCalibImage(CORBA::Short num)
+RTC::CameraImage* ImageCalibService_CalibrationServiceSVC_impl::getCalibImage(::CORBA::Short num)
 {
   ImageCalibService::ImageList_var list;
   RTC::CameraImage_var image;
@@ -88,7 +90,7 @@ RTC::CameraImage* CalibrationServiceSVC_impl::getCalibImage(CORBA::Short num)
   return image._retn();
 }
 
-ImageCalibService::ImageList* CalibrationServiceSVC_impl::getCalibImages()
+ImageCalibService::ImageList* ImageCalibService_CalibrationServiceSVC_impl::getCalibImages()
 {
   ImageCalibService::ImageList_var list;
   list = new ImageCalibService::ImageList(m_imageList);
@@ -96,7 +98,7 @@ ImageCalibService::ImageList* CalibrationServiceSVC_impl::getCalibImages()
   return list._retn();
 }
 
-CORBA::Boolean CalibrationServiceSVC_impl::removeCalibImage(CORBA::Short num)
+::CORBA::Boolean ImageCalibService_CalibrationServiceSVC_impl::removeCalibImage(::CORBA::Short num)
 {
   std::string filename = "capture";
   std::ostringstream oss;
@@ -131,7 +133,7 @@ CORBA::Boolean CalibrationServiceSVC_impl::removeCalibImage(CORBA::Short num)
   return ret;
 }
 
-RTC::CameraInfo CalibrationServiceSVC_impl::getCalibParameter()
+RTC::CameraInfo ImageCalibService_CalibrationServiceSVC_impl::getCalibParameter()
 {
   int i,j;
   RTC::CameraInfo cameraInfo = {{0.0},{0.0},0.0};
@@ -217,7 +219,7 @@ RTC::CameraInfo CalibrationServiceSVC_impl::getCalibParameter()
   return cameraInfo;
 }
 
-void CalibrationServiceSVC_impl::setCurrentImage(RTC::CameraImage* cameraimage)
+void ImageCalibService_CalibrationServiceSVC_impl::setCurrentImage(RTC::CameraImage* cameraimage)
 {
   int len = cameraimage->pixels.length();
   m_currentCameraImg.pixels.length(len);
@@ -226,13 +228,13 @@ void CalibrationServiceSVC_impl::setCurrentImage(RTC::CameraImage* cameraimage)
   memcpy((void *)&(m_currentCameraImg.pixels[0]), (void*)&(cameraimage->pixels[0]), len);
 }
 
-void CalibrationServiceSVC_impl::setCheckerSize(int width, int height)
+void ImageCalibService_CalibrationServiceSVC_impl::setCheckerSize(int width, int height)
 {
   m_checker_w = width;
   m_checker_h = height;
 }
 
-CORBA::Boolean CalibrationServiceSVC_impl::removeFile(std::string name)
+::CORBA::Boolean ImageCalibService_CalibrationServiceSVC_impl::removeFile(std::string name)
 {
   std::cout << "removeFile : " << name.c_str() << std::endl;
   if(remove(name.c_str()) != 0)
@@ -243,7 +245,7 @@ CORBA::Boolean CalibrationServiceSVC_impl::removeFile(std::string name)
   return true;
 }
 
-void CalibrationServiceSVC_impl::outUndistortedImage(
+void ImageCalibService_CalibrationServiceSVC_impl::outUndistortedImage(
 				cv::Mat cameraMatrix, cv::Mat distCoeffs)
 {
   cv::Mat gray, undistorted;
@@ -267,7 +269,7 @@ void CalibrationServiceSVC_impl::outUndistortedImage(
   return;
 }
 
-void CalibrationServiceSVC_impl::outYamlFile(
+void ImageCalibService_CalibrationServiceSVC_impl::outYamlFile(
 				cv::Mat cameraMatrix, cv::Mat distCoeffs)
 {
   cv::FileStorage fs("camera.yml", cv::FileStorage::WRITE);
@@ -283,7 +285,7 @@ void CalibrationServiceSVC_impl::outYamlFile(
   return;
 }
 
-std::string CalibrationServiceSVC_impl::getSavePath()
+std::string ImageCalibService_CalibrationServiceSVC_impl::getSavePath()
 {
   std::string path;
   
@@ -300,8 +302,8 @@ std::string CalibrationServiceSVC_impl::getSavePath()
   path = "/tmp/";
 #endif
 
-	std::cout << "getEnvironTmpPath : " << path.c_str() << std::endl;
-	return path;
+  std::cout << "getEnvironTmpPath : " << path.c_str() << std::endl;
+  return path;
 }
 
 // End of example implementational code
