@@ -1,0 +1,9 @@
+Architecture: amd64
+Description: Image subtraction conponent
+Maintainer: Noriaki;Ando;<n-ando@aist.go.jp>
+Package: imagesubtraction
+Priority: optional
+Section: devel
+Version: 1.2.3
+Installed-Size: 679
+
