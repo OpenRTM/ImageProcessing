@@ -1,2 +1,0 @@
-/usr/share/openrtm-1.2/components/c++/opencv-rtcs/ImageSubtraction/ImageSubtraction.so
-/usr/share/openrtm-1.2/components/c++/opencv-rtcs/ImageSubtraction/ImageSubtractionComp
