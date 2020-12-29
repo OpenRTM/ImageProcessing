@@ -1,0 +1,54 @@
+# ImageSubtraction CMake config file
+#
+# This file sets the following variables:
+# ImageSubtraction_FOUND - Always TRUE.
+# ImageSubtraction_INCLUDE_DIRS - Directories containing the ImageSubtraction include files.
+# ImageSubtraction_IDL_DIRS - Directories containing the ImageSubtraction IDL files.
+# ImageSubtraction_LIBRARIES - Libraries needed to use ImageSubtraction.
+# ImageSubtraction_DEFINITIONS - Compiler flags for ImageSubtraction.
+# ImageSubtraction_VERSION - The version of ImageSubtraction found.
+# ImageSubtraction_VERSION_MAJOR - The major version of ImageSubtraction found.
+# ImageSubtraction_VERSION_MINOR - The minor version of ImageSubtraction found.
+# ImageSubtraction_VERSION_REVISION - The revision version of ImageSubtraction found.
+# ImageSubtraction_VERSION_CANDIDATE - The candidate version of ImageSubtraction found.
+
+message(STATUS "Found ImageSubtraction-@PROJECT_VERSION@")
+set(ImageSubtraction_FOUND TRUE)
+
+find_package(<dependency> REQUIRED)
+
+#set(ImageSubtraction_INCLUDE_DIRS
+#    "@CMAKE_INSTALL_PREFIX@/include/@PROJECT_NAME_LOWER@-@PROJECT_VERSION_MAJOR@"
+#    ${<dependency>_INCLUDE_DIRS}
+#    )
+#
+#set(ImageSubtraction_IDL_DIRS
+#    "@CMAKE_INSTALL_PREFIX@/include/@PROJECT_NAME_LOWER@-@PROJECT_VERSION_MAJOR@/idl")
+set(ImageSubtraction_INCLUDE_DIRS
+    "@CMAKE_INSTALL_PREFIX@/include/@CPACK_PACKAGE_FILE_NAME@"
+    ${<dependency>_INCLUDE_DIRS}
+    )
+set(ImageSubtraction_IDL_DIRS
+    "@CMAKE_INSTALL_PREFIX@/include/@CPACK_PACKAGE_FILE_NAME@/idl")
+
+
+if(WIN32)
+    set(ImageSubtraction_LIBRARIES
+        "@CMAKE_INSTALL_PREFIX@/@LIB_INSTALL_DIR@/@CMAKE_SHARED_LIBRARY_PREFIX@@PROJECT_NAME_LOWER@@CMAKE_STATIC_LIBRARY_SUFFIX@"
+        ${<dependency>_LIBRARIES}
+        )
+else(WIN32)
+    set(ImageSubtraction_LIBRARIES
+        "@CMAKE_INSTALL_PREFIX@/@LIB_INSTALL_DIR@/@CMAKE_SHARED_LIBRARY_PREFIX@@PROJECT_NAME_LOWER@@CMAKE_SHARED_LIBRARY_SUFFIX@"
+        ${<dependency>_LIBRARIES}
+        )
+endif(WIN32)
+
+set(ImageSubtraction_DEFINITIONS ${<dependency>_DEFINITIONS})
+
+set(ImageSubtraction_VERSION @PROJECT_VERSION@)
+set(ImageSubtraction_VERSION_MAJOR @PROJECT_VERSION_MAJOR@)
+set(ImageSubtraction_VERSION_MINOR @PROJECT_VERSION_MINOR@)
+set(ImageSubtraction_VERSION_REVISION @PROJECT_VERSION_REVISION@)
+set(ImageSubtraction_VERSION_CANDIDATE @PROJECT_VERSION_CANDIDATE@)
+
