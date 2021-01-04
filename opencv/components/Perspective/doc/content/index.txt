@@ -1,4 +1,4 @@
-PerspectiveName - English
+﻿PerspectiveName - English
 ========================
 
 .. toctree::
