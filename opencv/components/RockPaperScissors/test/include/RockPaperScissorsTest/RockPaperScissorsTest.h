@@ -1,6 +1,6 @@
 ﻿// -*- C++ -*-
 /*!
- * @file  RockPaperScissors.h
+ * @file  RockPaperScissorsTest.h
  * @brief RockpaperScissors check compoenet
  * @date  $Date$
  *
@@ -9,40 +9,27 @@
  * $Id$
  */
 
-#ifndef ROCKPAPERSCISSORS_H
-#define ROCKPAPERSCISSORS_H
+#ifndef ROCKPAPERSCISSORS_TEST__H
+#define ROCKPAPERSCISSORS_TEST_H
 
 #include <rtm/idl/BasicDataTypeSkel.h>
 #include <rtm/idl/ExtendedDataTypesSkel.h>
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
-/* OpenCVHeadファイルのIncluding */
-#include <opencv2/opencv.hpp>
-
-#include <string>
-#include "Labeling.h"
-
-/* 肌色抽出用閾値：上限、下限の閾値設定 */
-#define HMAX 20
-#define HMIN 0
-#define SMAX 255*1
-#define SMIN 255*0.2
-#define VMAX 255*1.0
-#define VMIN 255*0
-
-/* 無視する領域サイズ(ラベリング用) */
-#define IGNORE_SIZE 1000	
-
 // Service implementation headers
 // <rtc-template block="service_impl_h">
+#include "InterfaceDataTypesSVC_impl.h"
+#include "BasicDataTypeSVC_impl.h"
 
 // </rtc-template>
 
 // Service Consumer stub headers
 // <rtc-template block="consumer_stub_h">
-#include "InterfaceDataTypesStub.h"
-#include "BasicDataTypeStub.h"
 
+// </rtc-template>
+
+// Service Consumer stub headers
+// <rtc-template block="port_stub_h">
 // </rtc-template>
 
 #include <rtm/Manager.h>
@@ -52,11 +39,11 @@
 #include <rtm/DataOutPort.h>
 
 /*!
- * @class RockPaperScissors
+ * @class RockPaperScissorsTest
  * @brief RockpaperScissors check compoenet
  *
  */
-class RockPaperScissors
+class RockPaperScissorsTest
   : public RTC::DataFlowComponentBase
 {
  public:
@@ -64,12 +51,12 @@ class RockPaperScissors
    * @brief constructor
    * @param manager Maneger Object
    */
-  RockPaperScissors(RTC::Manager* manager);
+  RockPaperScissorsTest(RTC::Manager* manager);
 
   /*!
    * @brief destructor
    */
-  ~RockPaperScissors();
+  ~RockPaperScissorsTest();
 
   // <rtc-template block="public_attribute">
   
@@ -82,6 +69,7 @@ class RockPaperScissors
   /***
    *
    * The initialize action (on CREATED->ALIVE transition)
+   * formaer rtc_init_entry() 
    *
    * @return RTC::ReturnCode_t
    * 
@@ -92,6 +80,7 @@ class RockPaperScissors
   /***
    *
    * The finalize action (on ALIVE->END transition)
+   * formaer rtc_exiting_entry()
    *
    * @return RTC::ReturnCode_t
    * 
@@ -102,6 +91,7 @@ class RockPaperScissors
   /***
    *
    * The startup action when ExecutionContext startup
+   * former rtc_starting_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -114,6 +104,7 @@ class RockPaperScissors
   /***
    *
    * The shutdown action when ExecutionContext stop
+   * former rtc_stopping_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -126,6 +117,7 @@ class RockPaperScissors
   /***
    *
    * The activated action (Active state entry action)
+   * former rtc_active_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -138,6 +130,7 @@ class RockPaperScissors
   /***
    *
    * The deactivated action (Active state exit action)
+   * former rtc_active_exit()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -150,6 +143,7 @@ class RockPaperScissors
   /***
    *
    * The execution action that is invoked periodically
+   * former rtc_active_do()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -162,6 +156,7 @@ class RockPaperScissors
   /***
    *
    * The aborting action when main logic error occurred.
+   * former rtc_aborting_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -174,6 +169,7 @@ class RockPaperScissors
   /***
    *
    * The error action in ERROR state
+   * former rtc_error_do()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -186,6 +182,7 @@ class RockPaperScissors
   /***
    *
    * The reset action that is invoked resetting
+   * This is same but different the former rtc_init_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -198,6 +195,7 @@ class RockPaperScissors
   /***
    *
    * The state update action that is invoked after onExecute() action
+   * no corresponding operation exists in OpenRTm-aist-0.2.0
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -210,6 +208,7 @@ class RockPaperScissors
   /***
    *
    * The action that is invoked when execution context's rate is changed
+   * no corresponding operation exists in OpenRTm-aist-0.2.0
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -284,24 +283,24 @@ class RockPaperScissors
 
   // DataInPort declaration
   // <rtc-template block="inport_declare">
-  RTC::CameraImage m_img_input;
+  RTC::CameraImage m_img_output;
   /*!
    */
-  RTC::InPort<RTC::CameraImage> m_img_inputIn;
+  RTC::InPort<RTC::CameraImage> m_img_outputIn;
+  RTC::TimedString m_result;
+  /*!
+   */
+  RTC::InPort<RTC::TimedString> m_resultIn;
   
   // </rtc-template>
 
 
   // DataOutPort declaration
   // <rtc-template block="outport_declare">
-  RTC::CameraImage m_img_output;
+  RTC::CameraImage m_img_input;
   /*!
    */
-  RTC::OutPort<RTC::CameraImage> m_img_outputOut;
-  RTC::TimedString m_result;
-  /*!
-   */
-  RTC::OutPort<RTC::TimedString> m_resultOut;
+  RTC::OutPort<RTC::CameraImage> m_img_inputOut;
   
   // </rtc-template>
 
@@ -328,35 +327,13 @@ class RockPaperScissors
   // <rtc-template block="private_operation">
   
   // </rtc-template>
-  
-  void extractSkinColor( void );
-  void interpolate( void );
-  int  pickupMaxArea( void );
-  void createConvexHull(int handarea, cv::Mat &pointMatrix, cv::Mat &hullMatrix );
-  void drawConvexHull(cv::Mat &handpoint, cv::Mat &hull, int hullcount);
-  int  calcConvexHullArea(cv::Mat &handpoint, cv::Mat &hull, int hullcount);
-  void decide( int handarea, int hullarea );
-  
-  int dummy;
-  std::string m_prev_judge;   /* 前回の判定　グー / チョキ / パー */
-
-  cv::Mat m_frame_image;
-  cv::Mat m_image_buff;
-  cv::Mat m_output_buff;
-  cv::Mat m_hsv_buff;
-  cv::Mat m_convexHull_buff;
-  cv::Mat m_skin_buff;
-  cv::Mat m_temp_buff;
-  cv::Mat m_label_buff;
-
-  cv::VideoCapture capture;
 
 };
 
 
 extern "C"
 {
-  DLL_EXPORT void RockPaperScissorsInit(RTC::Manager* manager);
+  DLL_EXPORT void RockPaperScissorsTestInit(RTC::Manager* manager);
 };
 
-#endif // ROCKPAPERSCISSORS_H
+#endif // ROCKPAPERSCISSORS_TEST_H

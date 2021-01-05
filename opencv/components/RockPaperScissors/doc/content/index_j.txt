@@ -1,4 +1,4 @@
-RockPaperScissors - 日本語
+﻿RockPaperScissors - 日本語
 =======================
 
 

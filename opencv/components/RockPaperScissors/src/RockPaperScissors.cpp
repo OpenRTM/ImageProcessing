@@ -1,8 +1,14 @@
-// -*- C++ -*-
+﻿// -*- C++ -*-
 /*!
  * @file  RockPaperScissors.cpp
  * @brief RockpaperScissors check compoenet
  * @date $Date$
+ *
+ * This RT-Component source code is using the code in 
+ * "OpenCVプログラミングブック" (OpenCV Programming book). 
+ * Please refer: https://book.mynavi.jp/support/pc/opencv11/#F_DWN
+ *
+ * @author Noriaki Ando <n-ando@aist.go.jp>
  *
  * $Id$
  */
@@ -21,9 +27,9 @@ static const char* rockpaperscissors_spec[] =
     "implementation_id", "RockPaperScissors",
     "type_name",         "RockPaperScissors",
     "description",       "RockpaperScissors check compoenet",
-    "version",           "1.2.0",
+    "version",           "1.2.3",
     "vendor",            "AIST",
-    "category",          "Category",
+    "category",          "opencv-rtcs",
     "activity_type",     "PERIODIC",
     "kind",              "DataFlowComponent",
     "max_instance",      "1",
@@ -38,6 +44,7 @@ static const char* rockpaperscissors_spec[] =
     "conf.default.paper_min", "0.5",
     "conf.default.iterations", "4",
     "conf.default.out_mode", "1",
+
     // Widget
     "conf.__widget__.rock_max", "text",
     "conf.__widget__.rock_min", "text",
@@ -55,26 +62,40 @@ static const char* rockpaperscissors_spec[] =
     "conf.__constraints__.paper_max", "0<=x<=1.0",
     "conf.__constraints__.paper_min", "0<=x<=1.0",
     "conf.__constraints__.out_mode", "(0,1)",
+
+    "conf.__type__.rock_max", "double",
+    "conf.__type__.rock_min", "double",
+    "conf.__type__.scissor_max", "double",
+    "conf.__type__.scissor_min", "double",
+    "conf.__type__.paper_max", "double",
+    "conf.__type__.paper_min", "double",
+    "conf.__type__.iterations", "int",
+    "conf.__type__.out_mode", "int",
+
     ""
   };
 // </rtc-template>
 
-Label *createLabeling(){
-	return new LabelingBS();
+Label *createLabeling()
+{
+  return new LabelingBS();
 }
 
 int exec(Label *label, cv::Mat target, cv::Mat result,
-		 const bool is_sort_region,int region_size_min){
-	return label->Exec((unsigned char *)target.data,(short *)result.data,
+		 const bool is_sort_region,int region_size_min)
+{
+  return label->Exec((unsigned char *)target.data,(short *)result.data,
 		target.size().width, target.size().height, is_sort_region, region_size_min);
 }
 
-int getNumOfResultRegions(Label *label){
-	return label->GetNumOfResultRegions();
+int getNumOfResultRegions(Label *label)
+{
+  return label->GetNumOfResultRegions();
 }
 
-void releaseLabeling(Label *label){
-	delete label;
+void releaseLabeling(Label *label)
+{
+  delete label;
 }
 
 /*!
@@ -107,17 +128,17 @@ RTC::ReturnCode_t RockPaperScissors::onInitialize()
   // <rtc-template block="registration">
   // Set InPort buffers
   addInPort("image_input", m_img_inputIn);
-  
+
   // Set OutPort buffer
   addOutPort("image_output", m_img_outputOut);
   addOutPort("result", m_resultOut);
-  
+
   // Set service provider to Ports
-  
+
   // Set service consumers to Ports
-  
+
   // Set CORBA Service Ports
-  
+
   // </rtc-template>
 
   // <rtc-template block="bind_config">
@@ -131,7 +152,7 @@ RTC::ReturnCode_t RockPaperScissors::onInitialize()
   bindParameter("iterations", m_iterations, "4");
   bindParameter("out_mode", m_out_mode, "1");
   // </rtc-template>
-  
+
   return RTC::RTC_OK;
 }
 
@@ -159,8 +180,6 @@ RTC::ReturnCode_t RockPaperScissors::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t RockPaperScissors::onActivated(RTC::UniqueId ec_id)
 {
-
-
   m_prev_judge = "";
 
   return RTC::RTC_OK;
@@ -169,35 +188,33 @@ RTC::ReturnCode_t RockPaperScissors::onActivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t RockPaperScissors::onDeactivated(RTC::UniqueId ec_id)
 {
-  
-
   if (!m_image_buff.empty())
   {
-	  m_image_buff.release();
+    m_image_buff.release();
   }
   if (!m_hsv_buff.empty())
   {
-	  m_hsv_buff.release();
+    m_hsv_buff.release();
   }
   if (!m_convexHull_buff.empty())
   {
-	  m_convexHull_buff.release();
+    m_convexHull_buff.release();
   }
   if (!m_skin_buff.empty())
   {
-	  m_skin_buff.release();
+    m_skin_buff.release();
   }
   if (!m_temp_buff.empty())
   {
-	  m_temp_buff.release();
+    m_temp_buff.release();
   }
   if (!m_label_buff.empty())
   {
-	  m_label_buff.release();
+    m_label_buff.release();
   }
   if (!m_output_buff.empty())
   {
-	  m_output_buff.release();
+    m_output_buff.release();
   }
 
   return RTC::RTC_OK;
@@ -206,22 +223,18 @@ RTC::ReturnCode_t RockPaperScissors::onDeactivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t RockPaperScissors::onExecute(RTC::UniqueId ec_id)
 {
-	
   /* 新データのチェック */
   if(m_img_inputIn.isNew()){
     /* データの読み込み */
     m_img_inputIn.read();
 
-	m_image_buff.create(cv::Size(m_img_input.width, m_img_input.height), CV_8UC3);
-	m_hsv_buff.create(cv::Size(m_img_input.width, m_img_input.height), CV_8UC3);
-	m_convexHull_buff.create(cv::Size(m_img_input.width, m_img_input.height), CV_8UC3);
-	m_skin_buff.create(cv::Size(m_img_input.width, m_img_input.height), CV_8UC1);
-	m_temp_buff.create(cv::Size(m_img_input.width, m_img_input.height), CV_8UC1);
-	m_label_buff.create(cv::Size(m_img_input.width, m_img_input.height), CV_16SC1);
-	m_output_buff.create(cv::Size(m_img_input.width, m_img_input.height), CV_8UC3);
-
-	
-
+    m_image_buff.create(cv::Size(m_img_input.width, m_img_input.height), CV_8UC3);
+    m_hsv_buff.create(cv::Size(m_img_input.width, m_img_input.height), CV_8UC3);
+    m_convexHull_buff.create(cv::Size(m_img_input.width, m_img_input.height), CV_8UC3);
+    m_skin_buff.create(cv::Size(m_img_input.width, m_img_input.height), CV_8UC1);
+    m_temp_buff.create(cv::Size(m_img_input.width, m_img_input.height), CV_8UC1);
+    m_label_buff.create(cv::Size(m_img_input.width, m_img_input.height), CV_16SC1);
+    m_output_buff.create(cv::Size(m_img_input.width, m_img_input.height), CV_8UC3);
 	
     /* InPortの映像の取得 */
     memcpy(m_image_buff.data,(void *)&(m_img_input.pixels[0]),m_img_input.pixels.length());
@@ -232,8 +245,8 @@ RTC::ReturnCode_t RockPaperScissors::onExecute(RTC::UniqueId ec_id)
 	
     /* ラベリングを行う */
     Label *labeling = createLabeling();
-	cv::Mat pointMatrix;  /* 手領域用行列 */
-	cv::Mat hullMatrix;   /* ConvexHull用行列 */
+    cv::Mat pointMatrix;  /* 手領域用行列 */
+    cv::Mat hullMatrix;   /* ConvexHull用行列 */
 
     exec( labeling, m_skin_buff, m_label_buff, true, IGNORE_SIZE );
 	
@@ -243,76 +256,53 @@ RTC::ReturnCode_t RockPaperScissors::onExecute(RTC::UniqueId ec_id)
       int handarea;     /* 手領域の面積 */
       int hullarea;     /* ConvexHull内の面積 */
       int hullcount;    /* ConvexHullの頂点の数 */
-      //std::vector<cv::Point> handpoint; /* 手領域内の点の座標配列 */
-      //std::vector<int> hull;        /* ConvexHullの頂点のhandpointにおけるindex番号 */
-      
 
       /* 最大領域(手領域)の抽出を行う */
       handarea = pickupMaxArea();
 
       /* ConvexHullを生成する */
       createConvexHull( handarea, pointMatrix, hullMatrix );
-	  
-      //hullcount = hullMatrix.cols;
-	  hullcount = hullMatrix.rows;
+      hullcount = hullMatrix.rows;
 
       /* ConvexHullを描画する */
-	  drawConvexHull(pointMatrix, hullMatrix, hullcount);
+      drawConvexHull(pointMatrix, hullMatrix, hullcount);
 	 
       /* ConvexHull内の面積を求める */
-	  hullarea = calcConvexHullArea(pointMatrix, hullMatrix, hullcount);
+      hullarea = calcConvexHullArea(pointMatrix, hullMatrix, hullcount);
 	  
       /* ジャンケンの判定を行う */
       decide( handarea, hullarea );
 
-      /* メモリを解放する */
-      
-	  
-
     } else {
 
       /* 画像を初期化する */
-		m_convexHull_buff = cv::Mat::zeros(cv::Size(m_img_input.width, m_img_input.height), CV_8UC3);
+      m_convexHull_buff = cv::Mat::zeros(cv::Size(m_img_input.width, m_img_input.height), CV_8UC3);
     }
 	
     releaseLabeling( labeling );
 	
-
-
-    /* 左上が原点の場合 */
-    //cv::flip( m_skin_buff, m_skin_buff, 0 );
-	
-
-    /* 左上が原点の場合 */
-    //cv::flip( m_convexHull_buff, m_convexHull_buff, 0 );
-	
-	std::vector<cv::Mat> tmp;
-	tmp.push_back(m_skin_buff);
-	tmp.push_back(m_skin_buff);
-	tmp.push_back(m_skin_buff);
-	cv::Mat test_mat = cv::Mat(cv::Size(m_img_input.width, m_img_input.height), CV_8UC3);
-	cv::merge(tmp, test_mat);
+    std::vector<cv::Mat> tmp;
+    tmp.push_back(m_skin_buff);
+    tmp.push_back(m_skin_buff);
+    tmp.push_back(m_skin_buff);
+    cv::Mat test_mat = cv::Mat(cv::Size(m_img_input.width, m_img_input.height), CV_8UC3);
+    cv::merge(tmp, test_mat);
 	
     /* 画像データのサイズ取得 */
-	int len = (m_convexHull_buff.channels() * m_convexHull_buff.size().width * m_convexHull_buff.size().height);
-	
+    int len = (m_convexHull_buff.channels() * m_convexHull_buff.size().width * m_convexHull_buff.size().height);
     m_img_output.pixels.length(len);
 
     /* 該当のイメージをMemCopyする */
-	memcpy((void *)&(m_img_output.pixels[0]), m_convexHull_buff.data, len);
-	
+    memcpy((void *)&(m_img_output.pixels[0]), m_convexHull_buff.data, len);
 
     /* 反転した画像データをOutPortから出力する */
-	m_img_output.width = m_image_buff.size().width;
-	m_img_output.height = m_image_buff.size().height;
+    m_img_output.width = m_image_buff.size().width;
+    m_img_output.height = m_image_buff.size().height;
 	
     m_img_outputOut.write();
+  }
 
-	
-
-    }
-
-    return RTC::RTC_OK;
+  return RTC::RTC_OK;
 }
 
 /*
@@ -355,7 +345,7 @@ RTC::ReturnCode_t RockPaperScissors::onRateChanged(RTC::UniqueId ec_id)
 //
 void RockPaperScissors::extractSkinColor( void )
 {
-	cv::Vec3b color;   /* HSV表色系で表した色 */
+  cv::Vec3b color;   /* HSV表色系で表した色 */
   unsigned char h;  /* H成分 */
   unsigned char s;  /* S成分 */
   unsigned char v;  /* V成分 */
@@ -366,9 +356,9 @@ void RockPaperScissors::extractSkinColor( void )
   /* 肌色抽出 */
   for (int x = 0; x < m_hsv_buff.size().width; x++)
   {
-	  for (int y = 0; y < m_hsv_buff.size().height; y++)
+    for (int y = 0; y < m_hsv_buff.size().height; y++)
     {
-		color = m_hsv_buff.at<cv::Vec3b>(cv::Point(x, y));
+      color = m_hsv_buff.at<cv::Vec3b>(cv::Point(x, y));
       h = color.val[0];
       s = color.val[1];
       v = color.val[2];
@@ -378,11 +368,10 @@ void RockPaperScissors::extractSkinColor( void )
           v <= VMAX && v >= VMIN )
       {
         /* 肌色の場合 */
-		  m_skin_buff.at<uchar>(cv::Point(x, y)) = 255;
-        //cvSetReal2D( m_skin_buff, y, x, 255 );
+        m_skin_buff.at<uchar>(cv::Point(x, y)) = 255;
+
       } else {
-		  m_skin_buff.at<uchar>(cv::Point(x, y)) = 0;
-        //cvSetReal2D( m_skin_buff, y, x, 0 );
+        m_skin_buff.at<uchar>(cv::Point(x, y)) = 0;
       }
     }
   }
@@ -412,17 +401,17 @@ int RockPaperScissors::pickupMaxArea( void )
 
   for (int x = 0; x < m_label_buff.size().width; x++)
   {
-	  for (int y = 0; y < m_label_buff.size().height; y++)
+    for (int y = 0; y < m_label_buff.size().height; y++)
     {
-		if (m_label_buff.at<short>(cv::Point(x, y)) == 1)
+      if (m_label_buff.at<short>(cv::Point(x, y)) == 1)
       {
         /* 最大領域だった場合 */
         handarea++;
-		m_convexHull_buff.at<cv::Vec3b>(cv::Point(x, y)) = cv::Vec3b(255, 255, 255);
+        m_convexHull_buff.at<cv::Vec3b>(cv::Point(x, y)) = cv::Vec3b(255, 255, 255);
         
       } else {
-		  m_skin_buff.at<uchar>(cv::Point(x, y)) = 0;
-		  m_convexHull_buff.at< cv::Vec3b>(cv::Point(x, y)) = cv::Vec3b(0, 0, 0);
+        m_skin_buff.at<uchar>(cv::Point(x, y)) = 0;
+        m_convexHull_buff.at< cv::Vec3b>(cv::Point(x, y)) = cv::Vec3b(0, 0, 0);
       }
     }
   }
@@ -444,33 +433,20 @@ void RockPaperScissors::createConvexHull(int handarea, cv::Mat &pointMatrix, cv:
   int i=0;
 
   /* ConvexHullを計算するために必要な行列を生成する */
-  
-  //*handpoint=( cv::Point * )malloc( sizeof( CvPoint ) * handarea );
-	//*hull = ( int * )malloc( sizeof( int ) * handarea );
-	
   pointMatrix.create(cv::Point(handarea, 1), CV_32SC2);
   hullMatrix.create(cv::Point(handarea, 1), CV_32SC1);
   
-
-  
   for( int x = 0; x < m_skin_buff.size().width; x++ )
   {
-	  for (int y = 0; y < m_skin_buff.size().height; y++)
+    for (int y = 0; y < m_skin_buff.size().height; y++)
     {
-		if (m_skin_buff.at<uchar>(cv::Point(x,y)) == 255)
+      if (m_skin_buff.at<uchar>(cv::Point(x,y)) == 255)
       {
-		  pointMatrix.at<cv::Vec2i>(i) = cv::Vec2i(x, y);
-		  
-		  //hull[i] = 0;
+        pointMatrix.at<cv::Vec2i>(i) = cv::Vec2i(x, y);
         i++;
       }
     }
   }
-
-  
-  //pointMatrix.copyTo(handpoint);
-  //hullMatrix.copyTo(hull);
-  
 
   /* ConvexHullを生成する */
 #if CV_MAJOR_VERSION < 3
@@ -490,14 +466,11 @@ void RockPaperScissors::createConvexHull(int handarea, cv::Mat &pointMatrix, cv:
 //
 void RockPaperScissors::drawConvexHull(cv::Mat &handpoint, cv::Mat &hull, int hullcount)
 {
-	
-	cv::Point pt0 = handpoint.at<cv::Vec2i>(hull.at<long>(hullcount - 1));
+  cv::Point pt0 = handpoint.at<cv::Vec2i>(hull.at<long>(hullcount - 1));
 	
   for( int i = 0; i < hullcount; i++ )
   {
-	  
-	  cv::Point pt = handpoint.at<cv::Vec2i>(hull.at<long>(i));
-	  
+    cv::Point pt = handpoint.at<cv::Vec2i>(hull.at<long>(i));
     cv::line( m_convexHull_buff, pt0, pt, CV_RGB( 0, 255, 0 ) );
     pt0 = pt;
   }
@@ -517,26 +490,19 @@ void RockPaperScissors::drawConvexHull(cv::Mat &handpoint, cv::Mat &hull, int hu
 int RockPaperScissors::calcConvexHullArea(cv::Mat &handpoint, cv::Mat &hull, int hullcount)
 {
   /* ConvexHullの頂点からなる行列を生成 */
-  //cv::Point *hullpoint = ( cv::Point * )malloc( sizeof( CvPoint ) * hullcount );
-	//std::vector<cv::Point> hullpoint;
-
-  
-	cv::Mat hMatrix;
-	hMatrix.create(cv::Point(1, hullcount), CV_32SC2);
+  cv::Mat hMatrix;
+  hMatrix.create(cv::Point(1, hullcount), CV_32SC2);
 
   for( int i = 0; i < hullcount; i++ )
   {
-	  hMatrix.at<cv::Vec2i>(i) = handpoint.at<cv::Vec2i>(hull.at<long>(i));
+    hMatrix.at<cv::Vec2i>(i) = handpoint.at<cv::Vec2i>(hull.at<long>(i));
   }
  
-  //hMatrix.copyTo(hullpoint);
-  
-
   /* ConvexHull内の点の数を数える */
   int hullarea = 0;
   for( int x = 0; x < m_convexHull_buff.size().width; x++ )
   {
-	  for (int y = 0; y < m_convexHull_buff.size().height; y++)
+    for (int y = 0; y < m_convexHull_buff.size().height; y++)
     {
       if( cv::pointPolygonTest( hMatrix, cv::Point2f( x, y ), 0 ) > 0)
       {
@@ -544,7 +510,6 @@ int RockPaperScissors::calcConvexHullArea(cv::Mat &handpoint, cv::Mat &hull, int
       }
     }
   }
-
 
   return hullarea;
 }
@@ -585,8 +550,7 @@ void RockPaperScissors::decide( int handarea, int hullarea )
      */
     if( judge != err_judge && m_prev_judge != judge && hullarea >= 10000 )
     {
-      //printf( "Ratio = %lf  : 判定領域の大きさ = %d\n", ratio,  hullarea );
-	  printf("Ratio = %lf  : Size of hand region = %d\n", ratio, hullarea);
+      printf("Ratio = %lf  : Size of hand region = %d\n", ratio, hullarea);
       printf( "%s\n", judge.c_str() );
       m_prev_judge = judge;
 
@@ -597,8 +561,7 @@ void RockPaperScissors::decide( int handarea, int hullarea )
   else
   {
     /* すべての結果を出力する */
-    //printf( "Ratio = %lf  : 判定領域の大きさ = %d\n", ratio,  hullarea );
-	 printf("Ratio = %lf  : Size of hand region = %d\n", ratio, hullarea);
+    printf("Ratio = %lf  : Size of hand region = %d\n", ratio, hullarea);
     printf( "%s\n", judge.c_str() );
   }
 }
@@ -606,7 +569,7 @@ void RockPaperScissors::decide( int handarea, int hullarea )
 
 extern "C"
 {
- 
+
   void RockPaperScissorsInit(RTC::Manager* manager)
   {
     coil::Properties profile(rockpaperscissors_spec);
@@ -614,7 +577,7 @@ extern "C"
                              RTC::Create<RockPaperScissors>,
                              RTC::Delete<RockPaperScissors>);
   }
-  
+
 };
 
 
