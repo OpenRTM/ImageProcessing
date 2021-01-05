@@ -4,6 +4,10 @@
  * @brief Rotate image component
  * @date $Date$
  *
+ * This RT-Component source code is using the code in
+ * "OpenCVプログラミングブック" (OpenCV Programming book).
+ * Please refer: https://book.mynavi.jp/support/pc/opencv11/#F_DWN
+ *
  * @author Noriaki Ando <n-ando@aist.go.jp>
  *
  * $Id$
