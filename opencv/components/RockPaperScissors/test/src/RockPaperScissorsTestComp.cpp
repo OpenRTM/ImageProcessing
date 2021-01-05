@@ -1,6 +1,6 @@
 ﻿// -*- C++ -*-
 /*!
- * @file RockPaperScissorsComp.cpp
+ * @file RockPaperScissorsTestComp.cpp
  * @brief Standalone component
  * @date $Date$
  *
@@ -13,16 +13,16 @@
 #include <iostream>
 #include <string>
 #include <stdlib.h>
-#include "RockPaperScissors.h"
+#include "RockPaperScissorsTest.h"
 
 
 void MyModuleInit(RTC::Manager* manager)
 {
-  RockPaperScissorsInit(manager);
+  RockPaperScissorsTestInit(manager);
   RTC::RtcBase* comp;
 
   // Create a component
-  comp = manager->createComponent("RockPaperScissors");
+  comp = manager->createComponent("RockPaperScissorsTest");
 
   if (comp==NULL)
   {
@@ -77,6 +77,9 @@ int main (int argc, char** argv)
 {
   RTC::Manager* manager;
   manager = RTC::Manager::init(argc, argv);
+
+  // Initialize manager
+  manager->init(argc, argv);
 
   // Set module initialization proceduer
   // This procedure will be invoked in activateManager() function.

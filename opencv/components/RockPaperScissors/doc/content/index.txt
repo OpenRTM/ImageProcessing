@@ -1,4 +1,4 @@
-RockPaperScissorsName - English
+﻿RockPaperScissorsName - English
 ========================
 
 .. toctree::
