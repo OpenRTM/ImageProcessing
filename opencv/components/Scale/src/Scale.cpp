@@ -1,8 +1,14 @@
-// -*- C++ -*-
+﻿// -*- C++ -*-
 /*!
  * @file  Scale.cpp
  * @brief Scale image component
  * @date $Date$
+ *
+ * This RT-Component source code is using the code in
+ * "OpenCVプログラミングブック" (OpenCV Programming book).
+ * Please refer: https://book.mynavi.jp/support/pc/opencv11/#F_DWN
+ *
+ * @author Noriaki Ando <n-ando@aist.go.jp>
  *
  * $Id$
  */
@@ -16,9 +22,9 @@ static const char* scale_spec[] =
     "implementation_id", "Scale",
     "type_name",         "Scale",
     "description",       "Scale image component",
-    "version",           "1.2.0",
+    "version",           "1.2.3",
     "vendor",            "AIST",
-    "category",          "Category",
+    "category",          "opencv-rtcs",
     "activity_type",     "PERIODIC",
     "kind",              "DataFlowComponent",
     "max_instance",      "1",
@@ -27,10 +33,15 @@ static const char* scale_spec[] =
     // Configuration variables
     "conf.default.output_scale_x", "1.0",
     "conf.default.output_scale_y", "1.0",
+
     // Widget
     "conf.__widget__.output_scale_x", "text",
     "conf.__widget__.output_scale_y", "text",
     // Constraints
+
+    "conf.__type__.output_scale_x", "double",
+    "conf.__type__.output_scale_y", "double",
+
     ""
   };
 // </rtc-template>
@@ -64,25 +75,24 @@ RTC::ReturnCode_t Scale::onInitialize()
   // <rtc-template block="registration">
   // Set InPort buffers
   addInPort("original_image", m_image_origIn);
-  
+
   // Set OutPort buffer
   addOutPort("output_image", m_image_outputOut);
-  
+
   // Set service provider to Ports
-  
+
   // Set service consumers to Ports
-  
+
   // Set CORBA Service Ports
-  
+
   // </rtc-template>
 
   // <rtc-template block="bind_config">
   // Bind variables and configuration variable
   bindParameter("output_scale_x", m_scale_x, "1.0");
   bindParameter("output_scale_y", m_scale_y, "1.0");
-
   // </rtc-template>
-  
+
   return RTC::RTC_OK;
 }
 
@@ -110,15 +120,12 @@ RTC::ReturnCode_t Scale::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Scale::onActivated(RTC::UniqueId ec_id)
 {
-  
   return RTC::RTC_OK;
 }
 
 
 RTC::ReturnCode_t Scale::onDeactivated(RTC::UniqueId ec_id)
 {
-
-
   return RTC::RTC_OK;
 }
 
@@ -133,24 +140,19 @@ RTC::ReturnCode_t Scale::onExecute(RTC::UniqueId ec_id)
     m_image_origIn.read();
 
     // Anternative actions
-
-    
-	cv::Mat m_image_buff(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3, (void *)&(m_image_orig.pixels[0]));
-   
-
-	cv::Mat m_image_dest(cv::Size(m_image_orig.width  * m_scale_x, m_image_orig.height * m_scale_y), CV_8UC3);     /* 結果出力用IplImage */
+    cv::Mat m_image_buff(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3, (void *)&(m_image_orig.pixels[0]));
+    cv::Mat m_image_dest(cv::Size(m_image_orig.width  * m_scale_x, m_image_orig.height * m_scale_y), CV_8UC3);     /* 結果出力用 */
           
-
     /* 画像の大きさを変換する */
-	cv::resize(m_image_buff, m_image_dest, m_image_dest.size(), INTER_LINEAR);
+    cv::resize(m_image_buff, m_image_dest, m_image_dest.size(), INTER_LINEAR);
 
     /* 画像データのサイズ取得 */
-	int len = m_image_dest.channels() * m_image_dest.size().width * m_image_dest.size().height;
+    int len = m_image_dest.channels() * m_image_dest.size().width * m_image_dest.size().height;
           
     m_image_output.pixels.length(len);
     /* 画面のサイズ情報を入れる */
-	m_image_output.width = m_image_dest.size().width;
-	m_image_output.height = m_image_dest.size().height;
+    m_image_output.width = m_image_dest.size().width;
+    m_image_output.height = m_image_dest.size().height;
 
     /* 反転した画像データをOutPortにコピー */
     memcpy((void *)&(m_image_output.pixels[0]), m_image_dest.data, len);
@@ -200,7 +202,7 @@ RTC::ReturnCode_t Scale::onRateChanged(RTC::UniqueId ec_id)
 
 extern "C"
 {
- 
+
   void ScaleInit(RTC::Manager* manager)
   {
     coil::Properties profile(scale_spec);
@@ -208,7 +210,7 @@ extern "C"
                              RTC::Create<Scale>,
                              RTC::Delete<Scale>);
   }
-  
+
 };
 
 
