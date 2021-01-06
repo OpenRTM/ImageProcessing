@@ -1,4 +1,4 @@
-SepiaName - English
+﻿SepiaName - English
 ========================
 
 .. toctree::
