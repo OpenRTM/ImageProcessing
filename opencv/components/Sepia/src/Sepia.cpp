@@ -1,8 +1,14 @@
-// -*- C++ -*-
+﻿// -*- C++ -*-
 /*!
  * @file  Sepia.cpp
  * @brief Sepia component
  * @date $Date$
+ *
+ * This RT-Component source code is using the code in
+ * "OpenCVプログラミングブック" (OpenCV Programming book).
+ * Please refer: https://book.mynavi.jp/support/pc/opencv11/#F_DWN
+ *
+ * @author Noriaki Ando <n-ando@aist.go.jp>
  *
  * $Id$
  */
@@ -16,9 +22,9 @@ static const char* sepia_spec[] =
     "implementation_id", "Sepia",
     "type_name",         "Sepia",
     "description",       "Sepia component",
-    "version",           "1.2.0",
+    "version",           "1.2.3",
     "vendor",            "AIST",
-    "category",          "Category",
+    "category",          "opencv-rtcs",
     "activity_type",     "PERIODIC",
     "kind",              "DataFlowComponent",
     "max_instance",      "1",
@@ -27,10 +33,15 @@ static const char* sepia_spec[] =
     // Configuration variables
     "conf.default.image_hue", "22",
     "conf.default.image_Saturation", "90",
+
     // Widget
     "conf.__widget__.image_hue", "text",
     "conf.__widget__.image_Saturation", "text",
     // Constraints
+
+    "conf.__type__.image_hue", "int",
+    "conf.__type__.image_Saturation", "int",
+
     ""
   };
 // </rtc-template>
@@ -64,16 +75,16 @@ RTC::ReturnCode_t Sepia::onInitialize()
   // <rtc-template block="registration">
   // Set InPort buffers
   addInPort("original_image", m_image_origIn);
-  
+
   // Set OutPort buffer
   addOutPort("sepia_image", m_image_sepiaOut);
-  
+
   // Set service provider to Ports
-  
+
   // Set service consumers to Ports
-  
+
   // Set CORBA Service Ports
-  
+
   // </rtc-template>
 
   // <rtc-template block="bind_config">
@@ -81,7 +92,7 @@ RTC::ReturnCode_t Sepia::onInitialize()
   bindParameter("image_hue", m_nHue, "22");
   bindParameter("image_Saturation", m_nSaturation, "90");
   // </rtc-template>
-  
+
   return RTC::RTC_OK;
 }
 
@@ -109,20 +120,12 @@ RTC::ReturnCode_t Sepia::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Sepia::onActivated(RTC::UniqueId ec_id)
 {
-
-
-
   return RTC::RTC_OK;
 }
 
 
 RTC::ReturnCode_t Sepia::onDeactivated(RTC::UniqueId ec_id)
 {
-  /* イメージ用メモリの解放 */
-
-
-
-
   return RTC::RTC_OK;
 }
 
@@ -137,60 +140,49 @@ RTC::ReturnCode_t Sepia::onExecute(RTC::UniqueId ec_id)
     m_image_origIn.read();
 
     /* サイズが変わったときだけ再生成する */
-    
+    cv::Mat m_image_buff(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3, (void *)&(m_image_orig.pixels[0]));       /* Original Image */
 
+    cv::Mat m_hsvImage;         /* HSV画像用IplImage */
+    cv::Mat m_hueImage;         /* 色相(H)情報用IplImage */
+    cv::Mat m_saturationImage;  /* 彩度(S)情報用IplImage */
+    cv::Mat m_valueImage;       /* 明度(V)情報用IplImage */
 
-	cv::Mat m_image_buff(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3, (void *)&(m_image_orig.pixels[0]));       /* Original Image */
-
-	cv::Mat m_hsvImage;         /* HSV画像用IplImage */
-	cv::Mat m_hueImage;         /* 色相(H)情報用IplImage */
-	cv::Mat m_saturationImage;  /* 彩度(S)情報用IplImage */
-	cv::Mat m_valueImage;       /* 明度(V)情報用IplImage */
-
-	cv::Mat m_mergeImage;       /* マージ用IplImage */
-	cv::Mat m_destinationImage; /* 結果出力用IplImage */
-
-    /* InPortの画像データをIplImageのimageDataにコピー */
-   // memcpy(m_image_buff.data,(void *)&(m_image_orig.pixels[0]),m_image_orig.pixels.length());
-
-    // Anternative actions
+    cv::Mat m_mergeImage;       /* マージ用IplImage */
+    cv::Mat m_destinationImage; /* 結果出力用IplImage */
 
     /* BGRからHSVに変換する */
     cv::cvtColor(m_image_buff, m_hsvImage, COLOR_BGR2HSV);
 
     /* HSV画像をH、S、V画像に分ける */
-	std::vector<cv::Mat> tmp;
+    std::vector<cv::Mat> tmp;
 	
-	cv::split(m_hsvImage, tmp);
-	m_hueImage = tmp[0];
-	m_saturationImage = tmp[1];
-	m_valueImage = tmp[2];
+    cv::split(m_hsvImage, tmp);
+    m_hueImage = tmp[0];
+    m_saturationImage = tmp[1];
+    m_valueImage = tmp[2];
 
     /* HとSの値を変更する */
-	m_hueImage.setTo(cv::Scalar(m_nHue));
-	m_saturationImage.setTo(cv::Scalar(m_nSaturation));
+    m_hueImage.setTo(cv::Scalar(m_nHue));
+    m_saturationImage.setTo(cv::Scalar(m_nSaturation));
     
-    
-
     /* 3チャンネルを結合 */
-	tmp.clear();
-	tmp.push_back(m_hueImage);
-	tmp.push_back(m_saturationImage);
-	tmp.push_back(m_valueImage);
+    tmp.clear();
+    tmp.push_back(m_hueImage);
+    tmp.push_back(m_saturationImage);
+    tmp.push_back(m_valueImage);
 
-	
-	cv::merge(tmp, m_mergeImage);
+    cv::merge(tmp, m_mergeImage);
 
     /* HSVからBGRに変換する */
     cv::cvtColor(m_mergeImage, m_destinationImage, COLOR_HSV2BGR);
 
     /* 画像データのサイズ取得 */
-	int len = m_destinationImage.channels() * m_destinationImage.size().width * m_destinationImage.size().height;
+    int len = m_destinationImage.channels() * m_destinationImage.size().width * m_destinationImage.size().height;
           
     /* 画面のサイズ情報を入れる */
     m_image_sepia.pixels.length(len);        
-	m_image_sepia.width = m_destinationImage.size().width;
-	m_image_sepia.height = m_destinationImage.size().height;
+    m_image_sepia.width = m_destinationImage.size().width;
+    m_image_sepia.height = m_destinationImage.size().height;
 
     /* 反転した画像データをOutPortにコピー */
     memcpy((void *)&(m_image_sepia.pixels[0]), m_destinationImage.data,len);
@@ -240,7 +232,7 @@ RTC::ReturnCode_t Sepia::onRateChanged(RTC::UniqueId ec_id)
 
 extern "C"
 {
- 
+
   void SepiaInit(RTC::Manager* manager)
   {
     coil::Properties profile(sepia_spec);
@@ -248,7 +240,7 @@ extern "C"
                              RTC::Create<Sepia>,
                              RTC::Delete<Sepia>);
   }
-  
+
 };
 
 

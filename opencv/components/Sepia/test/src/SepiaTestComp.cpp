@@ -1,6 +1,6 @@
 ﻿// -*- C++ -*-
 /*!
- * @file SepiaComp.cpp
+ * @file SepiaTestComp.cpp
  * @brief Standalone component
  * @date $Date$
  *
@@ -13,16 +13,16 @@
 #include <iostream>
 #include <string>
 #include <stdlib.h>
-#include "Sepia.h"
+#include "SepiaTest.h"
 
 
 void MyModuleInit(RTC::Manager* manager)
 {
-  SepiaInit(manager);
+  SepiaTestInit(manager);
   RTC::RtcBase* comp;
 
   // Create a component
-  comp = manager->createComponent("Sepia");
+  comp = manager->createComponent("SepiaTest");
 
   if (comp==NULL)
   {
@@ -77,6 +77,9 @@ int main (int argc, char** argv)
 {
   RTC::Manager* manager;
   manager = RTC::Manager::init(argc, argv);
+
+  // Initialize manager
+  manager->init(argc, argv);
 
   // Set module initialization proceduer
   // This procedure will be invoked in activateManager() function.

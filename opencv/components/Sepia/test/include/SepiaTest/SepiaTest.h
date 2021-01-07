@@ -1,6 +1,6 @@
 ﻿// -*- C++ -*-
 /*!
- * @file  Sepia.h
+ * @file  SepiaTest.h
  * @brief Sepia component
  * @date  $Date$
  *
@@ -9,34 +9,26 @@
  * $Id$
  */
 
-#ifndef SEPIA_H
-#define SEPIA_H
+#ifndef SEPIA_TEST__H
+#define SEPIA_TEST_H
 
 #include <rtm/idl/BasicDataTypeSkel.h>
 #include <rtm/idl/ExtendedDataTypesSkel.h>
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
-/* OpenCV用インクルードファイルのインクルード */
-#include <opencv2/opencv.hpp>
-using namespace cv;
-#if CV_MAJOR_VERSION < 3
-#ifndef COLOR_BGR2HSV
-#define COLOR_BGR2HSV CV_BGR2HSV
-#endif
-#ifndef COLOR_HSV2BGR
-#define COLOR_HSV2BGR CV_HSV2BGR
-#endif
-#endif //CV_MAJOR_VERSION
-
 // Service implementation headers
 // <rtc-template block="service_impl_h">
+#include "InterfaceDataTypesSVC_impl.h"
 
 // </rtc-template>
 
 // Service Consumer stub headers
 // <rtc-template block="consumer_stub_h">
-#include "InterfaceDataTypesStub.h"
 
+// </rtc-template>
+
+// Service Consumer stub headers
+// <rtc-template block="port_stub_h">
 // </rtc-template>
 
 #include <rtm/Manager.h>
@@ -46,11 +38,11 @@ using namespace cv;
 #include <rtm/DataOutPort.h>
 
 /*!
- * @class Sepia
+ * @class SepiaTest
  * @brief Sepia component
  *
  */
-class Sepia
+class SepiaTest
   : public RTC::DataFlowComponentBase
 {
  public:
@@ -58,12 +50,12 @@ class Sepia
    * @brief constructor
    * @param manager Maneger Object
    */
-  Sepia(RTC::Manager* manager);
+  SepiaTest(RTC::Manager* manager);
 
   /*!
    * @brief destructor
    */
-  ~Sepia();
+  ~SepiaTest();
 
   // <rtc-template block="public_attribute">
   
@@ -76,6 +68,7 @@ class Sepia
   /***
    *
    * The initialize action (on CREATED->ALIVE transition)
+   * formaer rtc_init_entry() 
    *
    * @return RTC::ReturnCode_t
    * 
@@ -86,6 +79,7 @@ class Sepia
   /***
    *
    * The finalize action (on ALIVE->END transition)
+   * formaer rtc_exiting_entry()
    *
    * @return RTC::ReturnCode_t
    * 
@@ -96,6 +90,7 @@ class Sepia
   /***
    *
    * The startup action when ExecutionContext startup
+   * former rtc_starting_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -108,6 +103,7 @@ class Sepia
   /***
    *
    * The shutdown action when ExecutionContext stop
+   * former rtc_stopping_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -120,6 +116,7 @@ class Sepia
   /***
    *
    * The activated action (Active state entry action)
+   * former rtc_active_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -132,6 +129,7 @@ class Sepia
   /***
    *
    * The deactivated action (Active state exit action)
+   * former rtc_active_exit()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -144,6 +142,7 @@ class Sepia
   /***
    *
    * The execution action that is invoked periodically
+   * former rtc_active_do()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -156,6 +155,7 @@ class Sepia
   /***
    *
    * The aborting action when main logic error occurred.
+   * former rtc_aborting_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -168,6 +168,7 @@ class Sepia
   /***
    *
    * The error action in ERROR state
+   * former rtc_error_do()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -180,6 +181,7 @@ class Sepia
   /***
    *
    * The reset action that is invoked resetting
+   * This is same but different the former rtc_init_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -192,6 +194,7 @@ class Sepia
   /***
    *
    * The state update action that is invoked after onExecute() action
+   * no corresponding operation exists in OpenRTm-aist-0.2.0
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -204,6 +207,7 @@ class Sepia
   /***
    *
    * The action that is invoked when execution context's rate is changed
+   * no corresponding operation exists in OpenRTm-aist-0.2.0
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -242,20 +246,20 @@ class Sepia
 
   // DataInPort declaration
   // <rtc-template block="inport_declare">
-  RTC::CameraImage m_image_orig;
+  RTC::CameraImage m_image_sepia;
   /*!
    */
-  RTC::InPort<RTC::CameraImage> m_image_origIn;
+  RTC::InPort<RTC::CameraImage> m_image_sepiaIn;
   
   // </rtc-template>
 
 
   // DataOutPort declaration
   // <rtc-template block="outport_declare">
-  RTC::CameraImage m_image_sepia;
+  RTC::CameraImage m_image_orig;
   /*!
    */
-  RTC::OutPort<RTC::CameraImage> m_image_sepiaOut;
+  RTC::OutPort<RTC::CameraImage> m_image_origOut;
   
   // </rtc-template>
 
@@ -288,7 +292,7 @@ class Sepia
 
 extern "C"
 {
-  DLL_EXPORT void SepiaInit(RTC::Manager* manager);
+  DLL_EXPORT void SepiaTestInit(RTC::Manager* manager);
 };
 
-#endif // SEPIA_H
+#endif // SEPIA_TEST_H
