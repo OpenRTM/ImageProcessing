@@ -1,6 +1,6 @@
 ﻿// -*- C++ -*-
 /*!
- * @file TemplateComp.cpp
+ * @file TemplateTestComp.cpp
  * @brief Standalone component
  * @date $Date$
  *
@@ -13,16 +13,16 @@
 #include <iostream>
 #include <string>
 #include <stdlib.h>
-#include "Template.h"
+#include "TemplateTest.h"
 
 
 void MyModuleInit(RTC::Manager* manager)
 {
-  TemplateInit(manager);
+  TemplateTestInit(manager);
   RTC::RtcBase* comp;
 
   // Create a component
-  comp = manager->createComponent("Template");
+  comp = manager->createComponent("TemplateTest");
 
   if (comp==NULL)
   {
@@ -77,6 +77,9 @@ int main (int argc, char** argv)
 {
   RTC::Manager* manager;
   manager = RTC::Manager::init(argc, argv);
+
+  // Initialize manager
+  manager->init(argc, argv);
 
   // Set module initialization proceduer
   // This procedure will be invoked in activateManager() function.

@@ -1,6 +1,6 @@
 ﻿// -*- C++ -*-
 /*!
- * @file  Template.h
+ * @file  TemplateTest.h
  * @brief Template image component
  * @date  $Date$
  *
@@ -9,47 +9,26 @@
  * $Id$
  */
 
-#ifndef TEMPLATE_H
-#define TEMPLATE_H
+#ifndef TEMPLATE_TEST__H
+#define TEMPLATE_TEST_H
 
 #include <rtm/idl/BasicDataTypeSkel.h>
 #include <rtm/idl/ExtendedDataTypesSkel.h>
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
-//OpenCV headr file include
-#include <opencv2/opencv.hpp>
-using namespace cv;
-#if CV_MAJOR_VERSION < 3
-#ifndef IMREAD_ANYDEPTH
-#define IMREAD_ANYDEPTH CV_LOAD_IMAGE_ANYDEPTH
-#endif
-#ifndef IMREAD_ANYCOLOR
-#define IMREAD_ANYCOLOR CV_LOAD_IMAGE_ANYCOLOR
-#endif
-#ifndef COLOR_RGB2GRAY
-#define COLOR_RGB2GRAY CV_RGB2GRAY
-#endif
-#ifndef TM_SQDIFF
-#define TM_SQDIFF CV_TM_SQDIFF
-#endif
-#endif //CV_MAJOR_VERSION
-
-#define THRESHOLD	50            /* 2値化の際の閾値 */
-#define THRESHOLD_MAX_VALUE	255 /* 2値化の際に使用する最大値 */
-
-#define LINE_THICKNESS	1   /* 線の太さ */
-#define	LINE_TYPE	8         /* 線の種類 */
-#define SHIFT	0             /* 座標の小数点以下の桁を表すビット数 */
-
 // Service implementation headers
 // <rtc-template block="service_impl_h">
+#include "InterfaceDataTypesSVC_impl.h"
 
 // </rtc-template>
 
 // Service Consumer stub headers
 // <rtc-template block="consumer_stub_h">
-#include "InterfaceDataTypesStub.h"
 
+// </rtc-template>
+
+// Service Consumer stub headers
+// <rtc-template block="port_stub_h">
 // </rtc-template>
 
 #include <rtm/Manager.h>
@@ -59,11 +38,11 @@ using namespace cv;
 #include <rtm/DataOutPort.h>
 
 /*!
- * @class Template
+ * @class TemplateTest
  * @brief Template image component
  *
  */
-class Template
+class TemplateTest
   : public RTC::DataFlowComponentBase
 {
  public:
@@ -71,12 +50,12 @@ class Template
    * @brief constructor
    * @param manager Maneger Object
    */
-  Template(RTC::Manager* manager);
+  TemplateTest(RTC::Manager* manager);
 
   /*!
    * @brief destructor
    */
-  ~Template();
+  ~TemplateTest();
 
   // <rtc-template block="public_attribute">
   
@@ -89,6 +68,7 @@ class Template
   /***
    *
    * The initialize action (on CREATED->ALIVE transition)
+   * formaer rtc_init_entry() 
    *
    * @return RTC::ReturnCode_t
    * 
@@ -99,6 +79,7 @@ class Template
   /***
    *
    * The finalize action (on ALIVE->END transition)
+   * formaer rtc_exiting_entry()
    *
    * @return RTC::ReturnCode_t
    * 
@@ -109,6 +90,7 @@ class Template
   /***
    *
    * The startup action when ExecutionContext startup
+   * former rtc_starting_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -121,6 +103,7 @@ class Template
   /***
    *
    * The shutdown action when ExecutionContext stop
+   * former rtc_stopping_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -133,6 +116,7 @@ class Template
   /***
    *
    * The activated action (Active state entry action)
+   * former rtc_active_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -145,6 +129,7 @@ class Template
   /***
    *
    * The deactivated action (Active state exit action)
+   * former rtc_active_exit()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -157,6 +142,7 @@ class Template
   /***
    *
    * The execution action that is invoked periodically
+   * former rtc_active_do()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -169,6 +155,7 @@ class Template
   /***
    *
    * The aborting action when main logic error occurred.
+   * former rtc_aborting_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -181,6 +168,7 @@ class Template
   /***
    *
    * The error action in ERROR state
+   * former rtc_error_do()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -193,6 +181,7 @@ class Template
   /***
    *
    * The reset action that is invoked resetting
+   * This is same but different the former rtc_init_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -205,6 +194,7 @@ class Template
   /***
    *
    * The state update action that is invoked after onExecute() action
+   * no corresponding operation exists in OpenRTm-aist-0.2.0
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -217,6 +207,7 @@ class Template
   /***
    *
    * The action that is invoked when execution context's rate is changed
+   * no corresponding operation exists in OpenRTm-aist-0.2.0
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -243,30 +234,30 @@ class Template
    * - Name:  img_path
    * - DefaultValue: template.bmp
    */
-  char m_img_path[50];
+  char m_img_path;
 
   // </rtc-template>
 
   // DataInPort declaration
   // <rtc-template block="inport_declare">
-  RTC::CameraImage m_image_orig;
+  RTC::CameraImage m_image_template;
   /*!
    */
-  RTC::InPort<RTC::CameraImage> m_image_origIn;
+  RTC::InPort<RTC::CameraImage> m_image_templateIn;
+  RTC::CameraImage m_image_picture;
+  /*!
+   */
+  RTC::InPort<RTC::CameraImage> m_image_pictureIn;
   
   // </rtc-template>
 
 
   // DataOutPort declaration
   // <rtc-template block="outport_declare">
-  RTC::CameraImage m_image_template;
+  RTC::CameraImage m_image_orig;
   /*!
    */
-  RTC::OutPort<RTC::CameraImage> m_image_templateOut;
-  RTC::CameraImage m_image_picture;
-  /*!
-   */
-  RTC::OutPort<RTC::CameraImage> m_image_pictureOut;
+  RTC::OutPort<RTC::CameraImage> m_image_origOut;
   
   // </rtc-template>
 
@@ -293,23 +284,13 @@ class Template
   // <rtc-template block="private_operation">
   
   // </rtc-template>
-  std::string templateID;
-  int templateWidth, templateHeight;
-  int flag;
-  cv::Mat templateImage;
-  cv::Mat templateGrayImage;
-  cv::Mat templateBinaryImage;
-
-
-
-  int len;
 
 };
 
 
 extern "C"
 {
-  DLL_EXPORT void TemplateInit(RTC::Manager* manager);
+  DLL_EXPORT void TemplateTestInit(RTC::Manager* manager);
 };
 
-#endif // TEMPLATE_H
+#endif // TEMPLATE_TEST_H

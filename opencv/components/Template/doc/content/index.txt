@@ -1,4 +1,4 @@
-TemplateName - English
+﻿TemplateName - English
 ========================
 
 .. toctree::
