@@ -1,8 +1,14 @@
-// -*- C++ -*-
+﻿// -*- C++ -*-
 /*!
  * @file  Template.cpp
  * @brief Template image component
  * @date $Date$
+ *
+ * This RT-Component source code is using the code in
+ * "OpenCVプログラミングブック" (OpenCV Programming book).
+ * Please refer: https://book.mynavi.jp/support/pc/opencv11/#F_DWN
+ *
+ * @author Noriaki Ando <n-ando@aist.go.jp>
  *
  * $Id$
  */
@@ -18,9 +24,9 @@ static const char* template_spec[] =
     "implementation_id", "Template",
     "type_name",         "Template",
     "description",       "Template image component",
-    "version",           "1.2.0",
+    "version",           "1.2.3",
     "vendor",            "AIST",
-    "category",          "Category",
+    "category",          "opencv-rtcs",
     "activity_type",     "PERIODIC",
     "kind",              "DataFlowComponent",
     "max_instance",      "1",
@@ -28,10 +34,14 @@ static const char* template_spec[] =
     "lang_type",         "compile",
     // Configuration variables
     "conf.default.image_path", "template.bmp",
+
     // Widget
     "conf.__widget__.image_path", "text",
     // Constraints
     "conf.__constraints__.image_path", "[50]",
+
+    "conf.__type__.image_path", "char",
+
     ""
   };
 // </rtc-template>
@@ -66,24 +76,24 @@ RTC::ReturnCode_t Template::onInitialize()
   // <rtc-template block="registration">
   // Set InPort buffers
   addInPort("original_image", m_image_origIn);
-  
+
   // Set OutPort buffer
   addOutPort("template", m_image_templateOut);
   addOutPort("picture", m_image_pictureOut);
-  
+
   // Set service provider to Ports
-  
+
   // Set service consumers to Ports
-  
+
   // Set CORBA Service Ports
-  
+
   // </rtc-template>
 
   // <rtc-template block="bind_config">
   // Bind variables and configuration variable
   bindParameter("image_path", m_img_path, "template.bmp");
   // </rtc-template>
-  
+
   return RTC::RTC_OK;
 }
 
@@ -111,14 +121,10 @@ RTC::ReturnCode_t Template::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Template::onActivated(RTC::UniqueId ec_id)
 {
-
   /* 対象画像用メモリの初期化 */
   templateID = "";
   templateWidth = 0;
   templateHeight = 0;
-
-
-
 
   /* OutPort１の画面サイズの初期化 */
   m_image_template.width = 0;
@@ -133,9 +139,6 @@ RTC::ReturnCode_t Template::onActivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Template::onDeactivated(RTC::UniqueId ec_id)
 {
-
-
-
   if (!templateImage.empty())
   {
 	  templateImage.release();
@@ -149,7 +152,6 @@ RTC::ReturnCode_t Template::onDeactivated(RTC::UniqueId ec_id)
 	  templateBinaryImage.release();
   }
 
-
   return RTC::RTC_OK;
 }
 
@@ -162,11 +164,11 @@ RTC::ReturnCode_t Template::onExecute(RTC::UniqueId ec_id)
     /* InPortデータの読み込み */
     m_image_origIn.read();
 
-	if (templateID != m_img_path)
-	{
-		/* 対象画像を読み込む */
-		templateImage = cv::imread(m_img_path, IMREAD_ANYDEPTH | IMREAD_ANYCOLOR);
-	}
+    if (templateID != m_img_path)
+    {
+      /* 対象画像を読み込む */
+      templateImage = cv::imread(m_img_path, IMREAD_ANYDEPTH | IMREAD_ANYCOLOR);
+    }
 
     if( templateImage.empty() )
     {
@@ -176,20 +178,13 @@ RTC::ReturnCode_t Template::onExecute(RTC::UniqueId ec_id)
 
     /* 対象画像チェック */
     /* 対象画像のPathとか名が無い場合テンプレートマッチングしなくて入力されたイメージをそのまま出力 */
-	if (!templateImage.empty() && templateID != m_img_path)
+    if (!templateImage.empty() && templateID != m_img_path)
     {
-
       /* フラッグ設定(正しい対象画像が入力） */
       flag = 1;
-	  templateID = m_img_path;
+      templateID = m_img_path;
       templateWidth = templateImage.size().width;
-	  templateHeight = templateImage.size().height;
-
-      
-
-      /* 対象画像用のメモリ確保 */
-
-
+      templateHeight = templateImage.size().height;
 
       cout << "templateID : "<<templateID<<endl;
       cout << "template - width :"<<templateWidth<<endl;
@@ -203,23 +198,22 @@ RTC::ReturnCode_t Template::onExecute(RTC::UniqueId ec_id)
 
       /* OutPort２用の画面サイズ初期化 */
       m_image_picture.width = templateImage.size().width;
-	  m_image_picture.height = templateImage.size().height;
+      m_image_picture.height = templateImage.size().height;
     }
 
     /* InPortとOutPortの画面サイズ処理およびイメージ用メモリの確保(正しい対象画像が入れるとdifferenceMapImageが変換される-フラッグを見て判断） */
-	m_image_template.width = m_image_orig.width;
-	m_image_template.height = m_image_orig.height;
+    m_image_template.width = m_image_orig.width;
+    m_image_template.height = m_image_orig.height;
 
     /* InPortの画像データをコピー */
-	cv::Mat imageBuff(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3, (void *)&(m_image_orig.pixels[0]));
+    cv::Mat imageBuff(cv::Size(m_image_orig.width, m_image_orig.height), CV_8UC3, (void *)&(m_image_orig.pixels[0]));
 	
-	cv::Mat sourceGrayImage;
-	cv::Mat sourceBinaryImage;
+    cv::Mat sourceGrayImage;
+    cv::Mat sourceBinaryImage;
 
-	cv::Mat differenceMapImage;
+    cv::Mat differenceMapImage;
 
-	cv::Point minLocation;
-    //memcpy( imageBuff.data, (void *)&(m_image_orig.pixels[0]), m_image_orig.pixels.length() );
+    cv::Point minLocation;
 	
     if( !templateImage.empty() )
     {
@@ -230,38 +224,36 @@ RTC::ReturnCode_t Template::onExecute(RTC::UniqueId ec_id)
       cv::threshold( sourceGrayImage, sourceBinaryImage, THRESHOLD, THRESHOLD_MAX_VALUE, cv::THRESH_BINARY );
 
       /* テンプレートマッチングを行う */
-	  cv::matchTemplate(sourceBinaryImage, templateBinaryImage, differenceMapImage, TM_SQDIFF);
+      cv::matchTemplate(sourceBinaryImage, templateBinaryImage, differenceMapImage, TM_SQDIFF);
 
       /* テンプレートが元画像のどの部分にあるのかという情報を得る */
-	  cv::Point max_pt;
-	  double maxVal;
-	  cv::minMaxLoc(differenceMapImage, NULL, NULL, &minLocation, NULL);
-      //cv::minMaxLoc( differenceMapImage, NULL, NULL, &minLocation, NULL, NULL );
-
+      cv::Point max_pt;
+      double maxVal;
+      cv::minMaxLoc(differenceMapImage, NULL, NULL, &minLocation, NULL);
+      
       /* 一致する場所を元画像に四角で描く */
       cv::rectangle(
       imageBuff,
       minLocation,
-	  cv::Point(minLocation.x + templateImage.size().width, minLocation.y + templateImage.size().height),
+      cv::Point(minLocation.x + templateImage.size().width, minLocation.y + templateImage.size().height),
                   CV_RGB( 255, 0, 0 ),
                   LINE_THICKNESS,
                   LINE_TYPE,
                   SHIFT
       );
 
-
       /* 画像データのサイズ取得 */
-	  len = imageBuff.channels() * imageBuff.size().width * imageBuff.size().height;
+      len = imageBuff.channels() * imageBuff.size().width * imageBuff.size().height;
       m_image_template.pixels.length(len);
 
       /* 反転した画像データをOutPortにコピー */
-	  memcpy((void *)&(m_image_template.pixels[0]), imageBuff.data, len);
+      memcpy((void *)&(m_image_template.pixels[0]), imageBuff.data, len);
 
       /* 反転した画像データをOutPortから出力 */
       m_image_templateOut.write();
 
       /* 対象画像データのサイズ取得 */
-	  len = templateImage.channels() * templateImage.size().width * templateImage.size().height;
+      len = templateImage.channels() * templateImage.size().width * templateImage.size().height;
       m_image_picture.pixels.length(len);
 
       /* 反転した対象画像データをOutPortにコピー */
@@ -272,7 +264,7 @@ RTC::ReturnCode_t Template::onExecute(RTC::UniqueId ec_id)
     }else{
 
       /* 画像データのサイズ取得 */
-		len = imageBuff.channels() * imageBuff.size().width * imageBuff.size().height;
+      len = imageBuff.channels() * imageBuff.size().width * imageBuff.size().height;
       m_image_template.pixels.length(len);
 
       /* 反転した画像データをOutPortにコピー */
@@ -325,7 +317,7 @@ RTC::ReturnCode_t Template::onRateChanged(RTC::UniqueId ec_id)
 
 extern "C"
 {
- 
+
   void TemplateInit(RTC::Manager* manager)
   {
     coil::Properties profile(template_spec);
@@ -333,7 +325,7 @@ extern "C"
                              RTC::Create<Template>,
                              RTC::Delete<Template>);
   }
-  
+
 };
 
 
