@@ -1,6 +1,6 @@
 ﻿// -*- C++ -*-
 /*!
- * @file  Translate.h
+ * @file  TranslateTest.h
  * @brief Translate image component
  * @date  $Date$
  *
@@ -9,25 +9,26 @@
  * $Id$
  */
 
-#ifndef TRANSLATE_H
-#define TRANSLATE_H
+#ifndef TRANSLATE_TEST__H
+#define TRANSLATE_TEST_H
 
 #include <rtm/idl/BasicDataTypeSkel.h>
 #include <rtm/idl/ExtendedDataTypesSkel.h>
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
-/* OpenCV用インクルードファイルのインクルード */
-#include <opencv2/opencv.hpp>
-
 // Service implementation headers
 // <rtc-template block="service_impl_h">
+#include "InterfaceDataTypesSVC_impl.h"
 
 // </rtc-template>
 
 // Service Consumer stub headers
 // <rtc-template block="consumer_stub_h">
-#include "InterfaceDataTypesStub.h"
 
+// </rtc-template>
+
+// Service Consumer stub headers
+// <rtc-template block="port_stub_h">
 // </rtc-template>
 
 #include <rtm/Manager.h>
@@ -37,11 +38,11 @@
 #include <rtm/DataOutPort.h>
 
 /*!
- * @class Translate
+ * @class TranslateTest
  * @brief Translate image component
  *
  */
-class Translate
+class TranslateTest
   : public RTC::DataFlowComponentBase
 {
  public:
@@ -49,12 +50,12 @@ class Translate
    * @brief constructor
    * @param manager Maneger Object
    */
-  Translate(RTC::Manager* manager);
+  TranslateTest(RTC::Manager* manager);
 
   /*!
    * @brief destructor
    */
-  ~Translate();
+  ~TranslateTest();
 
   // <rtc-template block="public_attribute">
   
@@ -67,6 +68,7 @@ class Translate
   /***
    *
    * The initialize action (on CREATED->ALIVE transition)
+   * formaer rtc_init_entry() 
    *
    * @return RTC::ReturnCode_t
    * 
@@ -77,6 +79,7 @@ class Translate
   /***
    *
    * The finalize action (on ALIVE->END transition)
+   * formaer rtc_exiting_entry()
    *
    * @return RTC::ReturnCode_t
    * 
@@ -87,6 +90,7 @@ class Translate
   /***
    *
    * The startup action when ExecutionContext startup
+   * former rtc_starting_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -99,6 +103,7 @@ class Translate
   /***
    *
    * The shutdown action when ExecutionContext stop
+   * former rtc_stopping_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -111,6 +116,7 @@ class Translate
   /***
    *
    * The activated action (Active state entry action)
+   * former rtc_active_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -123,6 +129,7 @@ class Translate
   /***
    *
    * The deactivated action (Active state exit action)
+   * former rtc_active_exit()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -135,6 +142,7 @@ class Translate
   /***
    *
    * The execution action that is invoked periodically
+   * former rtc_active_do()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -147,6 +155,7 @@ class Translate
   /***
    *
    * The aborting action when main logic error occurred.
+   * former rtc_aborting_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -159,6 +168,7 @@ class Translate
   /***
    *
    * The error action in ERROR state
+   * former rtc_error_do()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -171,6 +181,7 @@ class Translate
   /***
    *
    * The reset action that is invoked resetting
+   * This is same but different the former rtc_init_entry()
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -183,6 +194,7 @@ class Translate
   /***
    *
    * The state update action that is invoked after onExecute() action
+   * no corresponding operation exists in OpenRTm-aist-0.2.0
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -195,6 +207,7 @@ class Translate
   /***
    *
    * The action that is invoked when execution context's rate is changed
+   * no corresponding operation exists in OpenRTm-aist-0.2.0
    *
    * @param ec_id target ExecutionContext Id
    *
@@ -233,20 +246,20 @@ class Translate
 
   // DataInPort declaration
   // <rtc-template block="inport_declare">
-  RTC::CameraImage m_image_orig;
+  RTC::CameraImage m_image_output;
   /*!
    */
-  RTC::InPort<RTC::CameraImage> m_image_origIn;
+  RTC::InPort<RTC::CameraImage> m_image_outputIn;
   
   // </rtc-template>
 
 
   // DataOutPort declaration
   // <rtc-template block="outport_declare">
-  RTC::CameraImage m_image_output;
+  RTC::CameraImage m_image_orig;
   /*!
    */
-  RTC::OutPort<RTC::CameraImage> m_image_outputOut;
+  RTC::OutPort<RTC::CameraImage> m_image_origOut;
   
   // </rtc-template>
 
@@ -273,17 +286,13 @@ class Translate
   // <rtc-template block="private_operation">
   
   // </rtc-template>
-  int m_in_height;          /* 入力イメージのHeight */
-  int m_in_width;           /* 入力イメージのWidth */
 
-
-  cv::Mat m_transformMatrix;
 };
 
 
 extern "C"
 {
-  DLL_EXPORT void TranslateInit(RTC::Manager* manager);
+  DLL_EXPORT void TranslateTestInit(RTC::Manager* manager);
 };
 
-#endif // TRANSLATE_H
+#endif // TRANSLATE_TEST_H

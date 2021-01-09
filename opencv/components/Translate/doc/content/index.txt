@@ -1,4 +1,4 @@
-TranslateName - English
+﻿TranslateName - English
 ========================
 
 .. toctree::
