@@ -97,7 +97,7 @@ set(OTHER_SRCS CMakeLists.txt
                RTC.xml TkCalibGUI.conf rtc.conf)
 
 # check python installed
-find_package(PythonInterp)
+find_package(PythonInterp 3)
 
 if(WIN32)
    set(OPENRTM_SHARE_PREFIX "OpenRTM-aist/${RTM_VER}/Components/${PROJECT_TYPE}")
