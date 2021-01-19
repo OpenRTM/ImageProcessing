@@ -358,8 +358,13 @@ class TkCalibGUI(Frame):
 				path = env + "examples\\C++\\opencv-rtcs\\"
 				ret_path.append(path.replace('\\', '/'))
 		else:
+			import subprocess
+			from subprocess import PIPE 
+			ret = subprocess.run("rtm-config --rtm-datadir", shell=True, stdout=PIPE, text=True) 
+			rtmdir = ret.stdout.strip() 
 			tmp = (
-					"/usr/share/openrtm-1.1/components/c++/opencv-rtcs/",
+					rtmdir + "/components/c++/opencv-rtcs/OpenCVCamera/",
+					rtmdir + "/components/c++/opencv-rtcs/ImageCalibration/",
 					"/usr/bin/", "/usr/X11R6/bin/",
 					"/usr/local/bin/", "/bin/",
 					"/opt/bin/", "/opt/local/bin/",
