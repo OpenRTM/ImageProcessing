@@ -1,4 +1,0 @@
-#!/bin/bash
-# prerm script
-sudo rm -rf /usr/share/openrtm-1.2/components/python3/opencv-rtcs/TkCalibGUI
-

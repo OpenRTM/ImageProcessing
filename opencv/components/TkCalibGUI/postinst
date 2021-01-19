@@ -1,5 +1,0 @@
-#!/bin/bash
-# postinst script
-set -e
-cd /usr/share/openrtm-1.2/components/python3/opencv-rtcs/TkCalibGUI
-sh idlcompile.sh
