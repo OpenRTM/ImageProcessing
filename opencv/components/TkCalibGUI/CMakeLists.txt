@@ -1,7 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
-#if(POLICY CMP0040)
-#  cmake_policy(SET CMP0040 OLD)
-#endif()
+cmake_minimum_required(VERSION 3.5.1)
 if(POLICY CMP0053)
   cmake_policy(SET CMP0053 OLD)
 endif()
