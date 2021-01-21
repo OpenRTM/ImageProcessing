@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # prerm script
 sudo rm -rf /usr/@INSTALL_PREFIX@
 

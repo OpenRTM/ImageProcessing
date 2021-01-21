@@ -1,4 +1,4 @@
-TkCalibGUIName - English
+﻿TkCalibGUIName - English
 ========================
 
 .. toctree::
