@@ -1,4 +1,4 @@
-OpenCVCamera - 日本語
+﻿OpenCVCamera - 日本語
 =======================
 
 
@@ -98,7 +98,20 @@ OpenCVCameraは ``OpenCVCameraComp`` を実行（ ``${prefix}/components/bin`` �
 ================ ================== ================ ====
 パラメータ       データ型           デフォルト値     意味
 ================ ================== ================ ====
+capture_mode     string             camera           
 device_num       int                0                
+video_file       string             video.mp4        
+URL              string                              
+frame_width      int                640              
+frame_height     int                480              
+frame_rate       int                30               
+brightness       int                128              
+contrast         int                32               
+saturation       int                32               
+hue              int                0                
+gain             int                64               
+exposure_mode    string             auto             
+exposure_absolute int                166              
 ================ ================== ================ ====
 
 ポート
