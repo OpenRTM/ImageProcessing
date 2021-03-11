@@ -106,6 +106,9 @@ if(WIN32)
 else(WIN32)
    set(OPENRTM_SHARE_PREFIX "share/openrtm-${OPENRTM_VERSION_MAJOR}.${OPENRTM_VERSION_MINOR}")
    set(INSTALL_PREFIX "${OPENRTM_SHARE_PREFIX}/components/${PROJECT_TYPE}/${PROJECT_NAME}")
+   if (SolutionDir)
+       install(FILES ${SolutionDir}/bin/rtc.conf DESTINATION ${INSTALL_PREFIX}/../)
+   endif()
 endif(WIN32)
 
 # Universal settings
