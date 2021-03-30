@@ -3,6 +3,9 @@ cmake_minimum_required(VERSION 3.5.1)
 project(ImageProcessing VERSION 1.2.3)
 set(TOP_PROJECT_NAME ${PROJECT_NAME})
 string(TOLOWER ${TOP_PROJECT_NAME} TOP_PROJECT_NAME_LOWER)
+set(ImageProcessing_VERSION_MAJOR "1")
+set(ImageProcessing_VERSION_MINOR "2")
+set(ImageProcessing_VERSION_REVISION "3")
 SUBDIRS(components)
 set(SolutionDir ${PROJECT_SOURCE_DIR})
 
@@ -62,29 +65,29 @@ if(PKGMGR)
 endif()
 
 if(UNIX)
-	# build linux package script
-	configure_file(${SolutionDir}/build_linux_package.sh.in
-  	${PROJECT_BINARY_DIR}/build_linux_package.sh
-  	@ONLY
-	)	
+  # build linux package script
+  configure_file(${SolutionDir}/build_linux_package.sh.in
+    ${PROJECT_BINARY_DIR}/build_linux_package.sh
+    @ONLY
+  )
 
-	# postinst, prerm settings
-	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/postinst.in
-		${CMAKE_CURRENT_SOURCE_DIR}/postinst @ONLY
-	)
-	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/prerm.in
-		${CMAKE_CURRENT_SOURCE_DIR}/prerm @ONLY
-	)
+  # postinst, prerm settings
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/postinst.in
+    ${CMAKE_CURRENT_SOURCE_DIR}/postinst @ONLY
+  )
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/prerm.in
+    ${CMAKE_CURRENT_SOURCE_DIR}/prerm @ONLY
+  )
 endif()
 
 if(NOT WIN32)
-    if(CPACK_DEBIAN_PACKAGE_ARCHITECTURE)
-				set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${PROJECT_SOURCE_DIR}/components/TkCalibGUI/postinst;${PROJECT_SOURCE_DIR}/components/TkCalibGUI/prerm")
-    endif(CPACK_DEBIAN_PACKAGE_ARCHITECTURE)
-    if(CPACK_RPM_PACKAGE_ARCHITECTURE)
-        set(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${PROJECT_SOURCE_DIR}/components/TkCalibGUI/postinst")
-        set(CPACK_RPM_POST_UNINSTALL_SCRIPT_FILE "${PROJECT_SOURCE_DIR}/components/TkCalibGUI/prerm")
-    endif(CPACK_RPM_PACKAGE_ARCHITECTURE)
+  if(CPACK_DEBIAN_PACKAGE_ARCHITECTURE)
+    set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${PROJECT_SOURCE_DIR}/components/TkCalibGUI/postinst;${PROJECT_SOURCE_DIR}/components/TkCalibGUI/prerm")
+  endif(CPACK_DEBIAN_PACKAGE_ARCHITECTURE)
+  if(CPACK_RPM_PACKAGE_ARCHITECTURE)
+    set(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${PROJECT_SOURCE_DIR}/components/TkCalibGUI/postinst")
+    set(CPACK_RPM_POST_UNINSTALL_SCRIPT_FILE "${PROJECT_SOURCE_DIR}/components/TkCalibGUI/prerm")
+  endif(CPACK_RPM_PACKAGE_ARCHITECTURE)
 endif()
 
 
