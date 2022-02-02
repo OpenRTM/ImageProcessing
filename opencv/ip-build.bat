@@ -37,10 +37,10 @@
 
 set PATH=%PATH%;C:\cygwin64\bin
 set OPENCV_RTC_ROOT=%~dp0
-set CMAKE_GENERATOR="Visual Studio 16 2019"
 
 if not DEFINED ARCH       set ARCH=x86_64
 if not DEFINED VC_VERSION set VC_VERSION=16
+if not DEFINED CMAKE_GENERATOR set CMAKE_GENERATOR="Visual Studio 16 2019"
 if not DEFINED PYTHON_DIR set PYTHON_DIR=c:\python39
 if not DEFINED PYTHONPATH set PYTHONPATH=%PYTHON_DIR%\Lib
 if not DEFINED OpenCV_DIR set OpenCV_DIR=C:\distribution\OpenCV4.4
