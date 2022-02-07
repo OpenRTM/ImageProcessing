@@ -3,7 +3,7 @@
 @rem OpenCVRTC (Image Processing) for Windows build batch
 @rem
 @rem @author Noriaki Ando <n-ando@aist.go.jp>
-@rem                Copyright (C) 2014 n-ando All Rights Reserved
+@rem                Copyright (C) 2022 n-ando All Rights Reserved
 @rem
 @rem In order to compile OpenCVRTC (Image Processing) on Windows, 
 @rem this batch file can be used with the following prerequisite 
@@ -38,17 +38,16 @@
 set PATH=%PATH%;C:\cygwin64\bin
 set OPENCV_RTC_ROOT=%~dp0
 
-if not DEFINED ARCH       set ARCH=x86
-if not DEFINED VC_VERSION set VC_VERSION=12
-if not DEFINED PYTHON_DIR set PYTHON_DIR=c:\python27
+if not DEFINED ARCH       set ARCH=x86_64
+if not DEFINED VC_VERSION set VC_VERSION=16
+if not DEFINED CMAKE_GENERATOR set CMAKE_GENERATOR="Visual Studio 16 2019"
+if not DEFINED PYTHON_DIR set PYTHON_DIR=c:\python39
 if not DEFINED PYTHONPATH set PYTHONPATH=%PYTHON_DIR%\Lib
-if not DEFINED OpenCV_DIR set OpenCV_DIR=C:\distribution\OpenCV2.4.11
-if not DEFINED RTM_ROOT   set RTM_ROOT=C:\distribution\OpenRTM-aist
-if not DEFINED OMNI_ROOT  set OMNI_ROOT=%RTM_ROOT%\omniORB
+if not DEFINED OpenCV_DIR set OpenCV_DIR=C:\distribution\OpenCV4.4
+if not DEFINED RTM_ROOT   set RTM_ROOT=C:\localRTM\2.0.0
+if not DEFINED OMNI_ROOT  set OMNI_ROOT=%RTM_ROOT%\omniORB\4.2.5_vc16
 
-set COIL_ROOT=%RTM_ROOT%\coil
 set OpenRTM_DIR=%RTM_ROOT%\cmake
-set VS_VERSION=%VC_VERSION%
 
 
 @rem ------------------------------------------------------------
@@ -60,138 +59,16 @@ echo VC_VERSION : %VC_VERSION%
 echo PYTHON_DIR : %PYTHON_DIR%
 
 set PATH_ORG=%PATH%
-set PATH=%OMNI_ROOT%\bin\x86_win32;%PATH%;%PYTHON_DIR%;
+set PATH=%PATH%;%OMNI_ROOT%\bin\x86_win32;%PYTHON_DIR%;
 
-if %ARCH% == x86       set DLL_ARCH=
 if %ARCH% == x86_64    set DLL_ARCH=_x64
 
-
-@set PATH="c:\WINDOWS\Microsoft.NET\Framework\v4.0.30319";%PATH%
-
-@rem ============================================================
-@rem make work dir 
-@rem ============================================================
-echo work dir : work
-if exist work rmdir /s/q work
-mkdir work
-cd work
-
-@rem ============================================================
-@rem  switching to x86 or x86_64
-@rem ============================================================
-echo ARCH %ARCH%
-if %ARCH% == x86       goto cmake_x86
-if %ARCH% == x86_64    goto cmake_x86_64
-goto END
-
-
-@rem ============================================================
-@rem start to cmake 32bit 
-@rem ============================================================
-:cmake_x86
-set VC_NAME="Visual Studio %VS_VERSION%"
-cmake .. -G %VC_NAME%
-
-@rem ============================================================
-@rem  Compiling 32bit binaries
-@rem ============================================================
-echo Compiling 32bit binaries
-echo Setting up Visual C++ environment.
-if %VC_VERSION% == 10 (
-   call C:\"Program Files (x86)"\"Microsoft Visual Studio 10.0"\VC\vcvarsall.bat x86
-   @rem call "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\vcvarsall.bat%" x86
-   set VCTOOLSET=4.0
-   set PLATFORMTOOL=
-   goto MSBUILDx86
-   )
-if %VC_VERSION% == 11 (
-   @rem call "C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\vcvarsall.bat" x86
-   call C:\"Program Files (x86)"\"Microsoft Visual Studio 11.0"\VC\vcvarsall.bat x86
-   set VCTOOLSET=4.0
-   set PLATFORMTOOL=/p:PlatformToolset=v110
-   goto MSBUILDx86
-   )
-if %VC_VERSION% == 12 (
-   @rem call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x86
-   call C:\"Program Files (x86)"\"Microsoft Visual Studio 12.0"\VC\vcvarsall.bat x86
-   set VCTOOLSET=12.0
-   set PLATFORMTOOL=/p:PlatformToolset=v120
-   goto MSBUILDx86
-   )
-if %VC_VERSION% == 14 (
-   call C:\"Program Files (x86)"\"Microsoft Visual Studio 14.0"\VC\vcvarsall.bat x86
-   set VCTOOLSET=14.0
-   set PLATFORMTOOL=/p:PlatformToolset=v140
-   goto MSBUILDx86
-   )
-
-@rem ------------------------------------------------------------
-@rem Build (VC2010- x86)
-@rem ------------------------------------------------------------
-:MSBUILDx86
-echo Visual Studio Dir: %VSINSTALLDIR%
-echo LIB: %LIB%
-set OPT=/M:4 /toolsversion:%VCTOOLSET% %PLATFORMTOOL% /p:platform=Win32
-set SLN=ImageProcessing.sln
-set LOG=/fileLogger /flp:logfile=debug.log /v:diag 
-
-msbuild /t:build /p:configuration=release %OPT% components\ImageCalibration\idl\ALL_IDL_TGT.vcxproj
-msbuild /t:build /p:configuration=release %OPT% %SLN%
-
-goto MAKE_ZIP
-
-
-@rem ============================================================
-@rem start to cmake 64bit 
-@rem ============================================================
-:cmake_x86_64
-set VC_NAME="Visual Studio %VS_VERSION% Win64"
-cmake .. -G %VC_NAME%
-
-@rem ============================================================
-@rem  Compiling 64bit binaries
-@rem ============================================================
-echo Compiling 64bit binaries
-@rem Setting up Visual C++ environment
-if /i %VC_VERSION% == 10 (
-   call "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\vcvarsall.bat" amd64
-   set VCTOOLSET=4.0
-   set PLATFORMTOOL=
-   goto MSBUILDx64
-   )
-if /i %VC_VERSION% == 11 (
-   call "C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\vcvarsall.bat" amd64
-   set VCTOOLSET=4.0
-   set PLATFORMTOOL=/p:PlatformToolset=v110
-   goto MSBUILDx64
-   )
-if /i %VC_VERSION% == 12 (
-   call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" amd64
-   set VCTOOLSET=12.0
-   set PLATFORMTOOL=/p:PlatformToolset=v120
-   goto MSBUILDx64
-   )
-if /i %VC_VERSION% == 14 (
-   call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
-   set VCTOOLSET=14.0
-   set PLATFORMTOOL=/p:PlatformToolset=v140
-   goto MSBUILDx64
-   )
-
-@rem ------------------------------------------------------------
-@rem Build (VC2010- x64)
-@rem ------------------------------------------------------------
-:MSBUILDx64
-echo Visual Studio Dir: %VSINSTALLDIR%
-echo LIB: %LIB%
-set OPT=/M:4 /toolsversion:%VCTOOLSET% %PLATFORMTOOL% /p:platform=x64
-set LOG=/fileLogger /flp:logfile=debug.log /v:diag 
-set SLN=ImageProcessing.sln
-
-msbuild /t:build /p:configuration=release %OPT% %SLN%
-
-goto MAKE_ZIP
-
+@rem set cmake parameter
+if exist build-release rmdir /s/q build-release
+mkdir build-release
+cd build-release
+cmake -G %CMAKE_GENERATOR% -A x64 ..
+cmake --build . --verbose --config Release
 
 @rem ------------------------------------------------------------
 @rem MAKE_ZIP Making ZIP archive

@@ -120,11 +120,20 @@ if(UNIX)
 		)
 endif()
 
-add_custom_target( ${PROJECT_NAME} ALL
-  COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/idl
-  COMMAND ${CMAKE_COMMAND} -E copy_directory
-      ${PROJECT_SOURCE_DIR}/idl ${PROJECT_BINARY_DIR}/idl
-)
+if(UNIX)
+  add_custom_target( ${PROJECT_NAME} ALL
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/idl
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${PROJECT_SOURCE_DIR}/idl ${PROJECT_BINARY_DIR}/idl
+  )
+else()
+  add_custom_target( ${PROJECT_NAME} ALL
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/idl
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${PROJECT_SOURCE_DIR}/idl ${PROJECT_BINARY_DIR}/idl
+    COMMAND cmd ARGS /k ${PROJECT_SOURCE_DIR}/idlcompile.bat
+  )
+endif()
 
 foreach(target ${EXEC_FILES})
   add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD
