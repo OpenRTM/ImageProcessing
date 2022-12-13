@@ -6,14 +6,14 @@ endmacro(_IDL_OUTPUTS)
 
 macro(_COMPILE_IDL _idl_file)
     if(NOT WIN32)
-        execute_process(COMMAND rtm-config --prefix OUTPUT_VARIABLE OPENRTM_DIR
+        execute_process(COMMAND rtm2-config --prefix OUTPUT_VARIABLE OPENRTM_DIR
         OUTPUT_STRIP_TRAILING_WHITESPACE)
-        execute_process(COMMAND rtm-config --idlflags OUTPUT_VARIABLE OPENRTM_IDLFLAGS
+        execute_process(COMMAND rtm2-config --idlflags OUTPUT_VARIABLE OPENRTM_IDLFLAGS
         OUTPUT_STRIP_TRAILING_WHITESPACE)
         separate_arguments(OPENRTM_IDLFLAGS)
-        execute_process(COMMAND rtm-config --idlc OUTPUT_VARIABLE OPENRTM_IDLC
+        execute_process(COMMAND rtm2-config --idlc OUTPUT_VARIABLE OPENRTM_IDLC
         OUTPUT_STRIP_TRAILING_WHITESPACE)
-        set(_rtm_skelwrapper_command "rtm-skelwrapper")
+        set(_rtm_skelwrapper_command "rtm2-skelwrapper")
     else(NOT WIN32)
         set(_rtm_skelwrapper_command "rtm-skelwrapper.py")
     endif(NOT WIN32)
