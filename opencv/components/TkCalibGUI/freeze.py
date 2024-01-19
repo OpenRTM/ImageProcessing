@@ -1,6 +1,5 @@
 
-from distutils.core import setup
-import py2exe
+from py2exe import freeze
 
 option = {
   "packages"	 : ['PIL'],
@@ -8,10 +7,10 @@ option = {
   "optimize"	 : 2,
   }
 
-setup(
-  options = { "py2exe"	:{
+freeze(
+  options = { 
     "includes": ["OpenRTM_aist"],
-    "dll_excludes": ["numpy-atlas.dll"] }
+    "dll_excludes": ["numpy-atlas.dll"] 
   },
   console = [
    {"script"	:	"TkCalibGUIComp.py" }

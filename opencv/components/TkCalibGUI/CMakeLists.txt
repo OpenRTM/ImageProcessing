@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.5.1)
 project(TkCalibGUI)
 string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 include("${PROJECT_SOURCE_DIR}/cmake/utils.cmake")
-set(PROJECT_VERSION 2.0.0 CACHE STRING "TkCalibGUI version")
+set(PROJECT_VERSION 2.0.1 CACHE STRING "TkCalibGUI version")
 set(UPGRADE_GUID "")
 DISSECT_VERSION()
 set(PROJECT_SHORT_VER ${PROJECT_VERSION_MAJOR}${PROJECT_VERSION_MINOR}${PROJECT_VERSION_REVISION})
@@ -87,14 +87,14 @@ else()
 endif()
 
 set(EXEC_FILES ""
-               TkCalibGUIComp.py tkcalibgui.py rtutil.py setup.py
+               TkCalibGUIComp.py tkcalibgui.py rtutil.py freeze.py
                ${SCRIPT_FILE})
 
 set(OTHER_SRCS CMakeLists.txt
                RTC.xml TkCalibGUI.conf rtc.conf)
 
 # check python installed
-find_package(PythonInterp 3)
+find_package(Python 3)
 
 if(WIN32)
    set(OPENRTM_SHARE_PREFIX "OpenRTM-aist/${RTM_VER}/Components/${PROJECT_TYPE}")
@@ -196,13 +196,13 @@ if (SolutionDir)
             ${PROJECT_SOURCE_DIR}/tkcalibgui.py 
             ${PROJECT_SOURCE_DIR}/rtutil.py 
             ${PROJECT_BINARY_DIR}/CalibrationService_idl.py 
-            ${PROJECT_BINARY_DIR}/setup.py) 
+            ${PROJECT_BINARY_DIR}/freeze.py) 
 	else()
   	SET (calib_python_file
             ${PROJECT_SOURCE_DIR}/TkCalibGUIComp.py 
             ${PROJECT_SOURCE_DIR}/tkcalibgui.py 
             ${PROJECT_SOURCE_DIR}/rtutil.py 
-            ${PROJECT_BINARY_DIR}/setup.py) 	
+            ${PROJECT_BINARY_DIR}/freeze.py) 	
 	endif()
 	               
   foreach(target ${calib_python_file})
