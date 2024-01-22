@@ -35,18 +35,17 @@
 @rem
 @rem ============================================================
 
-set PATH=%PATH%;C:\cygwin64\bin
 set OPENCV_RTC_ROOT=%~dp0
 
-if not DEFINED ARCH       set ARCH=x86_64
 if not DEFINED VC_VERSION set VC_VERSION=16
 if not DEFINED CMAKE_GENERATOR set CMAKE_GENERATOR="Visual Studio 16 2019"
-if not DEFINED PYTHON_DIR set PYTHON_DIR=c:\python39
+if not DEFINED PYTHON_DIR set PYTHON_DIR=c:\python311
 if not DEFINED PYTHONPATH set PYTHONPATH=%PYTHON_DIR%\Lib
-if not DEFINED OpenCV_DIR set OpenCV_DIR=C:\distribution\OpenCV4.4
-if not DEFINED RTM_ROOT   set RTM_ROOT=C:\localRTM\2.0.0
-if not DEFINED OMNI_ROOT  set OMNI_ROOT=%RTM_ROOT%\omniORB\4.2.5_vc16
+if not DEFINED OpenCV_DIR set OpenCV_DIR=C:\localCV
+if not DEFINED RTM_ROOT   set RTM_ROOT=C:\localRTM\2.0.2
+if not DEFINED OMNI_ROOT  set OMNI_ROOT=%RTM_ROOT%\omniORB\4.3.1_vc16
 
+set ARCH=x86_64
 set OpenRTM_DIR=%RTM_ROOT%\cmake
 
 
@@ -59,7 +58,7 @@ echo VC_VERSION : %VC_VERSION%
 echo PYTHON_DIR : %PYTHON_DIR%
 
 set PATH_ORG=%PATH%
-set PATH=%PATH%;%OMNI_ROOT%\bin\x86_win32;%PYTHON_DIR%;
+set PATH=%OMNI_ROOT%\bin\x86_win32;%PYTHON_DIR%;%PATH%
 
 if %ARCH% == x86_64    set DLL_ARCH=_x64
 
@@ -75,13 +74,14 @@ cmake --build . --verbose --config Release
 @rem ------------------------------------------------------------
 :MAKE_ZIP
 cd %OPENCV_RTC_ROOT%/bin
-python setup.py py2exe
+python freeze.py
 if not "%ERRORLEVEL%" == "0" (
 	goto END
 )
 
 cd ../
 set ZIP_DIR=ImageProcessing
+set PATH=%PATH%;C:\cygwin64\bin
 c:\cygwin64\bin\bash ip_make_package.sh
 
 goto END

@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.5.1)
 
-project(ImageProcessing VERSION 2.0.0)
+project(ImageProcessing VERSION 2.0.1)
 set(TOP_PROJECT_NAME ${PROJECT_NAME})
 string(TOLOWER ${TOP_PROJECT_NAME} TOP_PROJECT_NAME_LOWER)
 set(ImageProcessing_VERSION_MAJOR "2")
 set(ImageProcessing_VERSION_MINOR "0")
-set(ImageProcessing_VERSION_REVISION "0")
+set(ImageProcessing_VERSION_REVISION "1")
 SUBDIRS(components)
 set(SolutionDir ${PROJECT_SOURCE_DIR})
 
