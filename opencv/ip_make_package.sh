@@ -25,9 +25,8 @@ cd ${NEW_DIR}
 cp ${WORK_ROOT}/bin/*.conf .
 cp ${WORK_ROOT}/bin/*.dll .
 cp ${WORK_ROOT}/bin/*.exe .
-cp ${WORK_ROOT}/bin/dist/TkCalibGUIComp.exe .
-cp ${WORK_ROOT}/bin/dist/python*.dll .
-cp -r ${WORK_ROOT}/bin/dist/lib .
+cp ${WORK_ROOT}/bin/dist/TkCalibGUIComp/TkCalibGUIComp.exe .
+cp -r ${WORK_ROOT}/bin/dist/TkCalibGUIComp/_internal .
 cd ${WORK_ROOT}
 chmod -R 755 ${NEW_DIR}
 

@@ -43,7 +43,7 @@ if not DEFINED PYTHON_DIR set PYTHON_DIR=c:\python311
 if not DEFINED PYTHONPATH set PYTHONPATH=%PYTHON_DIR%\Lib
 if not DEFINED OpenCV_DIR set OpenCV_DIR=C:\localCV
 if not DEFINED RTM_ROOT   set RTM_ROOT=C:\localRTM\2.0.2
-if not DEFINED OMNI_ROOT  set OMNI_ROOT=%RTM_ROOT%\omniORB\4.3.1_vc16
+if not DEFINED OMNI_ROOT  set OMNI_ROOT=%RTM_ROOT%\omniORB\4.3.2_vc16
 
 set ARCH=x86_64
 set OpenRTM_DIR=%RTM_ROOT%\cmake
@@ -74,7 +74,8 @@ cmake --build . --verbose --config Release
 @rem ------------------------------------------------------------
 :MAKE_ZIP
 cd %OPENCV_RTC_ROOT%/bin
-python freeze.py
+if exist dist rmdir /s/q  dist
+%PYTHON_DIR%\Scripts\pyinstaller --onefile --onedir TkCalibGUIComp.py
 if not "%ERRORLEVEL%" == "0" (
 	goto END
 )
